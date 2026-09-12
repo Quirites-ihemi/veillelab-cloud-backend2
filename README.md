@@ -37,3 +37,4 @@ Garde-fous :
 Le secret Anthropic reste dans Secret Manager via `ANTHROPIC_SECRET`.
 
 Aucune clé API ni secret n’est stocké dans ce dépôt.
+Migration du backend vers le dépôt Quiritès — septembre 2026.

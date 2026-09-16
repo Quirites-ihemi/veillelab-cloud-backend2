@@ -9,6 +9,7 @@ const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
+const { runReflectionAssist } = require("./reflectionAssist");
 
 const PORT = process.env.PORT || 8080;
 
@@ -575,6 +576,12 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/corpus-search") {
       const body = await readJsonBody(req, 512 * 1024);
       const result = searchCorpus(body);
+      return sendJson(res, 200, result);
+    }
+
+    if (req.method === "POST" && req.url === "/reflection-assist") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const result = runReflectionAssist(body);
       return sendJson(res, 200, result);
     }
 

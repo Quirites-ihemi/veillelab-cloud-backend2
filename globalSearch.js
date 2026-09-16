@@ -4,6 +4,42 @@ const DEFAULT_LIMIT = 12;
 const MAX_LIMIT = 30;
 const DEFAULT_MAX_PER_PUBLICATION = 3;
 
+// Expansion contrôlée, volontairement courte et auditable.
+// Elle sert uniquement au rappel lexical : elle n'ajoute aucun fait au corpus.
+const CONTROLLED_CONCEPTS = [
+  {
+    id: "narcotrafic",
+    triggers: ["narcotrafic", "cocaine", "stupefiants"],
+    alternatives: [
+      "narcotrafic",
+      "trafic de cocaine",
+      "trafics de cocaine",
+      "trafic de stupefiants",
+      "trafics de stupefiants",
+      "drug trafficking",
+      "cocaine smuggling"
+    ]
+  },
+  {
+    id: "port",
+    triggers: ["port", "ports", "portuaire", "portuaires"],
+    alternatives: [
+      "port",
+      "ports",
+      "portuaire",
+      "portuaires",
+      "infrastructure portuaire",
+      "infrastructures portuaires",
+      "port infrastructure",
+      "port infrastructures",
+      "shipping port",
+      "shipping ports",
+      "commercial port",
+      "commercial ports"
+    ]
+  }
+];
+
 const STOPWORDS = new Set([
   "a","ai","au","aux","avec","ce","ces","cette","cet","dans","de","des","du","elle","en","est","et","eux","il","ils","je","la","le","les","leur","leurs","mais","me","mes","moi","mon","ne","nos","notre","nous","on","ou","par","pas","pour","qu","que","quel","quelle","quelles","quels","qui","sa","se","ses","son","sur","ta","te","tes","toi","ton","tu","un","une","vos","votre","vous","y",
   "comment","quoi","peut","peuvent","plus","moins","faire","fait","faits","element","elements","sujet","question","corpus","publication","publications"
@@ -29,6 +65,33 @@ function tokenize(value) {
 
 function unique(values) {
   return [...new Set(values)];
+}
+
+function buildQueryConcepts(queryTokens) {
+  const concepts = [];
+  const consumed = new Set();
+
+  for (const definition of CONTROLLED_CONCEPTS) {
+    const matchingTokens = queryTokens.filter(token => definition.triggers.includes(token));
+    if (!matchingTokens.length) continue;
+    matchingTokens.forEach(token => consumed.add(token));
+    concepts.push({
+      id: definition.id,
+      source_tokens: matchingTokens,
+      alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean))
+    });
+  }
+
+  for (const token of queryTokens) {
+    if (consumed.has(token)) continue;
+    concepts.push({
+      id: token,
+      source_tokens: [token],
+      alternatives: [token]
+    });
+  }
+
+  return concepts;
 }
 
 function tokenSimilarity(queryToken, candidateToken) {
@@ -68,14 +131,11 @@ function buildSearchIndex(store) {
   for (const chunk of store.contents) {
     const pid = String(chunk.publication_id);
     const pub = publicationMeta.get(pid) || {};
-    const searchable = [
-      chunk.texte,
-      chunk.section,
-      pub.titre,
-      pub.organisme_producteur,
-      pub.domaine,
-      pub.type_document
-    ].join(" ");
+    const mainText = String(chunk.texte || "");
+    const sectionText = String(chunk.section || "");
+    const titleText = String(pub.titre || "");
+    const metadataText = [pub.organisme_producteur, pub.domaine, pub.type_document].join(" ");
+    const searchable = [mainText, sectionText, titleText, metadataText].join(" ");
     docs.push({
       kind: "chunk",
       id: String(chunk.chunk_id),
@@ -83,21 +143,26 @@ function buildSearchIndex(store) {
       raw: chunk,
       pub,
       normalized: normalizeText(searchable),
-      tokens: unique(tokenize(searchable))
+      tokens: unique(tokenize(searchable)),
+      mainNormalized: normalizeText(mainText),
+      mainTokens: unique(tokenize(mainText)),
+      sectionNormalized: normalizeText(sectionText),
+      sectionTokens: unique(tokenize(sectionText)),
+      titleNormalized: normalizeText(titleText),
+      titleTokens: unique(tokenize(titleText)),
+      metadataNormalized: normalizeText(metadataText),
+      metadataTokens: unique(tokenize(metadataText))
     });
   }
 
   for (const node of store.nodes) {
     const pid = String(node.publication_id);
     const pub = publicationMeta.get(pid) || {};
-    const searchable = [
-      node.libelle,
-      node.libelle_normalise,
-      node.type_noeud,
-      pub.titre,
-      pub.organisme_producteur,
-      pub.domaine
-    ].join(" ");
+    const mainText = [node.libelle, node.libelle_normalise].join(" ");
+    const sectionText = String(node.type_noeud || "");
+    const titleText = String(pub.titre || "");
+    const metadataText = [pub.organisme_producteur, pub.domaine].join(" ");
+    const searchable = [mainText, sectionText, titleText, metadataText].join(" ");
     docs.push({
       kind: "node",
       id: String(node.node_id),
@@ -105,7 +170,15 @@ function buildSearchIndex(store) {
       raw: node,
       pub,
       normalized: normalizeText(searchable),
-      tokens: unique(tokenize(searchable))
+      tokens: unique(tokenize(searchable)),
+      mainNormalized: normalizeText(mainText),
+      mainTokens: unique(tokenize(mainText)),
+      sectionNormalized: normalizeText(sectionText),
+      sectionTokens: unique(tokenize(sectionText)),
+      titleNormalized: normalizeText(titleText),
+      titleTokens: unique(tokenize(titleText)),
+      metadataNormalized: normalizeText(metadataText),
+      metadataTokens: unique(tokenize(metadataText))
     });
   }
 
@@ -114,16 +187,17 @@ function buildSearchIndex(store) {
     const pub = publicationMeta.get(pid) || {};
     const source = nodeById.get(String(rel.source_id));
     const target = nodeById.get(String(rel.cible_id));
-    const searchable = [
+    const mainText = [
       source?.libelle,
       source?.libelle_normalise,
       rel.type_relation,
       target?.libelle,
-      target?.libelle_normalise,
-      pub.titre,
-      pub.organisme_producteur,
-      pub.domaine
+      target?.libelle_normalise
     ].join(" ");
+    const sectionText = String(rel.type_relation || "");
+    const titleText = String(pub.titre || "");
+    const metadataText = [pub.organisme_producteur, pub.domaine].join(" ");
+    const searchable = [mainText, sectionText, titleText, metadataText].join(" ");
     docs.push({
       kind: "relation",
       id: String(rel.relation_id),
@@ -133,7 +207,15 @@ function buildSearchIndex(store) {
       target,
       pub,
       normalized: normalizeText(searchable),
-      tokens: unique(tokenize(searchable))
+      tokens: unique(tokenize(searchable)),
+      mainNormalized: normalizeText(mainText),
+      mainTokens: unique(tokenize(mainText)),
+      sectionNormalized: normalizeText(sectionText),
+      sectionTokens: unique(tokenize(sectionText)),
+      titleNormalized: normalizeText(titleText),
+      titleTokens: unique(tokenize(titleText)),
+      metadataNormalized: normalizeText(metadataText),
+      metadataTokens: unique(tokenize(metadataText))
     });
   }
 
@@ -166,50 +248,87 @@ function matchesFilters(doc, filters) {
   return true;
 }
 
-function scoreDocument(doc, queryNormalized, queryTokens) {
-  if (!queryNormalized || !queryTokens.length) return 0;
+function alternativeMatchScore(alternative, normalized, tokens) {
+  if (!alternative || !normalized) return 0;
+
+  // Une alternative composée est recherchée comme expression.
+  if (alternative.includes(" ")) {
+    return normalized.includes(alternative) ? 1 : 0;
+  }
+
+  // Un mot isolé doit correspondre à un token, jamais à une sous-chaîne
+  // (évite par exemple que « port » matche « rapport » ou « comporte »).
+  let best = 0;
+  for (const candidate of tokens) {
+    const sim = tokenSimilarity(alternative, candidate);
+    if (sim > best) best = sim;
+    if (best === 1) break;
+  }
+  return best;
+}
+
+function conceptMatchScore(concept, normalized, tokens) {
+  let best = 0;
+  for (const alternative of concept.alternatives) {
+    const score = alternativeMatchScore(alternative, normalized, tokens);
+    if (score > best) best = score;
+    if (best === 1) break;
+  }
+  return best;
+}
+
+function scoreDocument(doc, queryNormalized, queryConcepts) {
+  if (!queryNormalized || !queryConcepts.length) return 0;
+
   let score = 0;
+  let matchedConcepts = 0;
+  let matchedInMain = 0;
 
-  // Bonus fort pour phrase exacte / quasi exacte.
-  if (doc.normalized.includes(queryNormalized)) score += 18;
+  // Une expression exacte dans le contenu principal doit rester extrêmement discriminante.
+  if (doc.mainNormalized.includes(queryNormalized)) score += 24;
+  else if (doc.normalized.includes(queryNormalized)) score += 10;
 
-  // Pondération du contenu principal par type.
-  const rawMain = doc.kind === "chunk"
-    ? normalizeText(doc.raw.texte)
-    : doc.kind === "node"
-      ? normalizeText(`${doc.raw.libelle || ""} ${doc.raw.libelle_normalise || ""}`)
-      : normalizeText(`${doc.source?.libelle || ""} ${doc.raw.type_relation || ""} ${doc.target?.libelle || ""}`);
-  if (rawMain.includes(queryNormalized)) score += 8;
+  for (const concept of queryConcepts) {
+    const main = conceptMatchScore(concept, doc.mainNormalized, doc.mainTokens);
+    const section = conceptMatchScore(concept, doc.sectionNormalized, doc.sectionTokens);
+    const title = conceptMatchScore(concept, doc.titleNormalized, doc.titleTokens);
+    const metadata = conceptMatchScore(concept, doc.metadataNormalized, doc.metadataTokens);
 
-  let matched = 0;
-  let exactMatched = 0;
-  for (const qt of queryTokens) {
-    let best = 0;
-    for (const ct of doc.tokens) {
-      const sim = tokenSimilarity(qt, ct);
-      if (sim > best) best = sim;
-      if (best === 1) break;
-    }
-    if (best > 0) {
-      matched += best;
-      if (best === 1) exactMatched += 1;
+    // Pondération des champs : la matière documentaire / graphe prime nettement sur les métadonnées.
+    const weighted = Math.max(
+      main * 8.0,
+      section * 4.0,
+      title * 3.5,
+      metadata * 1.25
+    );
+
+    if (weighted > 0) {
+      matchedConcepts += 1;
+      if (main >= 0.68) matchedInMain += 1;
+      score += weighted;
     }
   }
 
-  const coverage = matched / queryTokens.length;
-  score += matched * 4.5;
-  score += coverage * 7;
-  score += exactMatched * 1.2;
+  const coverage = matchedConcepts / queryConcepts.length;
+  if (coverage <= 0) return 0;
 
-  // Exiger un minimum de recouvrement lorsque la requête comporte plusieurs termes.
-  if (queryTokens.length >= 3 && coverage < 0.34) return 0;
-  if (queryTokens.length >= 2 && coverage < 0.28) return 0;
+  // Deux concepts ou plus : la couverture complète doit dominer très nettement un résultat partiel.
+  if (queryConcepts.length >= 2) {
+    if (coverage === 1) score += 18;
+    else score *= 0.32;
 
-  // Le texte brut est meilleur pour la preuve, le graphe reste pleinement mobilisable.
+    // Bonus supplémentaire si tous les concepts sont réellement présents dans le contenu principal.
+    if (matchedInMain === queryConcepts.length) score += 10;
+  }
+
+  // Trois concepts ou plus : écarter les documents trop éloignés de la requête.
+  if (queryConcepts.length >= 3 && coverage < 0.5) return 0;
+
+  // Préférence légère pour la preuve textuelle, sans exclure le graphe.
   if (doc.kind === "chunk") score += 1.5;
   if (doc.kind === "node") score += 1.0;
 
-  return score;
+  return score >= 5 ? score : 0;
 }
 
 function buildLocator(doc) {
@@ -309,6 +428,7 @@ function searchCorpus(body = {}) {
   const filters = parseFilters(body);
   const queryNormalized = normalizeText(query);
   const queryTokens = unique(tokenize(query));
+  const queryConcepts = buildQueryConcepts(queryTokens);
 
   if (!queryTokens.length) {
     const error = new Error("La requête ne contient aucun terme exploitable.");
@@ -328,7 +448,7 @@ function searchCorpus(body = {}) {
     if (doc.kind === "chunk") scannedChunks += 1;
     if (doc.kind === "node") scannedNodes += 1;
     if (doc.kind === "relation") scannedRelations += 1;
-    const score = scoreDocument(doc, queryNormalized, queryTokens);
+    const score = scoreDocument(doc, queryNormalized, queryConcepts);
     if (score > 0) scored.push({ doc, score });
   }
 
@@ -347,10 +467,11 @@ function searchCorpus(body = {}) {
 
   return {
     ok: true,
-    engine: "corpus-search-v0-lexical-graph",
+    engine: "corpus-search-v0.1-controlled-ranking",
     query,
     normalized_query: queryNormalized,
     query_tokens: queryTokens,
+    query_concepts: queryConcepts.map(c => ({ id: c.id, source_tokens: c.source_tokens })),
     corpus: {
       active_publications: getCorpusStore().status.active_publications,
       chunks: getCorpusStore().status.chunks,

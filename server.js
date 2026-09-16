@@ -7,6 +7,7 @@ const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 const { genererResumeAnalytiqueT01, nettoyerCorpusT01, MODEL_REDACTION } = require("./t01");
 const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { createGraphChatHandler } = require("./graphChat");
+const { getCorpusStatus } = require("./corpusStore");
 
 const PORT = process.env.PORT || 8080;
 
@@ -564,6 +565,10 @@ const server = http.createServer(async (req, res) => {
         model: MODEL_REDACTION,
         input_storage: "firestore-subcollection"
       });
+    }
+
+    if (req.method === "GET" && req.url === "/corpus-status") {
+      return sendJson(res, 200, getCorpusStatus());
     }
 
     if (req.method === "POST" && req.url === "/graph-chat") {

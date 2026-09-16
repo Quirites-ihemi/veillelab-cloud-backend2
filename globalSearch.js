@@ -6,10 +6,24 @@ const DEFAULT_MAX_PER_PUBLICATION = 3;
 
 // Expansion contrôlée, volontairement courte et auditable.
 // Elle sert uniquement au rappel lexical : elle n'ajoute aucun fait au corpus.
-const CONTROLLED_CONCEPTS = [
+//
+// V0.2 : les expressions composées sont reconnues AVANT les mots isolés.
+// Exemple : « trafic de cocaïne infrastructures portuaires » devient deux
+// concepts (« narcotrafic » + « port »), et non quatre mots indépendants.
+// Cela évite que les mots génériques « trafic » et « infrastructures »
+// produisent des faux positifs une fois qu'ils appartiennent déjà à une
+// expression métier plus précise.
+const CONTROLLED_COMPOUND_CONCEPTS = [
   {
     id: "narcotrafic",
-    triggers: ["narcotrafic", "cocaine", "stupefiants"],
+    patterns: [
+      ["trafic", "cocaine"],
+      ["trafics", "cocaine"],
+      ["trafic", "stupefiants"],
+      ["trafics", "stupefiants"],
+      ["drug", "trafficking"],
+      ["cocaine", "smuggling"]
+    ],
     alternatives: [
       "narcotrafic",
       "trafic de cocaine",
@@ -22,7 +36,16 @@ const CONTROLLED_CONCEPTS = [
   },
   {
     id: "port",
-    triggers: ["port", "ports", "portuaire", "portuaires"],
+    patterns: [
+      ["infrastructure", "portuaire"],
+      ["infrastructures", "portuaires"],
+      ["port", "infrastructure"],
+      ["port", "infrastructures"],
+      ["shipping", "port"],
+      ["shipping", "ports"],
+      ["commercial", "port"],
+      ["commercial", "ports"]
+    ],
     alternatives: [
       "port",
       "ports",
@@ -37,6 +60,19 @@ const CONTROLLED_CONCEPTS = [
       "commercial port",
       "commercial ports"
     ]
+  }
+];
+
+const CONTROLLED_CONCEPTS = [
+  {
+    id: "narcotrafic",
+    triggers: ["narcotrafic", "cocaine", "stupefiants"],
+    alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "narcotrafic").alternatives
+  },
+  {
+    id: "port",
+    triggers: ["port", "ports", "portuaire", "portuaires"],
+    alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "port").alternatives
   }
 ];
 
@@ -67,27 +103,83 @@ function unique(values) {
   return [...new Set(values)];
 }
 
+function findPatternStart(tokens, pattern, consumedIndexes) {
+  if (!pattern.length || pattern.length > tokens.length) return -1;
+  for (let start = 0; start <= tokens.length - pattern.length; start += 1) {
+    let matches = true;
+    for (let offset = 0; offset < pattern.length; offset += 1) {
+      const index = start + offset;
+      if (consumedIndexes.has(index) || tokens[index] !== pattern[offset]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return start;
+  }
+  return -1;
+}
+
 function buildQueryConcepts(queryTokens) {
   const concepts = [];
-  const consumed = new Set();
+  const consumedIndexes = new Set();
+  const emittedControlledIds = new Set();
 
+  // 1) Expressions composées : elles ont priorité et consomment tous leurs mots.
+  for (const definition of CONTROLLED_COMPOUND_CONCEPTS) {
+    for (const pattern of definition.patterns) {
+      const start = findPatternStart(queryTokens, pattern, consumedIndexes);
+      if (start < 0) continue;
+
+      const sourceTokens = [];
+      for (let offset = 0; offset < pattern.length; offset += 1) {
+        const index = start + offset;
+        consumedIndexes.add(index);
+        sourceTokens.push(queryTokens[index]);
+      }
+
+      if (!emittedControlledIds.has(definition.id)) {
+        concepts.push({
+          id: definition.id,
+          source_tokens: sourceTokens,
+          alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean)),
+          compound: true
+        });
+        emittedControlledIds.add(definition.id);
+      }
+      break;
+    }
+  }
+
+  // 2) Concepts contrôlés sur les mots restants seulement.
   for (const definition of CONTROLLED_CONCEPTS) {
-    const matchingTokens = queryTokens.filter(token => definition.triggers.includes(token));
-    if (!matchingTokens.length) continue;
-    matchingTokens.forEach(token => consumed.add(token));
+    if (emittedControlledIds.has(definition.id)) continue;
+    const matchingIndexes = [];
+    for (let index = 0; index < queryTokens.length; index += 1) {
+      if (consumedIndexes.has(index)) continue;
+      if (definition.triggers.includes(queryTokens[index])) matchingIndexes.push(index);
+    }
+    if (!matchingIndexes.length) continue;
+
+    const matchingTokens = matchingIndexes.map(index => queryTokens[index]);
+    matchingIndexes.forEach(index => consumedIndexes.add(index));
     concepts.push({
       id: definition.id,
       source_tokens: matchingTokens,
-      alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean))
+      alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean)),
+      compound: false
     });
+    emittedControlledIds.add(definition.id);
   }
 
-  for (const token of queryTokens) {
-    if (consumed.has(token)) continue;
+  // 3) Les mots encore libres restent des concepts lexicaux ordinaires.
+  for (let index = 0; index < queryTokens.length; index += 1) {
+    if (consumedIndexes.has(index)) continue;
+    const token = queryTokens[index];
     concepts.push({
       id: token,
       source_tokens: [token],
-      alternatives: [token]
+      alternatives: [token],
+      compound: false
     });
   }
 
@@ -467,11 +559,11 @@ function searchCorpus(body = {}) {
 
   return {
     ok: true,
-    engine: "corpus-search-v0.1-controlled-ranking",
+    engine: "corpus-search-v0.2-compound-concepts",
     query,
     normalized_query: queryNormalized,
     query_tokens: queryTokens,
-    query_concepts: queryConcepts.map(c => ({ id: c.id, source_tokens: c.source_tokens })),
+    query_concepts: queryConcepts.map(c => ({ id: c.id, source_tokens: c.source_tokens, compound: Boolean(c.compound) })),
     corpus: {
       active_publications: getCorpusStore().status.active_publications,
       chunks: getCorpusStore().status.chunks,

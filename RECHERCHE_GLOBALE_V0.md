@@ -1,18 +1,35 @@
-# Recherche globale V0.1 — Quiritès Veille Lab
+# Recherche globale V0.2 — Quiritès Veille Lab
 
 ## Objectif
-Améliorer le classement déterministe de `POST /corpus-search` sans modifier T01, T03 ni `/graph-chat`, et sans ajouter d'appel LLM ou de dépendance.
+Améliorer la compréhension déterministe des requêtes multi-termes de `POST /corpus-search`, sans modifier T01, T03 ni `/graph-chat`, sans appel LLM et sans nouvelle dépendance.
 
-## Changements V0.1
-- pondération distincte du contenu principal, des sections, du titre et des métadonnées ;
-- forte priorité aux résultats qui couvrent tous les concepts importants d'une requête ;
-- pénalisation des résultats qui ne couvrent qu'une partie d'une requête multi-concepts ;
-- suppression des correspondances par sous-chaîne pour les mots isolés (`port` ne matche plus `rapport`) ;
-- petite expansion lexicale contrôlée et auditable pour les concepts actuellement testés (`narcotrafic` / trafic de cocaïne / stupéfiants ; `port` / portuaire / variantes anglaises) ;
-- conservation de la diversification par publication et des trois niveaux de provenance A/B/C.
+## Changements V0.2
+- conservation du ranking V0.1 (pondération des champs, couverture des concepts, diversification, provenance A/B/C) ;
+- reconnaissance prioritaire d'expressions métier composées avant l'analyse des mots isolés ;
+- consommation des mots qui appartiennent déjà à une expression composée, afin qu'ils ne deviennent pas ensuite des concepts génériques indépendants ;
+- premier jeu contrôlé et auditable :
+  - `trafic de cocaïne` / `trafic de stupéfiants` / variantes anglaises → concept `narcotrafic` ;
+  - `infrastructure(s) portuaire(s)` / variantes anglaises → concept `port` ;
+- aucune information n'est ajoutée au corpus : il s'agit uniquement d'une normalisation de la requête pour améliorer le rappel et le classement.
 
-## Test de référence
-Pour `narcotrafic ports`, la V0.1 retourne uniquement des résultats couvrant les deux concepts parmi les candidats suffisamment pertinents. Les premiers résultats viennent de PUB024 et PUB025 ; PUB006, PUB051 et autres résultats ne couvrant qu'un terme ne polluent plus le haut du classement.
+## Exemple de référence
+La requête :
+
+`trafic de cocaïne infrastructures portuaires`
+
+est analysée comme :
+
+- `narcotrafic` (source : `trafic cocaine`) ;
+- `port` (source : `infrastructures portuaires`).
+
+Elle n'est plus analysée comme quatre concepts indépendants (`narcotrafic`, `port`, `trafic`, `infrastructures`).
+
+## Résultat attendu sur le corpus actuel
+Pour cette reformulation, les résultats pertinents proviennent de PUB024 et PUB025. Les faux positifs observés en V0.1 dans PUB006 et PUB008 sont écartés du Top 12.
+
+La requête `narcotrafic ports` reste inchangée et continue à retourner PUB024/PUB025 en tête.
+
+La requête `terrorisme masculiniste` continue à retrouver PUB058 par le graphe seul, avec provenance C et sans fabrication de chunk ou de timecode.
 
 ## Route
 `POST /corpus-search`
@@ -21,7 +38,7 @@ Exemple :
 
 ```json
 {
-  "query": "narcotrafic ports",
+  "query": "trafic de cocaïne infrastructures portuaires",
   "limit": 12
 }
 ```
@@ -32,4 +49,8 @@ Exemple :
 node test_global_search.js
 ```
 
-Les tests couvrent les publications sans chunks (via le graphe), les publications textuelles et un contrôle spécifique du ranking multi-concepts.
+Les tests couvrent :
+- publications textuelles et publications sans chunks ;
+- régression du ranking V0.1 ;
+- reconnaissance des expressions composées ;
+- absence de PUB006/PUB008 dans le Top 12 de la requête de référence V0.2.

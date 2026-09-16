@@ -8,6 +8,7 @@ const { genererResumeAnalytiqueT01, nettoyerCorpusT01, MODEL_REDACTION } = requi
 const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
+const { searchCorpus } = require("./globalSearch");
 
 const PORT = process.env.PORT || 8080;
 
@@ -569,6 +570,12 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === "GET" && req.url === "/corpus-status") {
       return sendJson(res, 200, getCorpusStatus());
+    }
+
+    if (req.method === "POST" && req.url === "/corpus-search") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const result = searchCorpus(body);
+      return sendJson(res, 200, result);
     }
 
     if (req.method === "POST" && req.url === "/graph-chat") {

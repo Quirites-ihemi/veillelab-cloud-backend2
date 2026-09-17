@@ -19,6 +19,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Chercher des cas comparables",
     role: "documentaliste_augmentee",
     mode: "comparison_candidates_only"
+  }),
+  MIR01: Object.freeze({
+    id: "MIR01",
+    label: "Mettre une affirmation à l’épreuve",
+    role: "miroir_critique",
+    mode: "evidence_stress_test"
   })
 });
 
@@ -150,7 +156,7 @@ function runDoc01(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
     action,
     element,
     guardrails: {
@@ -360,7 +366,7 @@ function runDoc02(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
     action,
     selected_material_id: `${selector.kind}:${selector.id}`,
     selected_material: selectedMaterial,
@@ -608,7 +614,7 @@ function runDoc03(body) {
   if (!basis.anchors.length || !basis.query) {
     return {
       ok: true,
-      engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+      engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
       action,
       selected_material_id: selectedMaterialId,
       selected_material: selectedMaterial,
@@ -696,7 +702,7 @@ function runDoc03(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
     action,
     selected_material_id: selectedMaterialId,
     selected_material: selectedMaterial,
@@ -732,6 +738,290 @@ function runDoc03(body) {
   };
 }
 
+
+const MIR01_NUANCE_RELATIONS = new Set(["NUANCE", "SE_DISTINGUE_DE", "FREINE", "CONTRIBUE_PARTIELLEMENT_A"]);
+const MIR01_CONTRADICTION_RELATIONS = new Set(["REMET_EN_CAUSE", "CONTREDIT"]);
+const MIR01_SUPPORT_RELATIONS = new Set([
+  "CONFIRME", "MET_EN_EVIDENCE", "ILLUSTRE", "CARACTERISE", "QUANTIFIE", "DOCUMENTE",
+  "FAIT_SUITE_A", "CONTRIBUE_A", "FAVORISE", "ACCENTUE", "RENFORCE", "INFLUENCE",
+  "PERMET_DE", "SE_TRADUIT_PAR", "TAUX_ELEVE_DE", "TAUX_FAIBLE_DE"
+]);
+const MIR01_CAUSAL_RELATIONS = new Set([
+  "FAIT_SUITE_A", "CONTRIBUE_A", "FAVORISE", "ACCENTUE", "RENFORCE", "INFLUENCE",
+  "PERMET_DE", "SE_TRADUIT_PAR"
+]);
+
+const MIR01_NUANCE_MARKERS = [
+  "toutefois", "cependant", "neanmoins", "mais", "malgre", "en revanche",
+  "temporaire", "temporairement", "pas necessairement", "sans pour autant",
+  "however", "although", "despite", "temporary", "temporarily", "not necessarily", "yet"
+];
+
+const MIR01_STRONG_LIMIT_MARKERS = [
+  "temporaire", "temporairement", "pas necessairement", "sans pour autant",
+  "temporary", "temporarily", "not necessarily", "despite", "malgre"
+];
+
+const MIR01_CAUSAL_PATTERNS = [
+  /\bentraine\b/, /\bentrainent\b/, /\bprovoque\b/, /\bprovoquent\b/, /\bcause\b/,
+  /\bconduit a\b/, /\bconduisent a\b/, /\bdeplace\b/, /\bdeplacent\b/,
+  /\breoriente\b/, /\breorientent\b/, /\bfavorise\b/, /\bfavorisent\b/,
+  /\baccentue\b/, /\baccentuent\b/, /\bexplique\b/, /\bexpliquent\b/,
+  /\ba pour effet\b/, /\bont pour effet\b/, /\bproduit\b/, /\bproduisent\b/
+];
+
+const MIR01_TEXT_CAUSAL_MARKERS = [
+  "a entraine", "ont entraine", "contribue a", "fait suite a", "pour contourner",
+  "en reponse a", "sous l effet de", "a conduit a", "ont conduit a", "reorientation",
+  "responding to", "produces temporary shifts", "led to", "resulting in", "as a result"
+];
+
+function mir01ResultText(result) {
+  return resultComparisonText(result);
+}
+
+function mir01ConceptMatch(concept, result) {
+  const text = mir01ResultText(result);
+  if (concept.id === "narcotrafic") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === "narcotrafic");
+    return Boolean(facet && facet.matches(text));
+  }
+  if (concept.id === "port") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === "port");
+    return Boolean(facet && facet.matches(text));
+  }
+
+  const wanted = cleanString(concept.id);
+  if (!wanted) return false;
+  return tokenize(text).some(token => tokenApproxMatch(wanted, token));
+}
+
+function mir01Coverage(search, result) {
+  const concepts = search.query_concepts || [];
+  if (!concepts.length) return { matched: 0, total: 0, ratio: 0, matched_ids: [] };
+  const matched = concepts.filter(concept => mir01ConceptMatch(concept, result));
+  return {
+    matched: matched.length,
+    total: concepts.length,
+    ratio: matched.length / concepts.length,
+    matched_ids: matched.map(concept => concept.id)
+  };
+}
+
+function mir01RequiredControlledFacets(assertion) {
+  return COMPARISON_CONTROLLED_FACETS
+    .filter(facet => facet.matches(assertion))
+    .map(facet => facet.id);
+}
+
+function mir01HasAllControlledFacets(result, requiredFacetIds) {
+  if (!requiredFacetIds.length) return true;
+  const text = mir01ResultText(result);
+  return requiredFacetIds.every(id => {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === id);
+    return Boolean(facet && facet.matches(text));
+  });
+}
+
+function mir01DetectCausalClaim(assertion) {
+  const normalized = normalizeText(assertion);
+  const markers = MIR01_CAUSAL_PATTERNS
+    .filter(pattern => pattern.test(normalized))
+    .map(pattern => String(pattern).replace(/^\/\\b|\\b\/$/g, ""));
+  return {
+    causal_language_detected: markers.length > 0,
+    markers
+  };
+}
+
+function mir01TextHasMarker(text, markers) {
+  const normalized = normalizeText(text);
+  return markers.some(marker => normalized.includes(normalizeText(marker)));
+}
+
+function mir01Classify(result, coverage, causalClaim) {
+  const relationType = cleanString(result.relation_type).toUpperCase();
+  const text = mir01ResultText(result);
+
+  if (result.kind === "relation" && MIR01_CONTRADICTION_RELATIONS.has(relationType)) {
+    return { position: "contradiction", reason: `relation_explicit:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  if (result.kind === "relation" && MIR01_NUANCE_RELATIONS.has(relationType)) {
+    return { position: "nuance", reason: `relation_explicit:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  let support = false;
+  let reason = "";
+  if (result.kind === "relation" && MIR01_SUPPORT_RELATIONS.has(relationType)) {
+    support = true;
+    reason = `relation_explicit:${relationType}`;
+  } else if (result.kind === "node" && coverage.ratio >= 0.6) {
+    support = true;
+    reason = "high_concept_overlap_node";
+  } else if (result.kind === "chunk" && coverage.ratio >= 0.5) {
+    support = true;
+    reason = "high_concept_overlap_excerpt";
+  }
+
+  const hasNuanceMarker = mir01TextHasMarker(text, MIR01_NUANCE_MARKERS);
+  const hasStrongLimitMarker = mir01TextHasMarker(text, MIR01_STRONG_LIMIT_MARKERS);
+
+  if (causalClaim.causal_language_detected) {
+    const causalRelation = result.kind === "relation" && MIR01_CAUSAL_RELATIONS.has(relationType);
+    const causalText = mir01TextHasMarker(text, MIR01_TEXT_CAUSAL_MARKERS);
+
+    if (support && (causalRelation || causalText) && !hasStrongLimitMarker) {
+      return {
+        position: "support",
+        reason,
+        causal_scope: "causal_sequence_documented_in_source"
+      };
+    }
+
+    if (hasStrongLimitMarker || hasNuanceMarker) {
+      return {
+        position: "nuance",
+        reason: hasStrongLimitMarker ? "limitation_marker_in_source" : "nuance_marker_in_source",
+        causal_scope: (causalRelation || causalText) ? "causal_sequence_documented_but_limited" : "not_inferred"
+      };
+    }
+
+    if (support) {
+      return {
+        position: "support",
+        reason,
+        causal_scope: "descriptive_or_associative_support_only"
+      };
+    }
+
+    return { position: "context", reason: "relevant_context_only", causal_scope: "not_inferred" };
+  }
+
+  if (hasNuanceMarker) {
+    return { position: "nuance", reason: "nuance_marker_in_source", causal_scope: "not_applicable" };
+  }
+
+  if (support) return { position: "support", reason, causal_scope: "not_applicable" };
+  return { position: "context", reason: "relevant_context_only", causal_scope: "not_applicable" };
+}
+
+function mir01Material(result, coverage, classification) {
+  return {
+    ...buildMaterial(result),
+    stress_test: {
+      position: classification.position,
+      classification_reason: classification.reason,
+      query_concept_coverage: Number(coverage.ratio.toFixed(3)),
+      matched_query_concepts: coverage.matched_ids,
+      causal_scope: classification.causal_scope
+    }
+  };
+}
+
+function runMir01(body) {
+  const action = SUPPORTED_ACTIONS.MIR01;
+  const assertion = cleanString(body.assertion || body.element || body.query);
+  if (!assertion) {
+    const error = new Error("Le champ assertion est obligatoire pour MIR01.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const causalClaim = mir01DetectCausalClaim(assertion);
+  const search = searchCorpus({
+    query: assertion,
+    limit: Math.max(12, Math.min(30, Number(body.search_limit) || 24)),
+    max_per_publication: Math.max(3, Math.min(8, Number(body.max_per_publication) || 6)),
+    diversify_by_publication: true
+  });
+
+  const requiredControlledFacets = mir01RequiredControlledFacets(assertion);
+  const topScore = Math.max(0, ...search.results.map(result => Number(result.score || 0)));
+  const scoreFloor = topScore > 0 ? Math.max(5, topScore * 0.5) : Infinity;
+  const queryConceptCount = (search.query_concepts || []).length;
+  const minMatchedConcepts = queryConceptCount <= 2 ? 1 : Math.max(2, Math.ceil(queryConceptCount * 0.5));
+
+  const relevant = [];
+  for (const result of search.results) {
+    const score = Number(result.score || 0);
+    if (score < scoreFloor) continue;
+    if (!mir01HasAllControlledFacets(result, requiredControlledFacets)) continue;
+    const coverage = mir01Coverage(search, result);
+    if (!requiredControlledFacets.length && coverage.matched < minMatchedConcepts) continue;
+    const classification = mir01Classify(result, coverage, causalClaim);
+    relevant.push({ result, coverage, classification });
+  }
+
+  const byPosition = { support: [], nuance: [], contradiction: [], context: [] };
+  for (const item of relevant) {
+    byPosition[item.classification.position].push(mir01Material(item.result, item.coverage, item.classification));
+  }
+
+  for (const values of Object.values(byPosition)) {
+    values.sort((a, b) => b.relevance_score - a.relevance_score || a.material_id.localeCompare(b.material_id));
+  }
+
+  const maxPerPosition = Math.max(1, Math.min(4, Number(body.max_per_position) || 3));
+  const support = byPosition.support.slice(0, maxPerPosition);
+  const nuance = byPosition.nuance.slice(0, maxPerPosition);
+  const contradiction = byPosition.contradiction.slice(0, maxPerPosition);
+  const context = byPosition.context.slice(0, Math.min(2, maxPerPosition));
+  const classifiedCount = support.length + nuance.length + contradiction.length;
+  const insufficient = classifiedCount === 0;
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+    action,
+    assertion,
+    claim_analysis: {
+      causal_language_detected: causalClaim.causal_language_detected,
+      causal_markers: causalClaim.markers,
+      required_controlled_concepts: requiredControlledFacets,
+      methodological_caution: causalClaim.causal_language_detected
+        ? "La présence d'éléments convergents ne suffit pas, à elle seule, à établir une causalité générale. MIR01 distingue ce que la source documente d'une inférence causale plus large."
+        : null
+    },
+    search: {
+      engine: search.engine,
+      query_concepts: search.query_concepts,
+      candidates_returned: search.search.returned,
+      relevance_score_floor: Number.isFinite(scoreFloor) ? Number(scoreFloor.toFixed(3)) : null,
+      relevant_after_guardrails: relevant.length,
+      classified_materials: classifiedCount,
+      supporting_materials: support.length,
+      nuance_materials: nuance.length,
+      contradiction_materials: contradiction.length
+    },
+    evidence: {
+      support,
+      nuance,
+      contradiction,
+      context
+    },
+    documentary_state: {
+      insufficient,
+      explicit_contradiction_found: contradiction.length > 0,
+      contradiction_note: contradiction.length
+        ? "Le corpus contient au moins un matériau explicitement structuré comme remise en cause de l'affirmation ou d'un de ses éléments."
+        : "Aucune contradiction explicite n'a été repérée parmi les matériaux retenus. Cette absence ne prouve pas qu'il n'existe pas de contradiction.",
+      conclusion: "MIR01 expose les matériaux disponibles et leurs tensions documentaires ; il ne rend pas de verdict sur l'affirmation."
+    },
+    guardrails: {
+      corpus_only: true,
+      rewrites_assertion: false,
+      decides_truth_or_falsity: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      infers_causality_from_association: false,
+      invents_counterargument: false,
+      classification_is_documentary_not_verdict: true,
+      note: "MIR01 classe uniquement des matériaux retrouvés dans le corpus en appui, nuance ou contradiction explicite ; l'interprétation finale reste à l'utilisateur."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -744,6 +1034,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "DOC01") return runDoc01(body);
   if (actionId === "DOC02") return runDoc02(body);
   if (actionId === "DOC03") return runDoc03(body);
+  if (actionId === "MIR01") return runMir01(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

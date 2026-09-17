@@ -191,3 +191,38 @@ assert.equal(mir08Conceptual.checks[0].status, "outside_empirical_check_scope");
 assert.equal(mir08Conceptual.checks[0].weak_empirical_anchor, null);
 
 console.log("OK MIR08 ancrage empirique");
+
+// MET01 — deux matériaux issus de la même enquête peuvent partager population,
+// périmètre et source tout en mesurant des objets différents. MET01 doit le signaler
+// sans conclure à l'incomparabilité ni à l'équivalence.
+const met01SameSurveyDifferentIndicator = runReflectionAssist({
+  action_id: "MET01",
+  material_ids: ["node:N0366", "node:N0367"]
+});
+assert.equal(met01SameSurveyDifferentIndicator.ok, true);
+assert.equal(met01SameSurveyDifferentIndicator.engine, "reflection-assist-v0.7-met01");
+assert.equal(met01SameSurveyDifferentIndicator.input_mode, "two_selected_materials");
+assert.equal(met01SameSurveyDifferentIndicator.materials.length, 2);
+assert.equal(met01SameSurveyDifferentIndicator.criteria.length, 5);
+assert.equal(met01SameSurveyDifferentIndicator.criteria.find(c => c.id === "population").status, "documented_alignment");
+assert.equal(met01SameSurveyDifferentIndicator.criteria.find(c => c.id === "geography").status, "documented_overlap");
+assert.equal(met01SameSurveyDifferentIndicator.criteria.find(c => c.id === "indicator").status, "different_indicator_definitions_to_review");
+assert.equal(met01SameSurveyDifferentIndicator.criteria.find(c => c.id === "source_method").status, "same_publication_context");
+assert.equal(met01SameSurveyDifferentIndicator.summary.comparability_decision, "analyst_required");
+assert.equal(met01SameSurveyDifferentIndicator.guardrails.declares_equivalence, false);
+assert.equal(met01SameSurveyDifferentIndicator.guardrails.declares_incomparability_automatically, false);
+assert(met01SameSurveyDifferentIndicator.materials[0].evidence_refs.some(ref => ref.proof_id === "chunk:C0351" && ref.locator === "14"));
+
+// MET01 — deux matériaux sur le narcotrafic/les ports mais portant sur des espaces
+// et mesures distincts doivent déclencher une prudence méthodologique, sans verdict.
+const met01DifferentScopes = runReflectionAssist({
+  action_id: "MET01",
+  material_ids: ["node:N0672", "chunk:C0460"]
+});
+assert.equal(met01DifferentScopes.criteria.find(c => c.id === "geography").status, "different_geographic_scopes_to_review");
+assert.equal(met01DifferentScopes.criteria.find(c => c.id === "indicator").status, "different_indicator_definitions_to_review");
+assert.equal(met01DifferentScopes.summary.verification_state, "comparability_requires_caution");
+assert.equal(met01DifferentScopes.guardrails.performs_substantive_comparison_for_user, false);
+assert.equal(met01DifferentScopes.guardrails.uses_publication_year_as_observation_period, false);
+
+console.log("OK MET01 comparabilité");

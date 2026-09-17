@@ -37,6 +37,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Vérifier l’ancrage empirique",
     role: "miroir_critique",
     mode: "empirical_anchor_check"
+  }),
+  MET01: Object.freeze({
+    id: "MET01",
+    label: "Vérifier la comparabilité",
+    role: "aiguillon_methodologique",
+    mode: "comparability_check"
   })
 });
 
@@ -1570,6 +1576,351 @@ function runMir08(body) {
   };
 }
 
+
+
+const MET01_GEO_PATTERNS = Object.freeze([
+  { id: "france", label: "France", scale: "country", pattern: /\bfrance\b/ },
+  { id: "france_metropolitaine", label: "France métropolitaine", scale: "country_scope", pattern: /\bfrance metropolitaine\b/ },
+  { id: "union_europeenne", label: "Union européenne", scale: "supranational", pattern: /\b(?:union europeenne|ue|european union)\b/ },
+  { id: "europe", label: "Europe", scale: "continent", pattern: /\beurope\b/ },
+  { id: "caraibes", label: "Caraïbes", scale: "region", pattern: /\b(?:caraibes|caribbean)\b/ },
+  { id: "martinique", label: "Martinique", scale: "territory", pattern: /\bmartinique\b/ },
+  { id: "guadeloupe", label: "Guadeloupe", scale: "territory", pattern: /\bguadeloupe\b/ },
+  { id: "reunion", label: "La Réunion", scale: "territory", pattern: /\b(?:la )?reunion\b/ },
+  { id: "guyane", label: "Guyane", scale: "territory", pattern: /\bguyane\b/ },
+  { id: "republique_dominicaine", label: "République dominicaine", scale: "country", pattern: /\b(?:republique dominicaine|dominican republic)\b/ },
+  { id: "le_havre", label: "Le Havre", scale: "port_or_city", pattern: /\b(?:port du )?havre\b/ },
+  { id: "dunkerque", label: "Dunkerque", scale: "port_or_city", pattern: /\bdunkerque\b/ },
+  { id: "rouen", label: "Rouen", scale: "port_or_city", pattern: /\brouen\b/ },
+  { id: "nantes_saint_nazaire", label: "Nantes–Saint-Nazaire", scale: "port_or_city", pattern: /\b(?:nantes|saint nazair|montoir)\b/ },
+  { id: "gennevilliers", label: "Gennevilliers", scale: "port_or_city", pattern: /\bgennevilliers\b/ },
+  { id: "anvers", label: "Anvers", scale: "port_or_city", pattern: /\b(?:anvers|antwerp)\b/ },
+  { id: "rotterdam", label: "Rotterdam", scale: "port_or_city", pattern: /\brotterdam\b/ }
+]);
+
+const MET01_INDICATOR_PATTERNS = Object.freeze([
+  { id: "volume_saisies", label: "volume de saisies", pattern: /\b(?:volume|volumes|tonne|tonnes|kg|kilogramme|kilogrammes)\b[^.\n]{0,80}\b(?:saisi|saisie|saisies|intercepte|interceptees|interceptes)\b|\b(?:saisi|saisie|saisies|intercepte|interceptees|interceptes)\b[^.\n]{0,80}\b(?:volume|volumes|tonne|tonnes|kg|kilogramme|kilogrammes)\b/ },
+  { id: "part_pourcentage", label: "part ou proportion en pourcentage", pattern: /\b\d{1,3}(?:[.,]\d+)?\s*%\b/ },
+  { id: "image_opinion", label: "image / opinion", pattern: /\b(?:image|opinion)\b[^.\n]{0,100}\b(?:police|gendarmerie|forces de securite interieure|fsi)\b|\b(?:police|gendarmerie|forces de securite interieure|fsi)\b[^.\n]{0,100}\b(?:image|opinion)\b/ },
+  { id: "confiance", label: "confiance", pattern: /\bconfiance\b|\bfaire confiance\b/ },
+  { id: "taux_non_reponse", label: "taux de non-réponse", pattern: /\b(?:taux de non reponse|non reponse)\b/ },
+  { id: "flux_routes", label: "flux / routes de trafic", pattern: /\b(?:flux|route|routes|corridor|corridors|pipeline|pathway|pathways)\b[^.\n]{0,100}\b(?:cocaine|stupefiant|drug|trafic|traffick)\b|\b(?:cocaine|stupefiant|drug|trafic|traffick)\b[^.\n]{0,100}\b(?:flux|route|routes|corridor|corridors|pipeline|pathway|pathways)\b/ },
+  { id: "vulnerabilite_portuaire", label: "vulnérabilité portuaire", pattern: /\bvulnerabilit|\bvulnerable\b[^.\n]{0,80}\bport/ }
+]);
+
+const MET01_METHOD_PATTERNS = Object.freeze([
+  { id: "enquete", label: "enquête", pattern: /\benquete\b|\bsurvey\b/ },
+  { id: "questionnaire", label: "questionnaire / question d’enquête", pattern: /\bquestionnaire\b|\bquestion\b[^.\n]{0,40}\b(?:repond|répond|respond)/ },
+  { id: "statistiques", label: "données statistiques", pattern: /\bstatistique|\bdonnees\b|\bdata\b/ },
+  { id: "donnees_saisies", label: "données de saisies / interceptions", pattern: /\b(?:saisie|saisies|interception|interceptions|intercepte|interceptes|interceptees)\b/ },
+  { id: "entretiens", label: "entretiens", pattern: /\bentretien|\binterview\b/ }
+]);
+
+function met01SelectedMaterials(body, store) {
+  let ids = [];
+  if (Array.isArray(body.material_ids)) ids = body.material_ids;
+  else {
+    const left = cleanString(body.left_material_id);
+    const right = cleanString(body.right_material_id);
+    ids = [left, right].filter(Boolean);
+  }
+  ids = [...new Set(ids.map(cleanString).filter(Boolean))];
+  if (ids.length !== 2) {
+    const error = new Error("MET01 exige exactement deux matériaux du corpus à comparer.");
+    error.statusCode = 400;
+    throw error;
+  }
+  return ids.map(value => {
+    const selector = mir04ParseSelector(value);
+    const selected = exactMaterial(store, selector);
+    return {
+      selector,
+      selected,
+      material_id: selector.material_id,
+      publication_id: cleanString(selected.raw.publication_id)
+    };
+  });
+}
+
+function met01MaterialTexts(item, store) {
+  const proof = runDoc02({ material_id: item.material_id });
+  const primaryTexts = [];
+  const contextTexts = [];
+  const add = (target, value) => {
+    const cleaned = cleanString(value);
+    if (cleaned && !target.includes(cleaned)) target.push(cleaned);
+  };
+
+  if (item.selected.kind === "chunk") add(primaryTexts, item.selected.raw.texte);
+  else if (item.selected.kind === "node") add(primaryTexts, item.selected.raw.libelle);
+  else {
+    const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+    add(primaryTexts, relationSummary(item.selected.raw, nodeById).text);
+  }
+  for (const p of proof.proofs || []) add(contextTexts, p.text);
+  const texts = [...new Set([...primaryTexts, ...contextTexts])];
+
+  return { proof, primaryTexts, contextTexts, texts };
+}
+
+function met01ExtractPeriods(texts) {
+  const years = new Set();
+  const evidence = [];
+  const patterns = [
+    /\b(?:en|depuis|entre|durant|pendant|au cours de|a partir de|jusqu en)\s+((?:19|20)\d{2})\b/g,
+    /\b((?:19|20)\d{2})\s+(?:contre|versus|vs\.?|et|a)\s+((?:19|20)\d{2})\b/g
+  ];
+  for (const text of texts) {
+    const normalized = normalizeText(text);
+    for (const pattern of patterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        for (const value of match.slice(1).filter(Boolean)) years.add(value);
+        const raw = cleanString(match[0]);
+        if (raw && !evidence.includes(raw)) evidence.push(raw);
+      }
+    }
+  }
+  return { years: [...years].sort(), evidence: evidence.slice(0, 6) };
+}
+
+function met01ExtractPopulation(texts) {
+  const fields = [];
+  const groups = [];
+  const groupPatterns = [
+    /\b18\s*[-–]\s*29 ans\b/g,
+    /\b65 ans et plus\b/g,
+    /\bpersonnes agees de 18 ans et plus\b/g,
+    /\bdescendants d immigres\b/g,
+    /\bhabitants des qpv\b/g,
+    /\bresidents des qpv\b/g,
+    /\bensemble de la population\b/g
+  ];
+  for (const text of texts) {
+    const raw = cleanString(text);
+    const normalized = normalizeText(raw);
+    const fieldMatches = raw.match(/(?:Champ|Note)\s*:\s*[^\n.]+(?:\.)?/gi) || [];
+    for (const value of fieldMatches) {
+      const cleaned = cleanString(value);
+      if (cleaned && !fields.includes(cleaned)) fields.push(cleaned);
+    }
+    for (const pattern of groupPatterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        const value = cleanString(match[0]);
+        if (value && !groups.includes(value)) groups.push(value);
+      }
+    }
+  }
+  return { fields: fields.slice(0, 4), groups: groups.slice(0, 8) };
+}
+
+function met01ExtractGeography(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_GEO_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label, scale: item.scale }));
+}
+
+function met01ExtractIndicators(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_INDICATOR_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label }));
+}
+
+function met01ExtractMethods(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_METHOD_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label }));
+}
+
+function met01Profile(item, store) {
+  const context = met01MaterialTexts(item, store);
+  const publication = publicationMeta(store, item.publication_id);
+  const primaryIndicators = met01ExtractIndicators(context.primaryTexts);
+  return {
+    material_id: item.material_id,
+    publication,
+    provenance: context.proof.provenance,
+    evidence_refs: (context.proof.proofs || []).map(proof => ({
+      proof_id: proof.proof_id,
+      locator: proof.locator,
+      section: proof.section
+    })),
+    periods: met01ExtractPeriods(context.texts),
+    population: met01ExtractPopulation(context.texts),
+    geography: met01ExtractGeography(context.texts),
+    indicators: primaryIndicators.length ? primaryIndicators : met01ExtractIndicators(context.texts),
+    methods: met01ExtractMethods(context.texts),
+    source_context: {
+      publication_id: publication.publication_id,
+      organisme_producteur: publication.organisme_producteur || null,
+      type_document: publication.type_document || null,
+      publication_year: publication.annee_publication || null
+    }
+  };
+}
+
+function met01SetIntersection(left, right, key = x => x) {
+  const rightValues = new Set(right.map(key));
+  return left.filter(value => rightValues.has(key(value)));
+}
+
+function met01Criterion(id, label, status, left, right, note) {
+  return { id, label, status, left, right, methodological_note: note };
+}
+
+function met01AssessCriteria(left, right) {
+  const criteria = [];
+
+  const sharedYears = met01SetIntersection(left.periods.years, right.periods.years);
+  let periodStatus = "insufficient_documentation";
+  let periodNote = "La période d'observation n'est pas suffisamment explicite dans les deux matériaux pour vérifier l'alignement temporel.";
+  if (left.periods.years.length && right.periods.years.length) {
+    if (sharedYears.length) {
+      periodStatus = "documented_overlap";
+      periodNote = `Au moins une année d'observation est commune (${sharedYears.join(", ")}). Vérifier néanmoins que les fenêtres d'observation et la date de collecte sont équivalentes.`;
+    } else {
+      periodStatus = "different_periods_to_review";
+      periodNote = "Les années d'observation explicitement repérées ne se recouvrent pas. La comparaison exige de vérifier que cet écart temporel est acceptable.";
+    }
+  }
+  criteria.push(met01Criterion("period", "Période", periodStatus, left.periods, right.periods, periodNote));
+
+  const leftPopulationTokens = [...left.population.fields, ...left.population.groups].map(normalizeText);
+  const rightPopulationTokens = [...right.population.fields, ...right.population.groups].map(normalizeText);
+  const sharedPopulation = met01SetIntersection(leftPopulationTokens, rightPopulationTokens);
+  let populationStatus = "insufficient_documentation";
+  let populationNote = "Le champ ou la population n'est pas suffisamment explicite dans les deux matériaux.";
+  if (leftPopulationTokens.length && rightPopulationTokens.length) {
+    if (sharedPopulation.length) {
+      populationStatus = "documented_alignment";
+      populationNote = "Un même champ ou groupe de population est explicitement repéré dans les deux matériaux. Vérifier que les règles d'inclusion/exclusion sont identiques.";
+    } else {
+      populationStatus = "different_populations_to_review";
+      populationNote = "Les populations ou champs explicitement repérés diffèrent. MET01 ne conclut pas à l'incomparabilité : l'analyste doit vérifier si cette différence est compatible avec son objectif.";
+    }
+  }
+  criteria.push(met01Criterion("population", "Population / champ", populationStatus, left.population, right.population, populationNote));
+
+  const sharedGeo = met01SetIntersection(left.geography, right.geography, item => item.id);
+  let geoStatus = "insufficient_documentation";
+  let geoNote = "L'unité géographique n'est pas suffisamment explicite dans les deux matériaux.";
+  if (left.geography.length && right.geography.length) {
+    if (sharedGeo.length) {
+      geoStatus = "documented_overlap";
+      geoNote = `Un périmètre géographique commun est explicitement repéré (${sharedGeo.map(item => item.label).join(", ")}). Vérifier que l'échelle effective d'observation est la même.`;
+    } else {
+      geoStatus = "different_geographic_scopes_to_review";
+      geoNote = "Les périmètres géographiques nommés diffèrent. Cela n'interdit pas une comparaison, mais impose de contrôler l'échelle et le contexte territorial.";
+    }
+  }
+  criteria.push(met01Criterion("geography", "Unité géographique", geoStatus, left.geography, right.geography, geoNote));
+
+  const sharedIndicators = met01SetIntersection(left.indicators, right.indicators, item => item.id);
+  let indicatorStatus = "insufficient_documentation";
+  let indicatorNote = "La définition de l'indicateur ou de la mesure n'est pas suffisamment explicite dans les deux matériaux.";
+  if (left.indicators.length && right.indicators.length) {
+    if (sharedIndicators.length) {
+      indicatorStatus = "documented_overlap";
+      indicatorNote = `Au moins un type de mesure est commun (${sharedIndicators.map(item => item.label).join(", ")}). Cela ne garantit pas que les définitions, dénominateurs ou protocoles soient identiques.`;
+    } else {
+      indicatorStatus = "different_indicator_definitions_to_review";
+      indicatorNote = "Les mesures explicitement repérées ne portent pas sur le même indicateur. Une mise en parallèle directe serait méthodologiquement fragile sans justification supplémentaire.";
+    }
+  }
+  criteria.push(met01Criterion("indicator", "Définition de l’indicateur", indicatorStatus, left.indicators, right.indicators, indicatorNote));
+
+  const samePublication = left.source_context.publication_id === right.source_context.publication_id;
+  const sameProducer = normalizeText(left.source_context.organisme_producteur) === normalizeText(right.source_context.organisme_producteur)
+    && Boolean(cleanString(left.source_context.organisme_producteur));
+  const sameType = normalizeText(left.source_context.type_document) === normalizeText(right.source_context.type_document)
+    && Boolean(cleanString(left.source_context.type_document));
+  let sourceStatus = "different_sources_to_review";
+  let sourceNote = "Les matériaux proviennent de sources documentaires différentes. Vérifier la méthode de production des données avant toute comparaison directe.";
+  if (samePublication) {
+    sourceStatus = "same_publication_context";
+    sourceNote = "Les deux matériaux proviennent de la même publication. Cela réduit un écart de contexte documentaire, sans garantir à lui seul l'identité du protocole ou de l'indicateur.";
+  } else if (sameProducer && sameType) {
+    sourceStatus = "partially_aligned_source_context";
+    sourceNote = "Le producteur et le type de document sont communs, mais les protocoles et sources de données doivent encore être vérifiés.";
+  }
+  criteria.push(met01Criterion("source_method", "Source / méthode", sourceStatus, {
+    ...left.source_context,
+    method_markers: left.methods
+  }, {
+    ...right.source_context,
+    method_markers: right.methods
+  }, sourceNote));
+
+  return criteria;
+}
+
+function runMet01(body) {
+  const action = SUPPORTED_ACTIONS.MET01;
+  const store = getCorpusStore();
+  const selected = met01SelectedMaterials(body, store);
+  const profiles = selected.map(item => met01Profile(item, store));
+  const criteria = met01AssessCriteria(profiles[0], profiles[1]);
+
+  const explicitDifferences = criteria.filter(item => item.status.startsWith("different_"));
+  const insufficient = criteria.filter(item => item.status === "insufficient_documentation");
+  const aligned = criteria.filter(item => ["documented_alignment", "documented_overlap", "same_publication_context", "partially_aligned_source_context"].includes(item.status));
+
+  let verificationState = "comparability_not_established_from_available_materials";
+  if (explicitDifferences.length) verificationState = "comparability_requires_caution";
+  else if (!insufficient.length && aligned.length === criteria.length) verificationState = "several_conditions_aligned_no_equivalence_claim";
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.7-met01",
+    action,
+    input_mode: "two_selected_materials",
+    materials: profiles,
+    criteria,
+    summary: {
+      verification_state: verificationState,
+      criteria_checked: criteria.length,
+      documented_alignments: aligned.length,
+      differences_to_review: explicitDifferences.length,
+      insufficiently_documented_criteria: insufficient.length,
+      comparability_decision: "analyst_required",
+      note: explicitDifferences.length
+        ? "Au moins une différence de périmètre ou de mesure est explicitement repérée. MET01 signale les points à contrôler mais ne conclut pas à l'incomparabilité."
+        : insufficient.length
+          ? "Aucune incompatibilité décisive n'est déduite, mais plusieurs conditions de comparabilité restent insuffisamment documentées."
+          : "Plusieurs conditions sont documentées comme alignées. MET01 ne transforme pas cet alignement en équivalence automatique."
+    },
+    methodological_questions: criteria.map(item => ({
+      criterion_id: item.id,
+      status: item.status,
+      question: item.id === "period"
+        ? "Les périodes et fenêtres d'observation sont-elles suffisamment proches pour répondre à la même question ?"
+        : item.id === "population"
+          ? "Les populations, champs et règles d'inclusion sont-ils définis de manière comparable ?"
+          : item.id === "geography"
+            ? "Les unités géographiques et leurs échelles sont-elles comparables ?"
+            : item.id === "indicator"
+              ? "Les indicateurs mesurent-ils réellement le même objet avec la même définition et le même dénominateur ?"
+              : "Les sources, méthodes de collecte et protocoles sont-ils suffisamment homogènes pour soutenir la comparaison ?"
+    })),
+    guardrails: {
+      corpus_only: true,
+      compares_exactly_two_materials: true,
+      performs_substantive_comparison_for_user: false,
+      declares_equivalence: false,
+      declares_incomparability_automatically: false,
+      infers_missing_scope: false,
+      uses_publication_year_as_observation_period: false,
+      note: "MET01 vérifie les conditions documentaires de la comparaison (période, population, territoire, indicateur, source/méthode). Il signale les écarts et les informations manquantes ; la décision de comparer reste à l'analyste."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -1585,6 +1936,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "MIR01") return runMir01(body);
   if (actionId === "MIR04") return runMir04(body);
   if (actionId === "MIR08") return runMir08(body);
+  if (actionId === "MET01") return runMet01(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

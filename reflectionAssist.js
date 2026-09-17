@@ -43,6 +43,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Vérifier la comparabilité",
     role: "aiguillon_methodologique",
     mode: "comparability_check"
+  }),
+  MET02: Object.freeze({
+    id: "MET02",
+    label: "Vérifier la nature du lien",
+    role: "aiguillon_methodologique",
+    mode: "relation_nature_check"
   })
 });
 
@@ -1921,6 +1927,307 @@ function runMet01(body) {
   };
 }
 
+
+const MET02_STATISTICAL_ASSOCIATION_RELATIONS = new Set(["ASSOCIATION"]);
+const MET02_GENERIC_ASSOCIATION_RELATIONS = new Set(["ASSOCIE_A"]);
+const MET02_CAUSAL_OR_CONTRIBUTIVE_RELATIONS = new Set([
+  "CONTRIBUE_A",
+  "CONTRIBUE_A_PREVENIR",
+  "CONTRIBUE_PARTIELLEMENT_A",
+  "PEUT_CONTRIBUER_A",
+  "INFLUENCE",
+  "ACCENTUE",
+  "ACCROIT",
+  "FAVORISE",
+  "FRAGILISE",
+  "FREINE",
+  "RENFORCE",
+  "RENFORCE_LE_BESOIN_DE",
+  "SOUTIENT"
+]);
+const MET02_DESCRIPTIVE_RELATIONS = new Set([
+  "CARACTERISE",
+  "ILLUSTRE",
+  "QUANTIFIE",
+  "PRESENTE",
+  "MET_EN_EVIDENCE",
+  "DOCUMENTE",
+  "OBSERVEE_DANS",
+  "SE_MANIFESTE_PAR",
+  "TAUX_ELEVE_DE",
+  "TAUX_FAIBLE_DE"
+]);
+const MET02_TEMPORAL_RELATIONS = new Set(["PRECEDE", "FAIT_SUITE_A", "PROLONGE"]);
+const MET02_NORMATIVE_OR_ACTION_RELATIONS = new Set([
+  "PRECONISE",
+  "A_POUR_OBJECTIF",
+  "PERMET_DE",
+  "MET_EN_OEUVRE",
+  "UTILISE_POUR"
+]);
+
+const MET02_SOURCE_PATTERNS = Object.freeze({
+  association: [
+    /\bassocie(?:e|es|s)?\b/,
+    /\bassociation\b/,
+    /\bcorrel(?:e|ee|es|es|ation|ations)\b/,
+    /\bsont lies\b/,
+    /\best lie\b/,
+    /\blinked\b/,
+    /\bassociated\b/,
+    /\bcorrelat(?:ed|ion)\b/
+  ],
+  causal_wording: [
+    /\bcaus(?:e|es|er|al|alite)\b/,
+    /\bentraine(?:e|es|s)?\b/,
+    /\bprovoque(?:e|es|s)?\b/,
+    /\bconduit a\b/,
+    /\bsous l effet de\b/,
+    /\bs explique par\b/,
+    /\bexplique(?:e|es|s)? par\b/,
+    /\bcontribue(?:nt)? a\b/,
+    /\binfluence(?:nt)?\b/,
+    /\baccroit\b/,
+    /\baccentue\b/,
+    /\bfragilise\b/,
+    /\bfavorise\b/,
+    /\breduit\b/,
+    /\bdiminue\b/,
+    /\bcausal effect\b/,
+    /\bcauses?\b/,
+    /\bleads? to\b/,
+    /\bresults? in\b/
+  ],
+  uncertainty: [
+    /\bpeut\b/,
+    /\bpourrait\b/,
+    /\bpourraient\b/,
+    /\bsusceptible\b/,
+    /\bsemblerait\b/,
+    /\bsemble\b/,
+    /\bprobable\b/,
+    /\blikely\b/,
+    /\bmay\b/,
+    /\bcould\b/
+  ],
+  adjustment: [
+    /\ba autres caracteristiques identiques\b/,
+    /\btoutes choses egales par ailleurs\b/,
+    /\bapres prise en compte\b/,
+    /\bcontrole(?:e|es|s)? pour\b/,
+    /\bajuste(?:e|es|s)?\b/,
+    /\bregression\b/
+  ],
+  causal_identification_method: [
+    /\beffet causal\b/,
+    /\bcausal effect\b/,
+    /\brandomis/,
+    /\bdifference(?:s)? en differences\b/,
+    /\bdifference[- ]in[- ]differences\b/,
+    /\bvariable instrumentale\b/,
+    /\binstrumental variable\b/,
+    /\bregression discontinuity\b/,
+    /\bexperience naturelle\b/,
+    /\bnatural experiment\b/
+  ]
+});
+
+function met02RelationSelector(body, store) {
+  const materialId = cleanString(body.material_id);
+  const relationId = cleanString(body.relation_id);
+  if (materialId) {
+    const match = materialId.match(/^relation:(.+)$/i);
+    if (!match) {
+      const error = new Error("MET02 exige une relation du corpus : material_id doit être de la forme relation:Rxxxx.");
+      error.statusCode = 400;
+      throw error;
+    }
+    const selector = { kind: "relation", id: cleanString(match[1]), material_id: `relation:${cleanString(match[1])}` };
+    return { selector, selected: exactMaterial(store, selector) };
+  }
+  if (relationId) {
+    const selector = { kind: "relation", id: relationId, material_id: `relation:${relationId}` };
+    return { selector, selected: exactMaterial(store, selector) };
+  }
+  const error = new Error("MET02 exige une relation précise : material_id=relation:Rxxxx ou relation_id=Rxxxx.");
+  error.statusCode = 400;
+  throw error;
+}
+
+function met02PatternMatches(text, patterns) {
+  const normalized = normalizeText(text);
+  return patterns.filter(pattern => pattern.test(normalized)).map(pattern => pattern.source);
+}
+
+function met02RelevantProofText(proofs, sourceLabel, targetLabel) {
+  const anchorTokens = new Set([...tokenize(sourceLabel), ...tokenize(targetLabel)]);
+  const candidates = [];
+  for (const proof of proofs || []) {
+    const text = cleanString(proof.text);
+    if (!text) continue;
+    const segments = text
+      .split(/\n+|(?<=[.!?])\s+/)
+      .map(cleanString)
+      .filter(segment => segment.length >= 20);
+    for (const segment of segments) {
+      const tokens = [...new Set(tokenize(segment))];
+      const overlap = tokens.filter(token => anchorTokens.has(token));
+      if (!overlap.length) continue;
+      candidates.push({
+        text: segment,
+        overlap_count: overlap.length,
+        overlap_ratio: anchorTokens.size ? overlap.length / anchorTokens.size : 0,
+        proof_id: proof.proof_id
+      });
+    }
+  }
+  candidates.sort((a, b) => b.overlap_count - a.overlap_count || b.overlap_ratio - a.overlap_ratio || a.text.length - b.text.length);
+  const selected = candidates.slice(0, 5);
+  return {
+    text: selected.length ? selected.map(item => item.text).join("\n") : (proofs || []).map(proof => cleanString(proof.text)).filter(Boolean).join("\n"),
+    evidence_segments: selected.map(item => ({ proof_id: item.proof_id, text: item.text }))
+  };
+}
+
+function met02RelationFamily(relationType) {
+  const type = cleanString(relationType).toUpperCase();
+  if (MET02_STATISTICAL_ASSOCIATION_RELATIONS.has(type)) return "statistical_association";
+  if (MET02_GENERIC_ASSOCIATION_RELATIONS.has(type)) return "generic_association";
+  if (MET02_CAUSAL_OR_CONTRIBUTIVE_RELATIONS.has(type)) return "causal_or_contributive_wording";
+  if (MET02_DESCRIPTIVE_RELATIONS.has(type)) return "descriptive_or_evidentiary";
+  if (MET02_TEMPORAL_RELATIONS.has(type)) return "temporal_sequence";
+  if (MET02_NORMATIVE_OR_ACTION_RELATIONS.has(type)) return "normative_or_action_link";
+  return "other_structured_link";
+}
+
+function met02CausalInterpretation(family, sourceSignals) {
+  if (family === "statistical_association") {
+    return {
+      status: "association_does_not_establish_causality",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: "La relation est explicitement encodée comme ASSOCIATION. Elle peut documenter une covariation ou un lien statistique, mais ne doit pas être reformulée comme une causalité."
+    };
+  }
+  if (family === "generic_association") {
+    return {
+      status: "generic_association_no_causal_inference",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: "ASSOCIE_A est un lien sémantique générique du graphe ; il ne constitue pas une preuve statistique ni causale."
+    };
+  }
+  if (family === "causal_or_contributive_wording" || sourceSignals.causal_wording_detected) {
+    return {
+      status: sourceSignals.causal_identification_method_detected
+        ? "causal_wording_with_method_marker_requires_review"
+        : "causal_or_contributive_wording_requires_methodological_verification",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: sourceSignals.causal_identification_method_detected
+        ? "Un vocabulaire causal et au moins un marqueur de méthode d'identification causale sont repérés dans la source. MET02 ne valide pas pour autant la causalité : le protocole doit être examiné par l'analyste."
+        : "Le lien comporte un vocabulaire causal ou contributif, mais le libellé de relation et l'extrait documentaire ne suffisent pas à établir une causalité méthodologiquement démontrée."
+    };
+  }
+  return {
+    status: "no_causal_inference_from_relation_type",
+    causal_inference_allowed: false,
+    methodological_verification_required: false,
+    note: "La nature de ce lien n'appelle pas, à elle seule, une lecture causale. MET02 n'en déduit aucune causalité."
+  };
+}
+
+function runMet02(body) {
+  const action = SUPPORTED_ACTIONS.MET02;
+  const store = getCorpusStore();
+  const { selector, selected } = met02RelationSelector(body, store);
+  const relation = selected.raw;
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const sourceNode = nodeById.get(cleanString(relation.source_id)) || {};
+  const targetNode = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: selector.material_id });
+  const relevantProof = met02RelevantProofText(
+    proofLookup.proofs || [],
+    cleanString(sourceNode.libelle),
+    cleanString(targetNode.libelle)
+  );
+  const proofText = relevantProof.text;
+  const relationType = cleanString(relation.type_relation).toUpperCase();
+  const family = met02RelationFamily(relationType);
+
+  const associationMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.association);
+  const causalMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.causal_wording);
+  const uncertaintyMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.uncertainty);
+  const adjustmentMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.adjustment);
+  const methodMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.causal_identification_method);
+
+  const sourceSignals = {
+    association_language_detected: associationMatches.length > 0,
+    causal_wording_detected: causalMatches.length > 0 || family === "causal_or_contributive_wording",
+    uncertainty_language_detected: uncertaintyMatches.length > 0,
+    adjustment_or_control_language_detected: adjustmentMatches.length > 0,
+    causal_identification_method_detected: methodMatches.length > 0
+  };
+  const causalInterpretation = met02CausalInterpretation(family, sourceSignals);
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.8-met02",
+    action,
+    input_mode: "selected_relation",
+    relation: {
+      material_id: selector.material_id,
+      relation_id: cleanString(relation.relation_id),
+      relation_type: relationType,
+      source: {
+        node_id: cleanString(relation.source_id),
+        label: cleanString(sourceNode.libelle),
+        node_type: cleanString(sourceNode.type_noeud) || null
+      },
+      target: {
+        node_id: cleanString(relation.cible_id),
+        label: cleanString(targetNode.libelle),
+        node_type: cleanString(targetNode.type_noeud) || null
+      },
+      publication: publicationMeta(store, cleanString(relation.publication_id))
+    },
+    assessment: {
+      relation_family: family,
+      graph_direction_is_causal_direction: false,
+      statistical_association: family === "statistical_association",
+      generic_association: family === "generic_association",
+      causal_or_contributive_wording: family === "causal_or_contributive_wording",
+      source_signals: sourceSignals,
+      source_signal_scope: {
+        method: "relation_relevant_proof_segments",
+        evidence_segments: relevantProof.evidence_segments
+      },
+      causal_interpretation: causalInterpretation
+    },
+    provenance: {
+      ...proofLookup.provenance,
+      proof_count: (proofLookup.proofs || []).length,
+      proof_ids: (proofLookup.proofs || []).map(proof => proof.proof_id)
+    },
+    methodological_note: family === "statistical_association"
+      ? "Le graphe encode ici une ASSOCIATION : la coexistence ou la covariation documentée ne doit pas être transformée en relation de cause à effet."
+      : family === "causal_or_contributive_wording"
+        ? "Le libellé exprime une contribution, une influence ou un effet possible. MET02 signale ce niveau de formulation sans conclure que la causalité est démontrée."
+        : "MET02 décrit la nature documentaire du lien sélectionné et empêche sa surinterprétation causale.",
+    guardrails: {
+      corpus_only: true,
+      checks_one_explicit_relation: true,
+      converts_association_to_causality: false,
+      treats_graph_direction_as_causal_direction: false,
+      declares_causality_from_relation_label_alone: false,
+      declares_causality_from_wording_alone: false,
+      evaluates_truth_or_falsity: false,
+      rewrites_relation: false,
+      note: "MET02 qualifie le lien tel qu'il est documenté. Une relation ASSOCIATION reste une association ; un vocabulaire causal ou contributif déclenche une vérification méthodologique, pas une validation automatique de causalité."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -1937,6 +2244,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "MIR04") return runMir04(body);
   if (actionId === "MIR08") return runMir08(body);
   if (actionId === "MET01") return runMet01(body);
+  if (actionId === "MET02") return runMet02(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

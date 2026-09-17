@@ -226,3 +226,48 @@ assert.equal(met01DifferentScopes.guardrails.performs_substantive_comparison_for
 assert.equal(met01DifferentScopes.guardrails.uses_publication_year_as_observation_period, false);
 
 console.log("OK MET01 comparabilité");
+
+
+// MET02 — une relation statistique encodée ASSOCIATION doit rester une association.
+// Le sens source -> cible du graphe ne doit jamais devenir une direction causale.
+const met02Association = runReflectionAssist({
+  action_id: "MET02",
+  material_id: "relation:R018_07"
+});
+assert.equal(met02Association.ok, true);
+assert.equal(met02Association.engine, "reflection-assist-v0.8-met02");
+assert.equal(met02Association.input_mode, "selected_relation");
+assert.equal(met02Association.relation.relation_type, "ASSOCIATION");
+assert.equal(met02Association.assessment.relation_family, "statistical_association");
+assert.equal(met02Association.assessment.statistical_association, true);
+assert.equal(met02Association.assessment.graph_direction_is_causal_direction, false);
+assert.equal(met02Association.assessment.causal_interpretation.status, "association_does_not_establish_causality");
+assert.equal(met02Association.assessment.causal_interpretation.causal_inference_allowed, false);
+assert.equal(met02Association.provenance.level, "A");
+assert(met02Association.provenance.proof_ids.includes("chunk:C0418"));
+assert.equal(met02Association.guardrails.converts_association_to_causality, false);
+
+// MET02 — un libellé contributif peut porter un langage causal ou explicatif,
+// mais ne devient pas pour autant une causalité méthodologiquement démontrée.
+const met02Contributive = runReflectionAssist({
+  action_id: "MET02",
+  relation_id: "R014_13"
+});
+assert.equal(met02Contributive.relation.relation_type, "PEUT_CONTRIBUER_A");
+assert.equal(met02Contributive.assessment.relation_family, "causal_or_contributive_wording");
+assert.equal(met02Contributive.assessment.source_signals.causal_wording_detected, true);
+assert.equal(met02Contributive.assessment.source_signals.uncertainty_language_detected, true);
+assert.equal(met02Contributive.assessment.causal_interpretation.causal_inference_allowed, false);
+assert.equal(met02Contributive.guardrails.declares_causality_from_relation_label_alone, false);
+
+// MET02 — un lien illustratif reste descriptif, sans causalité déduite du sens du graphe.
+const met02Illustrative = runReflectionAssist({
+  action_id: "MET02",
+  material_id: "relation:R025_05"
+});
+assert.equal(met02Illustrative.relation.relation_type, "ILLUSTRE");
+assert.equal(met02Illustrative.assessment.relation_family, "descriptive_or_evidentiary");
+assert.equal(met02Illustrative.assessment.graph_direction_is_causal_direction, false);
+assert.equal(met02Illustrative.guardrails.treats_graph_direction_as_causal_direction, false);
+
+console.log("OK MET02 nature du lien");

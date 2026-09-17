@@ -49,6 +49,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Vérifier la nature du lien",
     role: "aiguillon_methodologique",
     mode: "relation_nature_check"
+  }),
+  MET04: Object.freeze({
+    id: "MET04",
+    label: "Éprouver une recommandation",
+    role: "aiguillon_methodologique",
+    mode: "recommendation_stress_test"
   })
 });
 
@@ -2228,6 +2234,242 @@ function runMet02(body) {
   };
 }
 
+
+
+const MET04_PROBLEM_RELATIONS = new Set(["REPOND_A", "RENFORCE_LE_BESOIN_DE"]);
+const MET04_ACTOR_OUT_RELATIONS = new Set(["MOBILISE"]);
+const MET04_ACTOR_IN_RELATIONS = new Set(["EST_DESTINATAIRE_DE"]);
+const MET04_ORIGIN_RELATIONS = new Set(["PRECONISE", "PORTE", "IMPULSE"]);
+const MET04_EFFECT_RELATIONS = new Set([
+  "CONTRIBUE_A", "CONTRIBUE_A_PREVENIR", "CONTRIBUE_PARTIELLEMENT_A",
+  "PERMET_DE", "RENFORCE", "SOUTIENT", "FAVORISE", "ACCENTUE", "ACCROIT",
+  "INFLUENCE", "A_POUR_OBJECTIF"
+]);
+const MET04_DEPENDENCY_RELATIONS = new Set(["S_APPUIE_SUR", "REPOSE_SUR"]);
+const MET04_LIMIT_RELATIONS = new Set(["NUANCE", "REMET_EN_CAUSE", "CONTREDIT", "FREINE"]);
+
+function met04RecommendationSelector(body, store) {
+  const materialId = cleanString(body.material_id);
+  const nodeId = cleanString(body.node_id || body.recommendation_id);
+
+  let selector;
+  if (materialId) {
+    const match = materialId.match(/^node:(.+)$/i);
+    if (!match) {
+      const error = new Error("MET04 exige un nœud de recommandation : material_id=node:Nxxxx.");
+      error.statusCode = 400;
+      throw error;
+    }
+    selector = { kind: "node", id: cleanString(match[1]), material_id: `node:${cleanString(match[1])}` };
+  } else if (nodeId) {
+    selector = { kind: "node", id: nodeId, material_id: `node:${nodeId}` };
+  } else {
+    const error = new Error("MET04 exige une recommandation précise du corpus : material_id=node:Nxxxx, node_id ou recommendation_id.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const selected = exactMaterial(store, selector);
+  const nodeType = normalizeText(selected.raw.type_noeud);
+  if (nodeType !== "recommandation") {
+    const error = new Error(`Le nœud ${selector.id} n'est pas typé recommandation dans le corpus actif.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return { selector, selected };
+}
+
+function met04RelationMaterial(relation, store, category) {
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const source = nodeById.get(cleanString(relation.source_id)) || {};
+  const target = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: `relation:${cleanString(relation.relation_id)}` });
+  return {
+    material_id: `relation:${cleanString(relation.relation_id)}`,
+    relation_id: cleanString(relation.relation_id),
+    relation_type: cleanString(relation.type_relation).toUpperCase(),
+    category,
+    source: {
+      node_id: cleanString(relation.source_id),
+      label: cleanString(source.libelle),
+      node_type: cleanString(source.type_noeud) || null
+    },
+    target: {
+      node_id: cleanString(relation.cible_id),
+      label: cleanString(target.libelle),
+      node_type: cleanString(target.type_noeud) || null
+    },
+    publication: publicationMeta(store, cleanString(relation.publication_id)),
+    provenance: {
+      ...proofLookup.provenance,
+      proof_count: (proofLookup.proofs || []).length,
+      proof_ids: (proofLookup.proofs || []).map(proof => proof.proof_id)
+    },
+    proofs: proofLookup.proofs || []
+  };
+}
+
+function met04ConnectedRelations(recommendationNode, store) {
+  const recommendationId = cleanString(recommendationNode.node_id);
+  const relevant = [];
+
+  for (const relation of store.relations) {
+    const sourceId = cleanString(relation.source_id);
+    const targetId = cleanString(relation.cible_id);
+    const type = cleanString(relation.type_relation).toUpperCase();
+    let category = null;
+
+    if (sourceId === recommendationId && MET04_PROBLEM_RELATIONS.has(type)) category = "problem_or_need";
+    else if (sourceId === recommendationId && MET04_ACTOR_OUT_RELATIONS.has(type)) category = "implementation_actor";
+    else if (targetId === recommendationId && MET04_ACTOR_IN_RELATIONS.has(type)) category = "implementation_actor";
+    else if (targetId === recommendationId && MET04_ORIGIN_RELATIONS.has(type)) category = "recommendation_origin";
+    else if (sourceId === recommendationId && MET04_EFFECT_RELATIONS.has(type)) category = "expected_effect_or_mechanism";
+    else if (sourceId === recommendationId && MET04_DEPENDENCY_RELATIONS.has(type)) category = "conditions_or_dependencies";
+    else if ((sourceId === recommendationId || targetId === recommendationId) && MET04_LIMIT_RELATIONS.has(type)) category = "limits_or_tensions";
+
+    if (category) relevant.push(met04RelationMaterial(relation, store, category));
+  }
+
+  return relevant;
+}
+
+function met04Criterion(id, label, materials, documentedNote, missingNote) {
+  return {
+    id,
+    label,
+    status: materials.length ? "documented_in_graph" : "not_documented_in_graph",
+    relation_count: materials.length,
+    materials,
+    note: materials.length ? documentedNote : missingNote
+  };
+}
+
+function runMet04(body) {
+  const action = SUPPORTED_ACTIONS.MET04;
+  const store = getCorpusStore();
+  const { selector, selected } = met04RecommendationSelector(body, store);
+  const recommendation = selected.raw;
+  const nodeProof = runDoc02({ material_id: selector.material_id });
+  const relationMaterials = met04ConnectedRelations(recommendation, store);
+  const byCategory = new Map();
+  for (const material of relationMaterials) {
+    if (!byCategory.has(material.category)) byCategory.set(material.category, []);
+    byCategory.get(material.category).push(material);
+  }
+
+  const criteria = [
+    met04Criterion(
+      "problem_or_need",
+      "Problème ou besoin auquel la recommandation répond",
+      byCategory.get("problem_or_need") || [],
+      "Le graphe relie explicitement la recommandation à au moins un problème ou besoin documenté.",
+      "Aucun lien explicite vers un problème ou besoin n'est documenté dans le graphe pour cette recommandation."
+    ),
+    met04Criterion(
+      "implementation_actor",
+      "Acteur de mise en œuvre ou destinataire",
+      byCategory.get("implementation_actor") || [],
+      "Au moins un acteur mobilisé ou destinataire est explicitement documenté.",
+      "Aucun acteur de mise en œuvre ou destinataire n'est explicitement documenté dans le graphe."
+    ),
+    met04Criterion(
+      "expected_effect_or_mechanism",
+      "Effet attendu ou mécanisme d'action",
+      byCategory.get("expected_effect_or_mechanism") || [],
+      "Le graphe documente au moins un effet attendu, objectif ou mécanisme associé à la recommandation.",
+      "Aucun effet attendu ni mécanisme d'action n'est explicitement documenté dans le graphe."
+    ),
+    met04Criterion(
+      "conditions_or_dependencies",
+      "Conditions, appuis ou dépendances",
+      byCategory.get("conditions_or_dependencies") || [],
+      "Au moins une condition, dépendance ou ressource d'appui est explicitement documentée.",
+      "Aucune condition de réussite, dépendance ou ressource d'appui n'est explicitement documentée dans le graphe."
+    ),
+    met04Criterion(
+      "limits_or_tensions",
+      "Limites, tensions ou contrepoints documentés",
+      byCategory.get("limits_or_tensions") || [],
+      "Le graphe contient au moins une limite, tension ou contradiction explicitement reliée à la recommandation.",
+      "Aucune limite, tension ou contradiction explicite n'est reliée à cette recommandation dans le graphe ; cette absence ne prouve pas qu'il n'en existe pas."
+    )
+  ];
+
+  const originMaterials = byCategory.get("recommendation_origin") || [];
+  const documentedCriteria = criteria.filter(item => item.status === "documented_in_graph");
+  const missingCriteria = criteria.filter(item => item.status === "not_documented_in_graph");
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.9-met04",
+    action,
+    input_mode: "selected_recommendation_node",
+    recommendation: {
+      material_id: selector.material_id,
+      node_id: cleanString(recommendation.node_id),
+      label: cleanString(recommendation.libelle),
+      node_type: cleanString(recommendation.type_noeud),
+      publication: publicationMeta(store, cleanString(recommendation.publication_id)),
+      provenance: {
+        ...nodeProof.provenance,
+        proof_count: (nodeProof.proofs || []).length,
+        proof_ids: (nodeProof.proofs || []).map(proof => proof.proof_id)
+      },
+      proofs: nodeProof.proofs || []
+    },
+    recommendation_origin: {
+      documented: originMaterials.length > 0,
+      materials: originMaterials,
+      note: originMaterials.length
+        ? "Le corpus documente explicitement au moins un auteur, porteur ou émetteur de la recommandation."
+        : "Aucun auteur, porteur ou émetteur n'est relié explicitement à cette recommandation dans le graphe."
+    },
+    criteria,
+    summary: {
+      verification_state: missingCriteria.length
+        ? "recommendation_requires_additional_documentation"
+        : "several_documentary_dimensions_present_no_feasibility_verdict",
+      criteria_checked: criteria.length,
+      documented_criteria: documentedCriteria.length,
+      undocumented_criteria: missingCriteria.length,
+      feasibility_decision: "analyst_required",
+      desirability_decision: "analyst_required",
+      effectiveness_decision: "analyst_required",
+      note: missingCriteria.length
+        ? "MET04 fait apparaître les dimensions documentées et celles qui restent absentes du graphe. Une absence de lien n'est pas une preuve d'irréalisme ni d'inefficacité."
+        : "Plusieurs dimensions sont documentées dans le corpus. MET04 n'en déduit ni faisabilité, ni efficacité, ni opportunité."
+    },
+    methodological_questions: criteria.map(item => ({
+      criterion_id: item.id,
+      status: item.status,
+      question: item.id === "problem_or_need"
+        ? "À quel problème précisément documenté cette recommandation répond-elle ?"
+        : item.id === "implementation_actor"
+          ? "Qui devrait la mettre en œuvre, avec quel mandat et quelles responsabilités ?"
+          : item.id === "expected_effect_or_mechanism"
+            ? "Par quel mécanisme cette mesure est-elle censée produire l'effet attendu, et ce mécanisme est-il documenté ?"
+            : item.id === "conditions_or_dependencies"
+              ? "Quelles conditions, ressources ou dépendances sont nécessaires à sa mise en œuvre ?"
+              : "Quelles limites, tensions, effets indésirables ou contrepoints doivent encore être recherchés ?"
+    })),
+    guardrails: {
+      corpus_only: true,
+      checks_exact_recommendation_node: true,
+      rewrites_recommendation: false,
+      generates_recommendation: false,
+      declares_feasibility: false,
+      declares_effectiveness: false,
+      declares_desirability: false,
+      infers_missing_problem: false,
+      infers_missing_actor: false,
+      infers_missing_conditions: false,
+      treats_absence_of_limit_as_absence_of_risk: false,
+      converts_documented_effect_into_proven_causality: false,
+      note: "MET04 éprouve la documentation d'une recommandation déjà structurée dans le corpus. Il met en évidence problèmes, acteurs, mécanismes, conditions et limites explicitement reliés, sans décider si la recommandation est bonne, faisable ou efficace."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -2245,6 +2487,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "MIR08") return runMir08(body);
   if (actionId === "MET01") return runMet01(body);
   if (actionId === "MET02") return runMet02(body);
+  if (actionId === "MET04") return runMet04(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

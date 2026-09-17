@@ -271,3 +271,54 @@ assert.equal(met02Illustrative.assessment.graph_direction_is_causal_direction, f
 assert.equal(met02Illustrative.guardrails.treats_graph_direction_as_causal_direction, false);
 
 console.log("OK MET02 nature du lien");
+
+// MET04 — une recommandation doit être éprouvée à partir des liens explicitement
+// documentés dans le graphe, sans verdict automatique de faisabilité ou d'efficacité.
+const met04Recommendation = runReflectionAssist({
+  action_id: "MET04",
+  material_id: "node:N1207"
+});
+assert.equal(met04Recommendation.ok, true);
+assert.equal(met04Recommendation.engine, "reflection-assist-v0.9-met04");
+assert.equal(met04Recommendation.input_mode, "selected_recommendation_node");
+assert.equal(met04Recommendation.recommendation.node_id, "N1207");
+assert.equal(met04Recommendation.recommendation.node_type, "recommandation");
+assert.equal(met04Recommendation.recommendation.provenance.level, "A");
+assert(met04Recommendation.recommendation.provenance.proof_ids.includes("chunk:C0900"));
+
+const met04Problem = met04Recommendation.criteria.find(c => c.id === "problem_or_need");
+const met04Actor = met04Recommendation.criteria.find(c => c.id === "implementation_actor");
+const met04Effect = met04Recommendation.criteria.find(c => c.id === "expected_effect_or_mechanism");
+const met04Conditions = met04Recommendation.criteria.find(c => c.id === "conditions_or_dependencies");
+const met04Limits = met04Recommendation.criteria.find(c => c.id === "limits_or_tensions");
+assert.equal(met04Problem.status, "documented_in_graph");
+assert(met04Problem.materials.some(m => m.relation_id === "R101_17" && m.relation_type === "REPOND_A"));
+assert.equal(met04Actor.status, "documented_in_graph");
+assert(met04Actor.materials.some(m => m.relation_id === "R101_18" && m.relation_type === "MOBILISE"));
+assert.equal(met04Effect.status, "not_documented_in_graph");
+assert.equal(met04Conditions.status, "not_documented_in_graph");
+assert.equal(met04Limits.status, "not_documented_in_graph");
+assert.equal(met04Recommendation.summary.feasibility_decision, "analyst_required");
+assert.equal(met04Recommendation.summary.effectiveness_decision, "analyst_required");
+assert.equal(met04Recommendation.guardrails.treats_absence_of_limit_as_absence_of_risk, false);
+assert.equal(met04Recommendation.guardrails.converts_documented_effect_into_proven_causality, false);
+
+// MET04 — une autre recommandation peut documenter un effet attendu et un appui,
+// sans que le moteur en déduise qu'elle est efficace ou faisable.
+const met04Mechanism = runReflectionAssist({
+  action_id: "MET04",
+  recommendation_id: "N1173"
+});
+assert.equal(met04Mechanism.criteria.find(c => c.id === "expected_effect_or_mechanism").status, "documented_in_graph");
+assert(met04Mechanism.criteria.find(c => c.id === "expected_effect_or_mechanism").materials.some(m => m.relation_id === "R090_22"));
+assert.equal(met04Mechanism.criteria.find(c => c.id === "conditions_or_dependencies").status, "documented_in_graph");
+assert(met04Mechanism.criteria.find(c => c.id === "conditions_or_dependencies").materials.some(m => m.relation_id === "R090_23"));
+assert.equal(met04Mechanism.summary.feasibility_decision, "analyst_required");
+
+// MET04 refuse un nœud qui n'est pas typé recommandation.
+assert.throws(() => runReflectionAssist({
+  action_id: "MET04",
+  material_id: "node:N0672"
+}), /n'est pas typé recommandation/);
+
+console.log("OK MET04 éprouver une recommandation");

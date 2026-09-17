@@ -152,3 +152,41 @@ assert.equal(mir04NoForcedOpposition.documentary_state.insufficient, true);
 assert.equal(mir04NoForcedOpposition.guardrails.infers_contradiction_from_difference, false);
 
 console.log("OK reflection-assist DOC01 + DOC02 (A/B/C) + DOC03 + MIR01 + MIR04");
+
+
+// MIR08 — un énoncé chiffré et précisément documenté doit être reconnu comme ancré empiriquement.
+const mir08Anchored = runReflectionAssist({
+  action_id: "MIR08",
+  text: "En 2024, 78 % du volume de cocaïne saisi en France l'a été par voie maritime."
+});
+assert.equal(mir08Anchored.ok, true);
+assert.equal(mir08Anchored.engine, "reflection-assist-v0.6-mir08");
+assert.equal(mir08Anchored.checks.length, 1);
+assert.equal(mir08Anchored.checks[0].status, "empirical_anchor_found");
+assert.equal(mir08Anchored.checks[0].weak_empirical_anchor, false);
+assert(mir08Anchored.checks[0].materials.some(m => m.material_id === "chunk:C0523" && m.empirical_check.counts_as_empirical_anchor === true));
+assert.equal(mir08Anchored.guardrails.treats_illustrative_material_as_proof, false);
+assert.equal(mir08Anchored.guardrails.evaluates_truth_or_falsity, false);
+
+// MIR08 — un matériau empirique proche avec une autre quantification ne doit pas être traité comme preuve.
+const mir08WrongNumber = runReflectionAssist({
+  action_id: "MIR08",
+  text: "En 2024, 90 % du volume de cocaïne saisi en France l'a été par voie maritime."
+});
+assert.equal(mir08WrongNumber.ok, true);
+assert.equal(mir08WrongNumber.checks.length, 1);
+assert.equal(mir08WrongNumber.checks[0].weak_empirical_anchor, true);
+assert.notEqual(mir08WrongNumber.checks[0].status, "empirical_anchor_found");
+assert(mir08WrongNumber.checks[0].materials.some(m => m.empirical_check.role === "related_empirical_material_with_mismatched_quantification"));
+assert.equal(mir08WrongNumber.guardrails.treats_related_quantification_as_matching_proof, false);
+
+// MIR08 — une proposition évaluative/conceptuelle n'est pas automatiquement qualifiée de faiblement étayée.
+const mir08Conceptual = runReflectionAssist({
+  action_id: "MIR08",
+  text: "La vérité-adéquation est supérieure à toute autre conception de la vérité."
+});
+assert.equal(mir08Conceptual.ok, true);
+assert.equal(mir08Conceptual.checks[0].status, "outside_empirical_check_scope");
+assert.equal(mir08Conceptual.checks[0].weak_empirical_anchor, null);
+
+console.log("OK MIR08 ancrage empirique");

@@ -31,6 +31,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Faire apparaître les contradictions entre matériaux",
     role: "miroir_critique",
     mode: "documentary_tension_mapping"
+  }),
+  MIR08: Object.freeze({
+    id: "MIR08",
+    label: "Vérifier l’ancrage empirique",
+    role: "miroir_critique",
+    mode: "empirical_anchor_check"
   })
 });
 
@@ -1296,6 +1302,274 @@ function runMir04(body) {
   };
 }
 
+
+const MIR08_EMPIRICAL_PATTERNS = Object.freeze({
+  quantitative_data: [
+    /\b\d{1,3}(?:[.,]\d+)?\s*%\b/,
+    /\b\d+(?:[.,]\d+)?\s*(?:tonnes?|kg|kilogrammes?|millions?|milliards?|euros?|personnes?|habitants?|cas|faits|saisies?|infractions?)\b/,
+    /\b(?:taux|part|proportion|nombre|volume|hausse|baisse|augmentation|diminution)\b[^.]{0,80}\b\d+(?:[.,]\d+)?\b/
+  ],
+  recorded_observation: [
+    /\b(?:observe|observes|observee|observees|recense|recenses|recensee|recensees|enregistre|enregistres|enregistree|enregistrees|mesure|mesures|mesuree|mesurees|saisi|saisie|saisies|intercepte|interceptes|interceptee|interceptees|declare|declares|declaree|declarees|mis en cause|enquete|donnees|statistiques?)\b/,
+    /\b(?:observed|recorded|measured|survey|data|statistics|seized|intercepted|reported)\b/
+  ],
+  concrete_case: [
+    /\b(?:en|au|depuis|entre)\s+(?:19|20)\d{2}\b/,
+    /\b(?:port du havre|dunkerque|rouen|nantes|saint-nazaire|martinique|guadeloupe|guyane|dominican republic|rotterdam|antwerp|anvers)\b/
+  ]
+});
+
+const MIR08_ILLUSTRATIVE_RELATIONS = new Set(["ILLUSTRE"]);
+const MIR08_NORMATIVE_MARKERS = [
+  "devrait", "devraient", "doit", "doivent", "souhaitable", "preferable", "meilleur", "meilleure",
+  "superieur", "superieure", "inferieur", "inferieure", "juste", "injuste", "acceptable", "inacceptable",
+  "necessaire", "indispensable", "prioritaire"
+];
+
+function mir08SplitSegments(text) {
+  const cleaned = cleanString(text).replace(/\r/g, "");
+  if (!cleaned) return [];
+  const raw = cleaned
+    .split(/\n+|(?<=[.!?])\s+/)
+    .map(cleanString)
+    .filter(Boolean);
+  const substantive = raw.filter(segment => segment.length >= 25);
+  return (substantive.length ? substantive : [cleaned]).slice(0, 8);
+}
+
+function mir08EmpiricalKinds(text) {
+  const normalized = normalizeText(text);
+  const kinds = [];
+  for (const [kind, patterns] of Object.entries(MIR08_EMPIRICAL_PATTERNS)) {
+    if (patterns.some(pattern => pattern.test(normalized))) kinds.push(kind);
+  }
+  return kinds;
+}
+
+function mir08NumberTokens(text) {
+  const matches = cleanString(text).match(/\b\d+(?:[.,]\d+)?\b/g) || [];
+  return [...new Set(matches.map(value => value.replace(",", ".")))];
+}
+
+function mir08PercentageTokens(text) {
+  const matches = cleanString(text).match(/\b\d+(?:[.,]\d+)?\s*%/g) || [];
+  return [...new Set(matches.map(value => value.replace(/\s*%/, "").replace(",", ".")))];
+}
+
+function mir08ClaimNature(segment) {
+  const normalized = normalizeText(segment);
+  const empiricalKinds = mir08EmpiricalKinds(segment);
+  const normative = MIR08_NORMATIVE_MARKERS.some(marker => normalized.includes(normalizeText(marker)));
+  const numberTokens = mir08NumberTokens(segment);
+  const percentageTokens = mir08PercentageTokens(segment);
+  const empiricalClaim = empiricalKinds.length > 0;
+
+  return {
+    empirical_claim_detected: empiricalClaim,
+    normative_or_evaluative_language_detected: normative,
+    empirical_markers: empiricalKinds,
+    required_number_tokens: numberTokens,
+    required_percentage_tokens: percentageTokens,
+    assessment_scope: empiricalClaim ? "empirical_claim" : "non_empirical_or_conceptual_claim"
+  };
+}
+
+function mir08ReferencedChunks(result, store) {
+  const chunkById = new Map(store.contents.map(chunk => [cleanString(chunk.chunk_id), chunk]));
+  const refs = splitChunkRefs(result.chunk_id || result.chunk_id_source);
+  return refs.map(id => chunkById.get(id)).filter(Boolean);
+}
+
+function mir08NumericRequirementsMet(texts, claimNature) {
+  const combined = texts.join(" ");
+  const evidenceNumbers = new Set(mir08NumberTokens(combined));
+  const evidencePercentages = new Set(mir08PercentageTokens(combined));
+  const missingNumbers = claimNature.required_number_tokens.filter(value => !evidenceNumbers.has(value));
+  const missingPercentages = claimNature.required_percentage_tokens.filter(value => !evidencePercentages.has(value));
+  return {
+    met: missingNumbers.length === 0 && missingPercentages.length === 0,
+    missing_numbers: missingNumbers,
+    missing_percentages: missingPercentages
+  };
+}
+
+function mir08EmpiricalAssessment(result, store, claimNature) {
+  const level = cleanString(result.provenance_level) || "C";
+  const relationType = cleanString(result.relation_type).toUpperCase();
+  const illustrativeOnly = result.kind === "relation" && MIR08_ILLUSTRATIVE_RELATIONS.has(relationType);
+
+  const evidenceTexts = [];
+  if (result.kind === "chunk") evidenceTexts.push(cleanString(result.text));
+  for (const chunk of mir08ReferencedChunks(result, store)) evidenceTexts.push(cleanString(chunk.texte));
+
+  const empiricalKinds = [...new Set(evidenceTexts.flatMap(mir08EmpiricalKinds))];
+  const hasFineSource = level === "A" && evidenceTexts.some(Boolean);
+  const numericCheck = mir08NumericRequirementsMet(evidenceTexts, claimNature);
+  const countsAsAnchor = claimNature.empirical_claim_detected
+    && hasFineSource
+    && empiricalKinds.length > 0
+    && numericCheck.met
+    && !illustrativeOnly;
+
+  let role = "documentary_material";
+  if (illustrativeOnly) role = "illustrative_material";
+  else if (countsAsAnchor) role = "empirical_anchor";
+  else if (level !== "A") role = "structured_material_without_fine_empirical_proof";
+  else if (!numericCheck.met) role = "related_empirical_material_with_mismatched_quantification";
+  else if (hasFineSource) role = "fine_source_without_empirical_signal";
+
+  return {
+    role,
+    empirical_kinds: empiricalKinds,
+    counts_as_empirical_anchor: countsAsAnchor,
+    fine_source_available: hasFineSource,
+    illustrative_only: illustrativeOnly,
+    quantitative_requirements_met: numericCheck.met,
+    missing_number_tokens: numericCheck.missing_numbers,
+    missing_percentage_tokens: numericCheck.missing_percentages,
+    note: illustrativeOnly
+      ? "Matériau explicitement illustratif : il n'est pas compté comme preuve empirique à lui seul."
+      : countsAsAnchor
+        ? "Matériau du corpus avec provenance fine, marqueur empirique explicite et quantification compatible avec le segment lorsque celui-ci en contient."
+        : level !== "A"
+          ? "Matériau documentaire disponible, mais sans preuve fine permettant de l'utiliser comme ancrage empirique."
+          : !numericCheck.met
+            ? "Matériau empirique proche, mais sa quantification ne correspond pas à celle du segment ; il n'est pas compté comme preuve de ce segment."
+            : "Source fine disponible, mais aucun marqueur empirique explicite n'est détecté par la règle V0.1."
+  };
+}
+
+function mir08RelevantResults(search) {
+  const topScore = Math.max(0, ...search.results.map(result => Number(result.score || 0)));
+  if (!topScore) return [];
+  const scoreFloor = Math.max(5, topScore * 0.55);
+  const conceptCount = (search.query_concepts || []).length;
+  const minMatched = conceptCount <= 2 ? 1 : Math.max(2, Math.ceil(conceptCount * 0.5));
+
+  return search.results.filter(result => {
+    const score = Number(result.score || 0);
+    if (score < scoreFloor) return false;
+    const coverage = mir01Coverage(search, result);
+    return coverage.matched >= minMatched;
+  });
+}
+
+function runMir08(body) {
+  const action = SUPPORTED_ACTIONS.MIR08;
+  const text = cleanString(body.text || body.assertion || body.element || body.query);
+  if (!text) {
+    const error = new Error("Le champ text (ou assertion/element/query) est obligatoire pour MIR08.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const store = getCorpusStore();
+  const segments = mir08SplitSegments(text);
+  const checks = [];
+
+  for (let index = 0; index < segments.length; index += 1) {
+    const segment = segments[index];
+    const claimNature = mir08ClaimNature(segment);
+
+    if (!claimNature.empirical_claim_detected) {
+      checks.push({
+        segment_id: `S${String(index + 1).padStart(2, "0")}`,
+        text: segment,
+        claim_nature: claimNature,
+        status: "outside_empirical_check_scope",
+        weak_empirical_anchor: null,
+        empirical_anchor_count: 0,
+        relevant_documentary_material_count: 0,
+        note: "Ce segment n'est pas identifié comme une affirmation empirique par MIR08 V0.1. Il n'est donc pas qualifié de faiblement étayé sur cette seule base.",
+        materials: []
+      });
+      continue;
+    }
+
+    const search = searchCorpus({
+      query: segment,
+      limit: Math.max(12, Math.min(24, Number(body.search_limit) || 18)),
+      max_per_publication: Math.max(3, Math.min(6, Number(body.max_per_publication) || 4)),
+      diversify_by_publication: true
+    });
+    const relevant = mir08RelevantResults(search);
+
+    const assessed = relevant.map(result => ({
+      result,
+      assessment: mir08EmpiricalAssessment(result, store, claimNature)
+    }));
+    assessed.sort((a, b) => {
+      const anchorDiff = Number(b.assessment.counts_as_empirical_anchor) - Number(a.assessment.counts_as_empirical_anchor);
+      if (anchorDiff !== 0) return anchorDiff;
+      return Number(b.result.score || 0) - Number(a.result.score || 0);
+    });
+
+    const anchors = assessed.filter(item => item.assessment.counts_as_empirical_anchor);
+    const state = anchors.length > 0
+      ? "empirical_anchor_found"
+      : assessed.length > 0
+        ? "documentary_support_without_matching_empirical_anchor"
+        : "no_sufficient_corpus_anchor";
+
+    const materials = assessed.slice(0, 3).map(item => ({
+      ...buildMaterial(item.result),
+      empirical_check: item.assessment
+    }));
+
+    checks.push({
+      segment_id: `S${String(index + 1).padStart(2, "0")}`,
+      text: segment,
+      claim_nature: claimNature,
+      status: state,
+      weak_empirical_anchor: state !== "empirical_anchor_found",
+      empirical_anchor_count: anchors.length,
+      relevant_documentary_material_count: assessed.length,
+      note: state === "empirical_anchor_found"
+        ? "Le corpus actif contient au moins un matériau avec provenance fine et marqueur empirique explicitement compatible avec ce segment."
+        : state === "documentary_support_without_matching_empirical_anchor"
+          ? "Le corpus contient des matériaux proches, mais MIR08 V0.1 n'y identifie pas de preuve empirique fine correspondant suffisamment au segment."
+          : "Aucun ancrage empirique suffisamment pertinent n'a été retrouvé dans le corpus actif. Cela ne signifie pas que l'affirmation est fausse ni qu'aucune preuve n'existe hors corpus.",
+      materials
+    });
+  }
+
+  const empiricalChecks = checks.filter(check => check.weak_empirical_anchor !== null);
+  const weakSegments = empiricalChecks.filter(check => check.weak_empirical_anchor);
+  const anchoredSegments = empiricalChecks.filter(check => !check.weak_empirical_anchor);
+  const outOfScopeSegments = checks.filter(check => check.weak_empirical_anchor === null);
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.6-mir08",
+    action,
+    text,
+    segmentation: {
+      segment_count: checks.length,
+      truncated: mir08SplitSegments(text).length >= 8 && text.split(/\n+|(?<=[.!?])\s+/).filter(Boolean).length > 8
+    },
+    summary: {
+      empirical_segments_checked: empiricalChecks.length,
+      empirically_anchored_segments: anchoredSegments.length,
+      weakly_anchored_segments: weakSegments.length,
+      outside_empirical_scope_segments: outOfScopeSegments.length,
+      all_empirical_segments_anchored: empiricalChecks.length > 0 && weakSegments.length === 0
+    },
+    checks,
+    guardrails: {
+      corpus_only: true,
+      evaluates_truth_or_falsity: false,
+      weak_anchor_is_not_falsehood: true,
+      treats_illustrative_material_as_proof: false,
+      treats_related_quantification_as_matching_proof: false,
+      generates_examples_to_support_argument: false,
+      generates_argument: false,
+      infers_generalization: false,
+      fine_provenance_required_for_empirical_anchor: true,
+      note: "MIR08 vérifie uniquement l'ancrage empirique disponible dans le corpus actif. Il ne juge pas la vérité d'une affirmation, ne choisit pas d'exemple pour construire un argument et ne transforme ni un matériau illustratif ni une quantification seulement voisine en preuve."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -1310,6 +1584,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "DOC03") return runDoc03(body);
   if (actionId === "MIR01") return runMir01(body);
   if (actionId === "MIR04") return runMir04(body);
+  if (actionId === "MIR08") return runMir08(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

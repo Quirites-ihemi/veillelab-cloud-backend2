@@ -1,4 +1,4 @@
-const { searchCorpus } = require("./globalSearch");
+const { searchCorpus, normalizeText, tokenize } = require("./globalSearch");
 const { getCorpusStore } = require("./corpusStore");
 
 const SUPPORTED_ACTIONS = Object.freeze({
@@ -13,6 +13,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Remonter à la preuve",
     role: "documentaliste_augmentee",
     mode: "exact_provenance_lookup"
+  }),
+  DOC03: Object.freeze({
+    id: "DOC03",
+    label: "Chercher des cas comparables",
+    role: "documentaliste_augmentee",
+    mode: "comparison_candidates_only"
   })
 });
 
@@ -144,7 +150,7 @@ function runDoc01(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.2-doc01-doc02",
+    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
     action,
     element,
     guardrails: {
@@ -354,7 +360,7 @@ function runDoc02(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.2-doc01-doc02",
+    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
     action,
     selected_material_id: `${selector.kind}:${selector.id}`,
     selected_material: selectedMaterial,
@@ -383,6 +389,349 @@ function runDoc02(body) {
   };
 }
 
+
+const COMPARISON_CONTROLLED_FACETS = Object.freeze([
+  Object.freeze({
+    id: "narcotrafic",
+    label: "trafic de cocaïne / stupéfiants",
+    query_term: "narcotrafic",
+    matches(text) {
+      const normalized = normalizeText(text);
+      return /\bnarcotrafic\b/.test(normalized)
+        || /\bcocaine\b/.test(normalized)
+        || /\bstupefiant/.test(normalized)
+        || /\bdrug trafficking\b/.test(normalized)
+        || /\bcocaine smuggling\b/.test(normalized);
+    }
+  }),
+  Object.freeze({
+    id: "port",
+    label: "ports / infrastructures portuaires",
+    query_term: "ports",
+    matches(text) {
+      const normalized = normalizeText(text);
+      const tokens = new Set(tokenize(normalized));
+      return tokens.has("port")
+        || tokens.has("ports")
+        || tokens.has("portuaire")
+        || tokens.has("portuaires")
+        || normalized.includes("port infrastructure")
+        || normalized.includes("port infrastructures")
+        || normalized.includes("shipping port")
+        || normalized.includes("commercial port");
+    }
+  })
+]);
+
+const COMPARISON_NOISE = new Set([
+  "accrue", "accru", "notamment", "francais", "francaise", "francaises", "france",
+  "mentionne", "mentionnee", "mentionnes", "mentionnees", "selon", "entre", "contre",
+  "risque", "risques", "enjeu", "enjeux", "probleme", "problemes", "public", "publique",
+  "publics", "publiques", "politique", "politiques", "evolution", "evolutions", "situation",
+  "situations", "cadre", "part", "niveau", "niveaux", "effet", "effets", "role", "roles"
+]);
+
+let COMPARISON_TOKEN_STATS = null;
+
+function comparisonTokenStats(store) {
+  if (COMPARISON_TOKEN_STATS) return COMPARISON_TOKEN_STATS;
+
+  const byPublication = new Map();
+  for (const publication of store.publications) {
+    byPublication.set(cleanString(publication.publication_id), new Set());
+  }
+
+  const add = (publicationId, text) => {
+    const target = byPublication.get(cleanString(publicationId));
+    if (!target) return;
+    for (const token of tokenize(text)) target.add(token);
+  };
+
+  for (const chunk of store.contents) add(chunk.publication_id, `${chunk.section || ""} ${chunk.texte || ""}`);
+  for (const node of store.nodes) add(node.publication_id, `${node.type_noeud || ""} ${node.libelle || ""}`);
+
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  for (const relation of store.relations) {
+    const source = nodeById.get(cleanString(relation.source_id));
+    const target = nodeById.get(cleanString(relation.cible_id));
+    add(relation.publication_id, `${source?.libelle || ""} ${relation.type_relation || ""} ${target?.libelle || ""}`);
+  }
+
+  const df = new Map();
+  for (const tokens of byPublication.values()) {
+    for (const token of tokens) df.set(token, (df.get(token) || 0) + 1);
+  }
+
+  COMPARISON_TOKEN_STATS = {
+    publication_count: byPublication.size,
+    byPublication,
+    df
+  };
+  return COMPARISON_TOKEN_STATS;
+}
+
+function comparisonIdf(token, stats) {
+  const count = stats.df.get(token) || 0;
+  return Math.log((stats.publication_count + 1) / (count + 1)) + 1;
+}
+
+function tokenApproxMatch(anchor, candidate) {
+  if (anchor === candidate) return true;
+  const minLen = Math.min(anchor.length, candidate.length);
+  if (minLen >= 6 && anchor.slice(0, 6) === candidate.slice(0, 6)) return true;
+  if (minLen >= 5 && (anchor.startsWith(candidate) || candidate.startsWith(anchor))) return true;
+  return false;
+}
+
+function resultComparisonText(result) {
+  if (result.kind === "chunk") return `${result.section || ""} ${result.text || ""}`;
+  if (result.kind === "node") return `${result.node_type || ""} ${result.label || ""}`;
+  return `${result.source_label || ""} ${result.relation_type || ""} ${result.target_label || ""}`;
+}
+
+function selectedMaterialText(selected, store) {
+  if (selected.kind === "chunk") {
+    return `${selected.raw.section || ""} ${selected.raw.texte || ""}`.trim();
+  }
+  if (selected.kind === "node") return cleanString(selected.raw.libelle);
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  return relationSummary(selected.raw, nodeById).text;
+}
+
+function extractComparisonBasis(text, store) {
+  const raw = cleanString(text);
+  const normalized = normalizeText(raw);
+  const sourceTokens = [...new Set(tokenize(normalized))];
+  const anchors = [];
+  const consumed = new Set();
+
+  for (const facet of COMPARISON_CONTROLLED_FACETS) {
+    if (!facet.matches(raw)) continue;
+    anchors.push({
+      id: facet.id,
+      label: facet.label,
+      type: "controlled_concept",
+      query_term: facet.query_term
+    });
+    if (facet.id === "narcotrafic") {
+      ["narcotrafic", "cocaine", "stupefiants", "stupefiant", "trafic", "trafics", "drug", "trafficking", "smuggling"].forEach(t => consumed.add(t));
+    }
+    if (facet.id === "port") {
+      ["port", "ports", "portuaire", "portuaires", "infrastructure", "infrastructures", "shipping", "commercial"].forEach(t => consumed.add(t));
+    }
+  }
+
+  const stats = comparisonTokenStats(store);
+  const fallbackLimit = anchors.length >= 2 ? 0 : (anchors.length === 1 ? 2 : 3);
+  const fallbackCandidates = sourceTokens
+    .filter(token => token.length >= 4)
+    .filter(token => !consumed.has(token) && !COMPARISON_NOISE.has(token))
+    .map((token, index) => ({
+      token,
+      index,
+      df: stats.df.get(token) || 0,
+      idf: comparisonIdf(token, stats)
+    }))
+    .filter(item => item.df > 0 && item.df <= Math.max(10, Math.floor(stats.publication_count * 0.4)))
+    .sort((a, b) => b.idf - a.idf || a.index - b.index)
+    .slice(0, fallbackLimit);
+
+  for (const item of fallbackCandidates) {
+    anchors.push({
+      id: `lex:${item.token}`,
+      label: item.token,
+      type: "lexical_anchor",
+      query_term: item.token,
+      document_frequency: item.df
+    });
+  }
+
+  return {
+    source_text: raw,
+    anchors,
+    query: anchors.map(anchor => anchor.query_term).join(" ").trim()
+  };
+}
+
+function anchorMatchesResult(anchor, result) {
+  const text = resultComparisonText(result);
+  if (anchor.type === "controlled_concept") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === anchor.id);
+    return Boolean(facet && facet.matches(text));
+  }
+
+  const tokens = tokenize(text);
+  const wanted = cleanString(anchor.query_term);
+  return tokens.some(token => tokenApproxMatch(wanted, token));
+}
+
+function runDoc03(body) {
+  const action = SUPPORTED_ACTIONS.DOC03;
+  const store = getCorpusStore();
+
+  let selectedMaterialId = null;
+  let originPublicationId = cleanString(body.origin_publication_id) || null;
+  let basisText = cleanString(body.element || body.query);
+  let selectedMaterial = null;
+
+  if (cleanString(body.material_id) || cleanString(body.chunk_id) || cleanString(body.node_id) || cleanString(body.relation_id)) {
+    const selector = parseMaterialSelector(body);
+    const selected = exactMaterial(store, selector);
+    selectedMaterialId = `${selector.kind}:${selector.id}`;
+    originPublicationId = cleanString(selected.raw.publication_id) || originPublicationId;
+    basisText = selectedMaterialText(selected, store);
+
+    if (selected.kind === "chunk") {
+      selectedMaterial = {
+        type: "excerpt",
+        chunk_id: cleanString(selected.raw.chunk_id),
+        section: cleanString(selected.raw.section) || null,
+        text: cleanString(selected.raw.texte),
+        page_debut: cleanString(selected.raw.page_debut) || null,
+        page_fin: cleanString(selected.raw.page_fin) || null
+      };
+    } else if (selected.kind === "node") {
+      selectedMaterial = nodeSummary(selected.raw);
+    } else {
+      const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+      selectedMaterial = relationSummary(selected.raw, nodeById);
+    }
+  }
+
+  if (!basisText) {
+    const error = new Error("DOC03 exige un élément à comparer : element/query ou un material_id précis.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const basis = extractComparisonBasis(basisText, store);
+  if (!basis.anchors.length || !basis.query) {
+    return {
+      ok: true,
+      engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+      action,
+      selected_material_id: selectedMaterialId,
+      selected_material: selectedMaterial,
+      origin_publication_id: originPublicationId,
+      comparison_basis: { source_text: basis.source_text, anchors: [], query: null },
+      search: { returned_cases: 0, returned_publications: 0 },
+      cases: [],
+      guardrails: {
+        corpus_only: true,
+        excludes_origin_publication: Boolean(originPublicationId),
+        comparability_verified: false,
+        generates_analysis: false,
+        generates_recommendation: false,
+        forces_candidate: false,
+        note: "DOC03 ne force aucun cas comparable lorsqu'aucun critère documentaire suffisamment précis n'est détecté."
+      }
+    };
+  }
+
+  const search = searchCorpus({
+    query: basis.query,
+    limit: 30,
+    max_per_publication: 4,
+    diversify_by_publication: true
+  });
+
+  const byPublication = new Map();
+  for (const result of search.results) {
+    if (originPublicationId && result.publication_id === originPublicationId) continue;
+    if (!byPublication.has(result.publication_id)) byPublication.set(result.publication_id, []);
+    byPublication.get(result.publication_id).push(result);
+  }
+
+  const minShared = basis.anchors.length >= 2 ? 2 : 1;
+  const candidates = [];
+
+  for (const [publicationId, results] of byPublication.entries()) {
+    const shared = basis.anchors.filter(anchor => results.some(result => anchorMatchesResult(anchor, result)));
+    if (shared.length < minShared) continue;
+
+    const coverage = shared.length / basis.anchors.length;
+    if (basis.anchors.length >= 2 && coverage < (2 / basis.anchors.length)) continue;
+
+    const bestScore = Math.max(...results.map(result => Number(result.score || 0)));
+    const score = bestScore + shared.length * 3 + coverage * 5;
+    const evidence = results
+      .slice()
+      .sort((a, b) => Number(b.score || 0) - Number(a.score || 0))
+      .slice(0, 2)
+      .map(buildMaterial);
+
+    const publication = evidence[0]?.publication || publicationMeta(store, publicationId);
+    candidates.push({
+      publication_id: publicationId,
+      score,
+      publication,
+      shared_features: shared.map(anchor => ({
+        id: anchor.id,
+        label: anchor.label,
+        type: anchor.type
+      })),
+      shared_feature_count: shared.length,
+      feature_coverage: Number(coverage.toFixed(3)),
+      rapprochement_nature: coverage === 1 && shared.length >= 2
+        ? "documented_shared_features"
+        : "thematic_proximity_only",
+      comparability_verified: false,
+      evidence_materials: evidence
+    });
+  }
+
+  candidates.sort((a, b) => b.score - a.score || a.publication_id.localeCompare(b.publication_id));
+  const maxCases = Math.max(1, Math.min(4, Number(body.limit_cases) || 4));
+  const cases = candidates.slice(0, maxCases).map((candidate, index) => ({
+    rank: index + 1,
+    publication: candidate.publication,
+    shared_features: candidate.shared_features,
+    rapprochement_nature: candidate.rapprochement_nature,
+    comparability_verified: false,
+    comparison_note: candidate.rapprochement_nature === "documented_shared_features"
+      ? "Plusieurs caractéristiques explicitement présentes dans le corpus sont communes. La comparabilité méthodologique reste à vérifier avec MET01."
+      : "Le rapprochement est seulement thématique à ce stade. La comparabilité méthodologique n'est pas établie.",
+    evidence_materials: candidate.evidence_materials
+  }));
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.3-doc01-doc02-doc03",
+    action,
+    selected_material_id: selectedMaterialId,
+    selected_material: selectedMaterial,
+    origin_publication_id: originPublicationId,
+    comparison_basis: {
+      source_text: basis.source_text,
+      query: basis.query,
+      anchors: basis.anchors.map(anchor => ({
+        id: anchor.id,
+        label: anchor.label,
+        type: anchor.type
+      }))
+    },
+    search: {
+      engine: search.engine,
+      returned_candidates_before_filter: search.search.returned,
+      returned_cases: cases.length,
+      returned_publications: cases.length,
+      origin_excluded: Boolean(originPublicationId)
+    },
+    cases,
+    guardrails: {
+      corpus_only: true,
+      excludes_origin_publication: Boolean(originPublicationId),
+      comparability_verified: false,
+      generates_analysis: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      infers_transferability: false,
+      forces_candidate: false,
+      note: "DOC03 propose des cas candidats à examiner à partir de caractéristiques documentées ; il ne conclut ni à l'équivalence, ni à la comparabilité méthodologique, ni à la transposabilité."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -394,6 +743,7 @@ function runReflectionAssist(body = {}) {
 
   if (actionId === "DOC01") return runDoc01(body);
   if (actionId === "DOC02") return runDoc02(body);
+  if (actionId === "DOC03") return runDoc03(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

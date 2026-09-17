@@ -115,4 +115,40 @@ assert(truthClaim.evidence.nuance.some(m => m.result_kind === "relation" && m.co
 assert.equal(truthClaim.evidence.contradiction.length, 0);
 assert.equal(truthClaim.documentary_state.explicit_contradiction_found, false);
 
-console.log("OK reflection-assist DOC01 + DOC02 (A/B/C) + DOC03 + MIR01");
+
+
+// MIR04 — deux matériaux explicitement reliés par NUANCE doivent être présentés
+// comme tension documentaire, jamais comme contradiction automatique.
+const mir04Nuance = runReflectionAssist({
+  action_id: "MIR04",
+  material_ids: ["node:N0366", "node:N0370"]
+});
+assert.equal(mir04Nuance.ok, true);
+assert.equal(mir04Nuance.engine, "reflection-assist-v0.5-mir04");
+assert.equal(mir04Nuance.input_mode, "selected_materials");
+assert.equal(mir04Nuance.findings.explicit_contradictions.length, 0);
+assert(mir04Nuance.findings.documented_tensions.some(f => f.finding_id === "relation:R013_11" && f.relation_type === "NUANCE"));
+assert.equal(mir04Nuance.documentary_state.explicit_contradiction_found, false);
+assert.equal(mir04Nuance.documentary_state.documented_tension_found, true);
+assert.equal(mir04Nuance.guardrails.treats_nuance_as_contradiction, false);
+
+// MIR04 — REMET_EN_CAUSE reste une tension documentaire, conformément au correctif MIR01 v0.4.1.
+const mir04Challenge = runReflectionAssist({
+  action_id: "MIR04",
+  material_ids: ["node:N1040", "node:N1044"]
+});
+assert.equal(mir04Challenge.findings.explicit_contradictions.length, 0);
+assert(mir04Challenge.findings.documented_tensions.some(f => f.finding_id === "relation:R062_05" && f.relation_type === "REMET_EN_CAUSE"));
+assert.equal(mir04Challenge.guardrails.treats_remet_en_cause_as_contradiction, false);
+
+// MIR04 — ne pas inventer une contradiction entre deux matériaux sans relation explicite.
+const mir04NoForcedOpposition = runReflectionAssist({
+  action_id: "MIR04",
+  material_ids: ["node:N0672", "node:N1010"]
+});
+assert.equal(mir04NoForcedOpposition.findings.explicit_contradictions.length, 0);
+assert.equal(mir04NoForcedOpposition.findings.documented_tensions.length, 0);
+assert.equal(mir04NoForcedOpposition.documentary_state.insufficient, true);
+assert.equal(mir04NoForcedOpposition.guardrails.infers_contradiction_from_difference, false);
+
+console.log("OK reflection-assist DOC01 + DOC02 (A/B/C) + DOC03 + MIR01 + MIR04");

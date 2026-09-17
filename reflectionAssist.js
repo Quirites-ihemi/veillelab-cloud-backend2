@@ -25,6 +25,12 @@ const SUPPORTED_ACTIONS = Object.freeze({
     label: "Mettre une affirmation à l’épreuve",
     role: "miroir_critique",
     mode: "evidence_stress_test"
+  }),
+  MIR04: Object.freeze({
+    id: "MIR04",
+    label: "Faire apparaître les contradictions entre matériaux",
+    role: "miroir_critique",
+    mode: "documentary_tension_mapping"
   })
 });
 
@@ -1029,6 +1035,267 @@ function runMir01(body) {
   };
 }
 
+
+
+const MIR04_EXPLICIT_CONTRADICTION_RELATIONS = new Set(["CONTREDIT"]);
+const MIR04_TENSION_RELATIONS = new Set([
+  "NUANCE", "REMET_EN_CAUSE", "SE_DISTINGUE_DE", "FREINE", "CONTRIBUE_PARTIELLEMENT_A"
+]);
+
+function mir04ParseSelector(value) {
+  const raw = cleanString(value);
+  const match = raw.match(/^(chunk|node|relation):(.+)$/i);
+  if (!match) {
+    const error = new Error(`Identifiant de matériau invalide pour MIR04 : ${raw || "(vide)"}.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return { kind: match[1].toLowerCase(), id: cleanString(match[2]), material_id: `${match[1].toLowerCase()}:${cleanString(match[2])}` };
+}
+
+function mir04SelectedMaterials(body, store) {
+  let ids = [];
+  if (Array.isArray(body.material_ids)) ids = body.material_ids;
+  else if (cleanString(body.material_id)) ids = [body.material_id];
+
+  ids = [...new Set(ids.map(cleanString).filter(Boolean))];
+  if (ids.length > 8) {
+    const error = new Error("MIR04 accepte au maximum 8 matériaux sélectionnés à la fois.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return ids.map(value => {
+    const selector = mir04ParseSelector(value);
+    const selected = exactMaterial(store, selector);
+    let summary;
+    if (selected.kind === "chunk") {
+      summary = {
+        type: "excerpt",
+        chunk_id: cleanString(selected.raw.chunk_id),
+        section: cleanString(selected.raw.section) || null,
+        text: cleanString(selected.raw.texte),
+        page_debut: cleanString(selected.raw.page_debut) || null,
+        page_fin: cleanString(selected.raw.page_fin) || null
+      };
+    } else if (selected.kind === "node") {
+      summary = nodeSummary(selected.raw);
+    } else {
+      const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+      summary = relationSummary(selected.raw, nodeById);
+    }
+    return {
+      selector,
+      selected,
+      material_id: selector.material_id,
+      publication_id: cleanString(selected.raw.publication_id),
+      summary
+    };
+  });
+}
+
+function mir04AnchorNodeIdsFromSelections(selections, store) {
+  const anchorNodeIds = new Set();
+  const chunkIds = new Set();
+  const selectedRelationIds = new Set();
+
+  for (const item of selections) {
+    if (item.selected.kind === "node") {
+      anchorNodeIds.add(cleanString(item.selected.raw.node_id));
+    } else if (item.selected.kind === "relation") {
+      anchorNodeIds.add(cleanString(item.selected.raw.source_id));
+      anchorNodeIds.add(cleanString(item.selected.raw.cible_id));
+      selectedRelationIds.add(cleanString(item.selected.raw.relation_id));
+    } else if (item.selected.kind === "chunk") {
+      chunkIds.add(cleanString(item.selected.raw.chunk_id));
+    }
+  }
+
+  if (chunkIds.size) {
+    for (const node of store.nodes) {
+      const refs = splitChunkRefs(node.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) anchorNodeIds.add(cleanString(node.node_id));
+    }
+    for (const relation of store.relations) {
+      const refs = splitChunkRefs(relation.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) {
+        anchorNodeIds.add(cleanString(relation.source_id));
+        anchorNodeIds.add(cleanString(relation.cible_id));
+      }
+    }
+  }
+
+  anchorNodeIds.delete("");
+  selectedRelationIds.delete("");
+  return { anchorNodeIds, selectedRelationIds };
+}
+
+function mir04AnchorNodeIdsFromSearch(search, store) {
+  const anchorNodeIds = new Set();
+  const chunkIds = new Set();
+  const selectedRelationIds = new Set();
+
+  for (const result of search.results || []) {
+    if (result.kind === "node") anchorNodeIds.add(cleanString(result.node_id));
+    if (result.kind === "relation") {
+      anchorNodeIds.add(cleanString(result.source_id));
+      anchorNodeIds.add(cleanString(result.target_id));
+      selectedRelationIds.add(cleanString(result.relation_id));
+    }
+    if (result.kind === "chunk") chunkIds.add(cleanString(result.chunk_id));
+  }
+
+  if (chunkIds.size) {
+    for (const node of store.nodes) {
+      const refs = splitChunkRefs(node.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) anchorNodeIds.add(cleanString(node.node_id));
+    }
+  }
+
+  anchorNodeIds.delete("");
+  selectedRelationIds.delete("");
+  return { anchorNodeIds, selectedRelationIds };
+}
+
+function mir04Finding(relation, store, classification) {
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const source = nodeById.get(cleanString(relation.source_id)) || {};
+  const target = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: `relation:${cleanString(relation.relation_id)}` });
+
+  return {
+    finding_id: `relation:${cleanString(relation.relation_id)}`,
+    classification,
+    relation_type: cleanString(relation.type_relation),
+    source: {
+      node_id: cleanString(relation.source_id),
+      label: cleanString(source.libelle),
+      node_type: cleanString(source.type_noeud) || null
+    },
+    target: {
+      node_id: cleanString(relation.cible_id),
+      label: cleanString(target.libelle),
+      node_type: cleanString(target.type_noeud) || null
+    },
+    publication: publicationMeta(store, cleanString(relation.publication_id)),
+    provenance: proofLookup.provenance,
+    proofs: proofLookup.proofs,
+    interpretation_note: classification === "explicit_contradiction"
+      ? "Contradiction explicitement structurée dans le graphe. MIR04 ne généralise pas au-delà de cette relation documentée."
+      : "Tension, nuance ou distinction explicitement structurée dans le graphe. Elle n'est pas assimilée à une contradiction."
+  };
+}
+
+function runMir04(body) {
+  const action = SUPPORTED_ACTIONS.MIR04;
+  const store = getCorpusStore();
+  const selections = mir04SelectedMaterials(body, store);
+  const query = cleanString(body.query || body.element);
+
+  if (selections.length < 2 && !query) {
+    const error = new Error("MIR04 exige soit au moins deux material_ids, soit un champ query/element pour rechercher des tensions documentaires.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let mode;
+  let search = null;
+  let anchors;
+  let basisMaterials = [];
+
+  if (selections.length >= 2) {
+    mode = "selected_materials";
+    anchors = mir04AnchorNodeIdsFromSelections(selections, store);
+    basisMaterials = selections.map(item => ({
+      material_id: item.material_id,
+      publication: publicationMeta(store, item.publication_id),
+      content: item.summary
+    }));
+  } else {
+    mode = "query";
+    search = searchCorpus({
+      query,
+      limit: Math.max(12, Math.min(30, Number(body.search_limit) || 24)),
+      max_per_publication: Math.max(3, Math.min(8, Number(body.max_per_publication) || 6)),
+      diversify_by_publication: true
+    });
+    anchors = mir04AnchorNodeIdsFromSearch(search, store);
+    basisMaterials = search.results.slice(0, 6).map(buildMaterial);
+  }
+
+  const explicitContradictions = [];
+  const documentedTensions = [];
+
+  for (const relation of store.relations) {
+    const relationType = cleanString(relation.type_relation).toUpperCase();
+    const isContradiction = MIR04_EXPLICIT_CONTRADICTION_RELATIONS.has(relationType);
+    const isTension = MIR04_TENSION_RELATIONS.has(relationType);
+    if (!isContradiction && !isTension) continue;
+
+    const relationId = cleanString(relation.relation_id);
+    const sourceId = cleanString(relation.source_id);
+    const targetId = cleanString(relation.cible_id);
+
+    // Règle conservatrice : la relation doit être elle-même sélectionnée/retournée,
+    // ou relier deux nœuds ancrés par les matériaux examinés.
+    const anchored = anchors.selectedRelationIds.has(relationId)
+      || (anchors.anchorNodeIds.has(sourceId) && anchors.anchorNodeIds.has(targetId));
+    if (!anchored) continue;
+
+    const finding = mir04Finding(relation, store, isContradiction ? "explicit_contradiction" : "documented_tension");
+    if (isContradiction) explicitContradictions.push(finding);
+    else documentedTensions.push(finding);
+  }
+
+  const sortFindings = values => values.sort((a, b) => {
+    const pub = a.publication.publication_id.localeCompare(b.publication.publication_id);
+    if (pub !== 0) return pub;
+    return a.finding_id.localeCompare(b.finding_id);
+  });
+  sortFindings(explicitContradictions);
+  sortFindings(documentedTensions);
+
+  const insufficient = explicitContradictions.length === 0 && documentedTensions.length === 0;
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.5-mir04",
+    action,
+    input_mode: mode,
+    query: mode === "query" ? query : null,
+    basis_materials: basisMaterials,
+    scope: {
+      anchor_node_count: anchors.anchorNodeIds.size,
+      selected_relation_count: anchors.selectedRelationIds.size,
+      search_engine: search ? search.engine : null,
+      search_results_considered: search ? search.search.returned : null
+    },
+    findings: {
+      explicit_contradictions: explicitContradictions,
+      documented_tensions: documentedTensions
+    },
+    documentary_state: {
+      insufficient,
+      explicit_contradiction_found: explicitContradictions.length > 0,
+      documented_tension_found: documentedTensions.length > 0,
+      note: insufficient
+        ? "Aucune contradiction ni tension explicitement structurée n'a été repérée entre les matériaux ancrés. Cette absence ne prouve pas que les matériaux sont compatibles."
+        : "MIR04 distingue les contradictions explicitement structurées des tensions, nuances et distinctions documentées."
+    },
+    guardrails: {
+      corpus_only: true,
+      infers_contradiction_from_difference: false,
+      treats_nuance_as_contradiction: false,
+      treats_remet_en_cause_as_contradiction: false,
+      compares_only_anchored_materials: true,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      decides_which_material_is_correct: false,
+      note: "MIR04 fait apparaître uniquement des oppositions explicitement structurées dans le corpus. Une nuance, une remise en cause ou une distinction reste une tension documentaire, pas une contradiction automatique."
+    }
+  };
+}
+
 function runReflectionAssist(body = {}) {
   const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
   const action = SUPPORTED_ACTIONS[actionId];
@@ -1042,6 +1309,7 @@ function runReflectionAssist(body = {}) {
   if (actionId === "DOC02") return runDoc02(body);
   if (actionId === "DOC03") return runDoc03(body);
   if (actionId === "MIR01") return runMir01(body);
+  if (actionId === "MIR04") return runMir04(body);
 
   const error = new Error(`Action non implémentée : ${actionId}.`);
   error.statusCode = 400;

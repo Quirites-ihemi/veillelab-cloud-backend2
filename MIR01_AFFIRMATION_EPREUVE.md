@@ -73,3 +73,12 @@ MIR01 :
 3. Vérité-adéquation : détection d’une relation explicite `REMET_EN_CAUSE` dans PUB062.
 
 MIR01 V0.1 n’utilise ni Claude ni embeddings. Il s’appuie sur `corpus-search-v0.2-compound-concepts`, le graphe structuré et des marqueurs documentaires contrôlés.
+
+
+## Correctif v0.4.1 — « REMET_EN_CAUSE » n'est pas une contradiction automatique
+
+Une relation de graphe `REMET_EN_CAUSE` est désormais classée par défaut comme **nuance / tension documentée**. Elle ne devient pas une contradiction de l'affirmation testée du seul fait de son type de relation.
+
+La catégorie `contradiction` est réservée aux matériaux explicitement structurés comme contradiction (`CONTREDIT`) ou, dans une évolution ultérieure, à un mécanisme suffisamment fiable permettant d'établir qu'un matériau nie effectivement le contenu propositionnel de l'affirmation.
+
+Exemple de contrôle : pour « La vérité-adéquation correspond à une réalité extérieure indépendante de l'individu », la définition issue de PUB062 est un **appui** ; la relation indiquant que la post-vérité `REMET_EN_CAUSE` la vérité-adéquation est une **tension / nuance**, et non une contradiction de cette définition.

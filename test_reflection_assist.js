@@ -11,7 +11,7 @@ const ports = runReflectionAssist({
   element: "trafic de cocaïne infrastructures portuaires"
 });
 assert.equal(ports.ok, true);
-assert.equal(ports.engine, "reflection-assist-v0.4-doc01-doc02-doc03-mir01");
+assert.equal(ports.engine, "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01");
 assert.deepEqual(ids(ports).sort(), ["PUB024", "PUB025"]);
 assert.equal(ports.guardrails.generates_analysis, false);
 assert(ports.materials.some(m => m.provenance.fine_proof_available === true));
@@ -28,7 +28,7 @@ assert(masculinismeDoc01.materials.every(m => m.provenance.proof_mode === "graph
 // DOC02 — Niveau A.
 const proofA = runReflectionAssist({ action_id: "DOC02", material_id: "node:N0672" });
 assert.equal(proofA.ok, true);
-assert.equal(proofA.engine, "reflection-assist-v0.4-doc01-doc02-doc03-mir01");
+assert.equal(proofA.engine, "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01");
 assert.equal(proofA.publication.publication_id, "PUB025");
 assert.equal(proofA.provenance.level, "A");
 assert.equal(proofA.provenance.status, "fine_proof_available");
@@ -58,7 +58,7 @@ const comparablePorts = runReflectionAssist({
   material_id: "node:N0672"
 });
 assert.equal(comparablePorts.ok, true);
-assert.equal(comparablePorts.engine, "reflection-assist-v0.4-doc01-doc02-doc03-mir01");
+assert.equal(comparablePorts.engine, "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01");
 assert.equal(comparablePorts.action.id, "DOC03");
 assert.equal(comparablePorts.origin_publication_id, "PUB025");
 assert.deepEqual(comparablePorts.comparison_basis.anchors.map(a => a.id).sort(), ["narcotrafic", "port"]);
@@ -104,12 +104,15 @@ const fsiClaim = runReflectionAssist({
 assert(fsiClaim.evidence.support.some(m => m.publication.publication_id === "PUB013"));
 assert(fsiClaim.evidence.nuance.some(m => m.result_kind === "relation" && m.content.relation_type === "NUANCE"));
 
-// MIR01 — contradiction explicite uniquement lorsqu'elle est structurée comme telle.
+// MIR01 v0.4.1 — REMET_EN_CAUSE est une tension/nuance par défaut,
+// pas une contradiction automatique de la proposition testée.
 const truthClaim = runReflectionAssist({
   action_id: "MIR01",
   assertion: "La vérité-adéquation correspond à une réalité extérieure indépendante de l'individu."
 });
-assert(truthClaim.evidence.contradiction.some(m => m.result_kind === "relation" && m.content.relation_type === "REMET_EN_CAUSE"));
-assert.equal(truthClaim.documentary_state.explicit_contradiction_found, true);
+assert(truthClaim.evidence.support.some(m => m.material_id === "chunk:C0803"));
+assert(truthClaim.evidence.nuance.some(m => m.result_kind === "relation" && m.content.relation_type === "REMET_EN_CAUSE"));
+assert.equal(truthClaim.evidence.contradiction.length, 0);
+assert.equal(truthClaim.documentary_state.explicit_contradiction_found, false);
 
 console.log("OK reflection-assist DOC01 + DOC02 (A/B/C) + DOC03 + MIR01");

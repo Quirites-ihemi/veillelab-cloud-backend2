@@ -156,7 +156,7 @@ function runDoc01(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
     action,
     element,
     guardrails: {
@@ -366,7 +366,7 @@ function runDoc02(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
     action,
     selected_material_id: `${selector.kind}:${selector.id}`,
     selected_material: selectedMaterial,
@@ -614,7 +614,7 @@ function runDoc03(body) {
   if (!basis.anchors.length || !basis.query) {
     return {
       ok: true,
-      engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+      engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
       action,
       selected_material_id: selectedMaterialId,
       selected_material: selectedMaterial,
@@ -702,7 +702,7 @@ function runDoc03(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
     action,
     selected_material_id: selectedMaterialId,
     selected_material: selectedMaterial,
@@ -740,7 +740,10 @@ function runDoc03(body) {
 
 
 const MIR01_NUANCE_RELATIONS = new Set(["NUANCE", "SE_DISTINGUE_DE", "FREINE", "CONTRIBUE_PARTIELLEMENT_A"]);
-const MIR01_CONTRADICTION_RELATIONS = new Set(["REMET_EN_CAUSE", "CONTREDIT"]);
+// MIR01 v0.4.1: REMET_EN_CAUSE signale une tension documentaire par défaut.
+// Il ne suffit pas, à lui seul, à établir que la proposition testée est contredite.
+const MIR01_TENSION_RELATIONS = new Set(["REMET_EN_CAUSE"]);
+const MIR01_CONTRADICTION_RELATIONS = new Set(["CONTREDIT"]);
 const MIR01_SUPPORT_RELATIONS = new Set([
   "CONFIRME", "MET_EN_EVIDENCE", "ILLUSTRE", "CARACTERISE", "QUANTIFIE", "DOCUMENTE",
   "FAIT_SUITE_A", "CONTRIBUE_A", "FAVORISE", "ACCENTUE", "RENFORCE", "INFLUENCE",
@@ -845,6 +848,10 @@ function mir01Classify(result, coverage, causalClaim) {
 
   if (result.kind === "relation" && MIR01_CONTRADICTION_RELATIONS.has(relationType)) {
     return { position: "contradiction", reason: `relation_explicit:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  if (result.kind === "relation" && MIR01_TENSION_RELATIONS.has(relationType)) {
+    return { position: "nuance", reason: `relation_tension:${relationType}`, causal_scope: "not_inferred" };
   }
 
   if (result.kind === "relation" && MIR01_NUANCE_RELATIONS.has(relationType)) {
@@ -972,7 +979,7 @@ function runMir01(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.4-doc01-doc02-doc03-mir01",
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
     action,
     assertion,
     claim_analysis: {
@@ -1004,8 +1011,8 @@ function runMir01(body) {
       insufficient,
       explicit_contradiction_found: contradiction.length > 0,
       contradiction_note: contradiction.length
-        ? "Le corpus contient au moins un matériau explicitement structuré comme remise en cause de l'affirmation ou d'un de ses éléments."
-        : "Aucune contradiction explicite n'a été repérée parmi les matériaux retenus. Cette absence ne prouve pas qu'il n'existe pas de contradiction.",
+        ? "Le corpus contient au moins un matériau explicitement structuré comme contradiction de l'affirmation ou d'un de ses éléments."
+        : "Aucune contradiction explicite n'a été repérée parmi les matériaux retenus. Une relation de remise en cause est traitée comme une tension ou une nuance, sauf contradiction explicitement structurée. Cette absence ne prouve pas qu'il n'existe pas de contradiction.",
       conclusion: "MIR01 expose les matériaux disponibles et leurs tensions documentaires ; il ne rend pas de verdict sur l'affirmation."
     },
     guardrails: {
@@ -1017,7 +1024,7 @@ function runMir01(body) {
       infers_causality_from_association: false,
       invents_counterargument: false,
       classification_is_documentary_not_verdict: true,
-      note: "MIR01 classe uniquement des matériaux retrouvés dans le corpus en appui, nuance ou contradiction explicite ; l'interprétation finale reste à l'utilisateur."
+      note: "MIR01 classe uniquement des matériaux retrouvés dans le corpus en appui, nuance/tension ou contradiction explicite ; une relation REMET_EN_CAUSE n'est pas assimilée automatiquement à une contradiction de la proposition testée. L'interprétation finale reste à l'utilisateur."
     }
   };
 }

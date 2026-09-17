@@ -1522,7 +1522,7 @@ function runMir08(body) {
       claim_nature: claimNature,
       status: state,
       weak_empirical_anchor: state !== "empirical_anchor_found",
-      empirical_anchor_count: anchors.length,
+      empirical_anchor_count: materials.filter(item => item.empirical_check && item.empirical_check.counts_as_empirical_anchor).length,
       relevant_documentary_material_count: assessed.length,
       note: state === "empirical_anchor_found"
         ? "Le corpus actif contient au moins un matériau avec provenance fine et marqueur empirique explicitement compatible avec ce segment."
@@ -1540,7 +1540,7 @@ function runMir08(body) {
 
   return {
     ok: true,
-    engine: "reflection-assist-v0.6-mir08",
+    engine: "reflection-assist-v0.6.1-mir08",
     action,
     text,
     segmentation: {

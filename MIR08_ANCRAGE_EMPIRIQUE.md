@@ -5,7 +5,7 @@ MIR08 examine un ou plusieurs segments rédigés par l’utilisateur et vérifie
 
 MIR08 ne juge pas la vérité d’une affirmation. Il vérifie uniquement son ancrage empirique dans le corpus actif.
 
-## Règles V0.1
+## Règles V0.1 — correctif v0.6.1
 - Seuls les segments reconnus comme empiriques sont évalués comme « ancrés » ou « faiblement ancrés ».
 - Une proposition conceptuelle ou évaluative n’est pas automatiquement qualifiée de faiblement étayée : elle est marquée `outside_empirical_check_scope`.
 - Un ancrage empirique exige une provenance fine de niveau A.
@@ -13,6 +13,7 @@ MIR08 ne juge pas la vérité d’une affirmation. Il vérifie uniquement son an
 - Lorsqu’un segment comporte une quantification, les valeurs numériques du matériau doivent correspondre ; une donnée seulement voisine n’est pas traitée comme preuve.
 - L’absence d’ancrage dans le corpus actif ne signifie ni que l’affirmation est fausse, ni qu’aucune preuve n’existe hors corpus.
 - MIR08 ne choisit pas d’exemples pour construire l’argument de l’utilisateur et ne produit pas de généralisation.
+- `empirical_anchor_count` compte uniquement les matériaux effectivement restitués dans `materials` et retenus comme ancrages empiriques après filtrage/dédoublonnage.
 
 ## Entrée
 `POST /reflection-assist`

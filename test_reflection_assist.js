@@ -160,10 +160,11 @@ const mir08Anchored = runReflectionAssist({
   text: "En 2024, 78 % du volume de cocaïne saisi en France l'a été par voie maritime."
 });
 assert.equal(mir08Anchored.ok, true);
-assert.equal(mir08Anchored.engine, "reflection-assist-v0.6-mir08");
+assert.equal(mir08Anchored.engine, "reflection-assist-v0.6.1-mir08");
 assert.equal(mir08Anchored.checks.length, 1);
 assert.equal(mir08Anchored.checks[0].status, "empirical_anchor_found");
 assert.equal(mir08Anchored.checks[0].weak_empirical_anchor, false);
+assert.equal(mir08Anchored.checks[0].empirical_anchor_count, mir08Anchored.checks[0].materials.filter(m => m.empirical_check && m.empirical_check.counts_as_empirical_anchor).length);
 assert(mir08Anchored.checks[0].materials.some(m => m.material_id === "chunk:C0523" && m.empirical_check.counts_as_empirical_anchor === true));
 assert.equal(mir08Anchored.guardrails.treats_illustrative_material_as_proof, false);
 assert.equal(mir08Anchored.guardrails.evaluates_truth_or_falsity, false);

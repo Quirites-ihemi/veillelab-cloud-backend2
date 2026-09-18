@@ -76,6 +76,39 @@ const CONTROLLED_CONCEPTS = [
   }
 ];
 
+// V0.3 : certains mots expriment l'intention documentaire de la requête
+// plutôt que son sujet. Exemple : dans « quelles perspectives d'avenir pour
+// la cybercriminalité », « perspectives / avenir » demandent une lecture
+// prospective, tandis que « cybercriminalité » est le sujet qui doit être
+// présent dans chaque résultat retenu.
+//
+// Ces intentions ne sont séparées du sujet QUE si au moins un concept sujet
+// reste disponible. Une requête générique comme « perspectives d'avenir »
+// conserve donc son comportement lexical antérieur au lieu de devenir vide.
+const CONTROLLED_QUERY_INTENTS = [
+  {
+    id: "future_outlook",
+    triggers: [
+      "perspective", "perspectives",
+      "avenir",
+      "futur", "future", "futures",
+      "prospective", "prospectives", "prospectif", "prospectifs", "prospective",
+      "tendance", "tendances",
+      "evolution", "evolutions",
+      "emergence", "emergences", "emergent", "emergents", "emerger"
+    ],
+    alternatives: [
+      "perspective", "perspectives",
+      "avenir", "futur", "future", "futures",
+      "prospective", "prospectives", "prospectif", "prospectifs",
+      "tendance", "tendances",
+      "evolution", "evolutions", "evolue", "evoluent",
+      "emergence", "emergences", "emergent", "emergents", "emerger",
+      "a venir", "dans les annees a venir", "points d attention"
+    ]
+  }
+];
+
 const STOPWORDS = new Set([
   "a","ai","au","aux","avec","ce","ces","cette","cet","dans","de","des","du","elle","en","est","et","eux","il","ils","je","la","le","les","leur","leurs","mais","me","mes","moi","mon","ne","nos","notre","nous","on","ou","par","pas","pour","qu","que","quel","quelle","quelles","quels","qui","sa","se","ses","son","sur","ta","te","tes","toi","ton","tu","un","une","vos","votre","vous","y",
   "comment","quoi","peut","peuvent","plus","moins","faire","fait","faits","element","elements","sujet","question","corpus","publication","publications"
@@ -184,6 +217,57 @@ function buildQueryConcepts(queryTokens) {
   }
 
   return concepts;
+}
+
+function splitSubjectAndIntentConcepts(queryConcepts) {
+  const intentDefinitions = new Map(CONTROLLED_QUERY_INTENTS.map(item => [item.id, item]));
+  const intentTokenToDefinition = new Map();
+  for (const definition of CONTROLLED_QUERY_INTENTS) {
+    for (const trigger of definition.triggers) {
+      intentTokenToDefinition.set(normalizeText(trigger), definition);
+    }
+  }
+
+  const subjectConcepts = [];
+  const intentBuckets = new Map();
+
+  for (const concept of queryConcepts) {
+    // Les concepts contrôlés métier (narcotrafic, port...) restent toujours des sujets.
+    if (concept.compound || CONTROLLED_CONCEPTS.some(item => item.id === concept.id)) {
+      subjectConcepts.push(concept);
+      continue;
+    }
+
+    const definition = intentTokenToDefinition.get(normalizeText(concept.id));
+    if (!definition) {
+      subjectConcepts.push(concept);
+      continue;
+    }
+
+    if (!intentBuckets.has(definition.id)) {
+      intentBuckets.set(definition.id, {
+        id: definition.id,
+        source_tokens: [],
+        alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean)),
+        compound: false,
+        role: "intent"
+      });
+    }
+    const bucket = intentBuckets.get(definition.id);
+    bucket.source_tokens.push(...concept.source_tokens);
+  }
+
+  const intentConcepts = [...intentBuckets.values()].map(item => ({
+    ...item,
+    source_tokens: unique(item.source_tokens)
+  }));
+
+  // Ne jamais laisser une requête sans sujet exploitable.
+  if (!subjectConcepts.length) {
+    return { subjectConcepts: queryConcepts, intentConcepts: [] };
+  }
+
+  return { subjectConcepts, intentConcepts };
 }
 
 function tokenSimilarity(queryToken, candidateToken) {
@@ -369,24 +453,25 @@ function conceptMatchScore(concept, normalized, tokens) {
   return best;
 }
 
-function scoreDocument(doc, queryNormalized, queryConcepts) {
-  if (!queryNormalized || !queryConcepts.length) return 0;
+function scoreDocument(doc, queryNormalized, subjectConcepts, intentConcepts = []) {
+  if (!queryNormalized || !subjectConcepts.length) return 0;
 
   let score = 0;
-  let matchedConcepts = 0;
-  let matchedInMain = 0;
+  let matchedSubjectConcepts = 0;
+  let matchedSubjectsInMain = 0;
 
-  // Une expression exacte dans le contenu principal doit rester extrêmement discriminante.
+  // Une expression exacte complète reste un bonus, mais elle ne peut jamais
+  // contourner l'obligation de correspondre au sujet principal.
   if (doc.mainNormalized.includes(queryNormalized)) score += 24;
   else if (doc.normalized.includes(queryNormalized)) score += 10;
 
-  for (const concept of queryConcepts) {
+  // 1) Le sujet est la condition d'entrée dans les résultats.
+  for (const concept of subjectConcepts) {
     const main = conceptMatchScore(concept, doc.mainNormalized, doc.mainTokens);
     const section = conceptMatchScore(concept, doc.sectionNormalized, doc.sectionTokens);
     const title = conceptMatchScore(concept, doc.titleNormalized, doc.titleTokens);
     const metadata = conceptMatchScore(concept, doc.metadataNormalized, doc.metadataTokens);
 
-    // Pondération des champs : la matière documentaire / graphe prime nettement sur les métadonnées.
     const weighted = Math.max(
       main * 8.0,
       section * 4.0,
@@ -395,26 +480,48 @@ function scoreDocument(doc, queryNormalized, queryConcepts) {
     );
 
     if (weighted > 0) {
-      matchedConcepts += 1;
-      if (main >= 0.68) matchedInMain += 1;
+      matchedSubjectConcepts += 1;
+      if (main >= 0.68) matchedSubjectsInMain += 1;
       score += weighted;
     }
   }
 
-  const coverage = matchedConcepts / queryConcepts.length;
-  if (coverage <= 0) return 0;
+  const subjectCoverage = matchedSubjectConcepts / subjectConcepts.length;
+  if (subjectCoverage <= 0) return 0;
 
-  // Deux concepts ou plus : la couverture complète doit dominer très nettement un résultat partiel.
-  if (queryConcepts.length >= 2) {
-    if (coverage === 1) score += 18;
+  // Deux concepts sujets ou plus : même discipline de couverture que la V0.2.
+  if (subjectConcepts.length >= 2) {
+    if (subjectCoverage === 1) score += 18;
     else score *= 0.32;
 
-    // Bonus supplémentaire si tous les concepts sont réellement présents dans le contenu principal.
-    if (matchedInMain === queryConcepts.length) score += 10;
+    if (matchedSubjectsInMain === subjectConcepts.length) score += 10;
   }
 
-  // Trois concepts ou plus : écarter les documents trop éloignés de la requête.
-  if (queryConcepts.length >= 3 && coverage < 0.5) return 0;
+  if (subjectConcepts.length >= 3 && subjectCoverage < 0.5) return 0;
+
+  // 2) L'intention (prospective, tendances, émergence...) ne rend jamais un
+  // document pertinent à elle seule. Elle ne sert qu'à ordonner les documents
+  // déjà pertinents pour le sujet.
+  let matchedIntentConcepts = 0;
+  for (const intent of intentConcepts) {
+    const main = conceptMatchScore(intent, doc.mainNormalized, doc.mainTokens);
+    const section = conceptMatchScore(intent, doc.sectionNormalized, doc.sectionTokens);
+    const title = conceptMatchScore(intent, doc.titleNormalized, doc.titleTokens);
+    const metadata = conceptMatchScore(intent, doc.metadataNormalized, doc.metadataTokens);
+
+    const weightedIntent = Math.max(
+      main * 4.0,
+      section * 5.0,
+      title * 2.5,
+      metadata * 0.5
+    );
+    if (weightedIntent > 0) {
+      matchedIntentConcepts += 1;
+      score += weightedIntent;
+    }
+  }
+
+  if (intentConcepts.length && matchedIntentConcepts === intentConcepts.length) score += 3;
 
   // Préférence légère pour la preuve textuelle, sans exclure le graphe.
   if (doc.kind === "chunk") score += 1.5;
@@ -520,7 +627,8 @@ function searchCorpus(body = {}) {
   const filters = parseFilters(body);
   const queryNormalized = normalizeText(query);
   const queryTokens = unique(tokenize(query));
-  const queryConcepts = buildQueryConcepts(queryTokens);
+  const rawQueryConcepts = buildQueryConcepts(queryTokens);
+  const { subjectConcepts: queryConcepts, intentConcepts: queryIntents } = splitSubjectAndIntentConcepts(rawQueryConcepts);
 
   if (!queryTokens.length) {
     const error = new Error("La requête ne contient aucun terme exploitable.");
@@ -540,7 +648,7 @@ function searchCorpus(body = {}) {
     if (doc.kind === "chunk") scannedChunks += 1;
     if (doc.kind === "node") scannedNodes += 1;
     if (doc.kind === "relation") scannedRelations += 1;
-    const score = scoreDocument(doc, queryNormalized, queryConcepts);
+    const score = scoreDocument(doc, queryNormalized, queryConcepts, queryIntents);
     if (score > 0) scored.push({ doc, score });
   }
 
@@ -559,11 +667,12 @@ function searchCorpus(body = {}) {
 
   return {
     ok: true,
-    engine: "corpus-search-v0.2-compound-concepts",
+    engine: "corpus-search-v0.3-topic-first",
     query,
     normalized_query: queryNormalized,
     query_tokens: queryTokens,
     query_concepts: queryConcepts.map(c => ({ id: c.id, source_tokens: c.source_tokens, compound: Boolean(c.compound) })),
+    query_intents: queryIntents.map(c => ({ id: c.id, source_tokens: c.source_tokens })),
     corpus: {
       active_publications: getCorpusStore().status.active_publications,
       chunks: getCorpusStore().status.chunks,

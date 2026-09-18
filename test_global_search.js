@@ -50,4 +50,35 @@ console.log(`${compoundRelevantOnly && compoundNoise.length === 0 ? 'OK' : 'ECHE
 console.log(`${preciseNodeAboveNoise ? 'OK' : 'ECHEC'} | nœud précis N0672 présent`);
 if (!compoundConceptsOk || !compoundRelevantOnly || compoundNoise.length || !preciseNodeAboveNoise) failed += 1;
 
+
+// Régression V0.3 : distinguer le sujet de la demande et son intention.
+// « perspectives / avenir » ne doit jamais suffire à faire remonter un texte
+// hors sujet si « cybercriminalité » est le thème demandé.
+const futureCyber = searchCorpus({
+  query: "quelles perspectives d'avenir pour la cybercriminalité",
+  limit: 12,
+  diversify_by_publication: false
+});
+const futureCyberIds = futureCyber.results.map(r => r.result_id);
+const futureCyberPubs = [...new Set(futureCyber.results.map(r => r.publication_id))];
+const futureCyberSubjectOk =
+  futureCyber.query_concepts.length === 1 &&
+  futureCyber.query_concepts[0].id === 'cybercriminalite';
+const futureCyberIntentOk =
+  futureCyber.query_intents.length === 1 &&
+  futureCyber.query_intents[0].id === 'future_outlook';
+const futureCyberNoFalsePositive = !futureCyberIds.includes('chunk:C0558') && !futureCyberPubs.includes('PUB026');
+const futureCyberTopRelevant = futureCyber.results.length > 0 && futureCyber.results[0].publication_id === 'PUB006';
+console.log(`${futureCyberSubjectOk ? 'OK' : 'ECHEC'} | sujet central cybercriminalité | concepts: ${futureCyber.query_concepts.map(c => c.id).join(', ')}`);
+console.log(`${futureCyberIntentOk ? 'OK' : 'ECHEC'} | intention prospective séparée | intents: ${futureCyber.query_intents.map(c => c.id).join(', ')}`);
+console.log(`${futureCyberNoFalsePositive ? 'OK' : 'ECHEC'} | faux positif C0558/PUB026 écarté | pubs: ${futureCyberPubs.join(', ')}`);
+console.log(`${futureCyberTopRelevant ? 'OK' : 'ECHEC'} | prospective cybercriminalité en tête | premier: ${futureCyber.results[0]?.result_id || 'aucun'} / ${futureCyber.results[0]?.publication_id || 'aucune'}`);
+if (!futureCyberSubjectOk || !futureCyberIntentOk || !futureCyberNoFalsePositive || !futureCyberTopRelevant) failed += 1;
+
+// La formulation courte « avenir cybercriminalité » ne doit plus renvoyer zéro résultat.
+const shortFutureCyber = searchCorpus({ query: 'avenir cybercriminalité', limit: 6 });
+const shortFutureCyberOk = shortFutureCyber.results.length > 0 && shortFutureCyber.results[0].publication_id === 'PUB006';
+console.log(`${shortFutureCyberOk ? 'OK' : 'ECHEC'} | avenir cybercriminalité | premier: ${shortFutureCyber.results[0]?.publication_id || 'aucun'}`);
+if (!shortFutureCyberOk) failed += 1;
+
 if (failed) process.exit(1);

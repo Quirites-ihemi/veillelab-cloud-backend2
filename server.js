@@ -6,6 +6,7 @@ const { CloudTasksClient } = require("@google-cloud/tasks");
 const { SecretManagerServiceClient } = require("@google-cloud/secret-manager");
 const { genererResumeAnalytiqueT01, nettoyerCorpusT01, MODEL_REDACTION } = require("./t01");
 const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
+const { genererGlossaireT02, nettoyerCorpusT02 } = require("./t02");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
@@ -232,6 +233,94 @@ async function loadInputT01(jobId) {
 }
 
 
+
+async function writeInputT02(jobId, body) {
+  const corpusPropre = nettoyerCorpusT02(body.corpus);
+  if (!corpusPropre.length) throw new Error("Aucun chunk exploitable dans le corpus sélectionné pour T02.");
+
+  const inputRef = firestore.collection("job_inputs").doc(jobId);
+  const chunksRef = inputRef.collection("chunks");
+  const publications = corpusPropre.map(pub => ({
+    publication_id: pub.publication_id,
+    titre: pub.titre,
+    organisme_producteur: pub.organisme_producteur,
+    annee_publication: pub.annee_publication,
+    type_document: pub.type_document,
+    url_contenu: pub.url_contenu,
+    url_source: pub.url_source
+  }));
+  const totalChunks = corpusPropre.reduce((n, pub) => n + pub.chunks.length, 0);
+
+  await inputRef.set({
+    job_id: jobId,
+    treatment_id: "T02",
+    need: String(body.need || "").trim(),
+    treatment: {
+      traitement_id: "T02",
+      nom_traitement: String(body.treatment?.nom_traitement || "Glossaire"),
+      objectif: String(body.treatment?.objectif || ""),
+      regime_IA: String(body.treatment?.regime_IA || "Extraction stricte"),
+      format_sortie: String(body.treatment?.format_sortie || ""),
+      provenance_exigee: String(body.treatment?.provenance_exigee || ""),
+      prompt_systeme: String(body.treatment?.prompt_systeme || "")
+    },
+    publications,
+    total_chunks: totalChunks,
+    created_at: FieldValue.serverTimestamp()
+  });
+
+  let globalIndex = 0;
+  const chunks = [];
+  corpusPropre.forEach(pub => pub.chunks.forEach(c => chunks.push({ ...c, _pub: pub.publication_id })));
+  for (let start = 0; start < chunks.length; start += 350) {
+    const batch = firestore.batch();
+    chunks.slice(start, start + 350).forEach(c => {
+      const orderIndex = globalIndex++;
+      const docId = String(orderIndex + 1).padStart(5, "0") + "_" + String(c.chunk_id).replace(/[^a-zA-Z0-9_-]/g, "_");
+      batch.set(chunksRef.doc(docId), {
+        chunk_id: c.chunk_id,
+        publication_id: c.publication_id || c._pub,
+        ordre: c.ordre,
+        section: c.section,
+        page_debut: c.page_debut,
+        page_fin: c.page_fin,
+        texte: c.texte,
+        order_index: orderIndex
+      });
+    });
+    await batch.commit();
+  }
+  return { publications, totalChunks };
+}
+
+async function loadInputT02(jobId) {
+  const inputRef = firestore.collection("job_inputs").doc(jobId);
+  const inputSnap = await inputRef.get();
+  if (!inputSnap.exists) throw new Error(`Entrée du job introuvable : ${jobId}`);
+  const meta = inputSnap.data();
+  const chunksSnap = await inputRef.collection("chunks").orderBy("order_index", "asc").get();
+  const byPub = new Map((meta.publications || []).map(pub => [String(pub.publication_id), { ...pub, chunks: [] }]));
+  chunksSnap.docs.forEach(doc => {
+    const c = doc.data();
+    const pubId = String(c.publication_id || "");
+    if (!byPub.has(pubId)) return;
+    byPub.get(pubId).chunks.push({
+      chunk_id: String(c.chunk_id || ""),
+      publication_id: pubId,
+      ordre: String(c.ordre || ""),
+      section: String(c.section || ""),
+      page_debut: c.page_debut == null ? "" : String(c.page_debut),
+      page_fin: c.page_fin == null ? "" : String(c.page_fin),
+      texte: String(c.texte || "")
+    });
+  });
+  return {
+    need: String(meta.need || ""),
+    treatment: meta.treatment || {},
+    corpus: [...byPub.values()]
+  };
+}
+
 async function writeInputT03(jobId, body) {
   const corpusPropre = nettoyerCorpusT03(body.corpus);
   if (!corpusPropre.length) throw new Error("Aucun chunk exploitable dans le corpus sélectionné.");
@@ -359,10 +448,11 @@ async function createJob(body) {
   const besoin = String(body.need || "").trim();
   const corpus = Array.isArray(body.corpus) ? body.corpus : [];
 
-  if (!["T01", "T03"].includes(traitementId)) {
-    throw new Error("Cette version Cloud traite T01 et T03.");
+  if (!["T01", "T02", "T03"].includes(traitementId)) {
+    throw new Error("Cette version Cloud traite T01, T02 et T03.");
   }
-  if (!besoin) throw new Error("Le besoin utilisateur est vide.");
+  const besoinEffectif = besoin || (traitementId === "T02" ? "Identifier et expliciter le vocabulaire spécialisé présent dans les publications sélectionnées." : "");
+  if (!besoinEffectif) throw new Error("Le besoin utilisateur est vide.");
   if (!corpus.length) throw new Error("Le corpus sélectionné est vide.");
 
   const jobId = randomUUID();
@@ -384,15 +474,18 @@ async function createJob(body) {
   });
 
   try {
+    const bodyEffectif = { ...body, need: besoinEffectif };
     const inputInfo = traitementId === "T01"
-      ? await writeInputT01(jobId, body)
-      : await writeInputT03(jobId, body);
+      ? await writeInputT01(jobId, bodyEffectif)
+      : traitementId === "T02"
+        ? await writeInputT02(jobId, bodyEffectif)
+        : await writeInputT03(jobId, bodyEffectif);
 
     await ref.update({
       publication_id: traitementId === "T01" ? inputInfo.publication.publication_id : String(inputInfo.publications[0]?.publication_id || ""),
       publication_title: traitementId === "T01" ? inputInfo.publication.titre : String(inputInfo.publications[0]?.titre || ""),
       publication_count: traitementId === "T01" ? 1 : inputInfo.publications.length,
-      chunks_total: traitementId === "T01" ? inputInfo.totalChunks : inputInfo.totalChunks,
+      chunks_total: inputInfo.totalChunks,
       stage: "waiting_for_task",
       updated_at: FieldValue.serverTimestamp()
     });
@@ -500,6 +593,17 @@ async function processJob(jobId, taskToken) {
           await ref.update({ status: "running", stage: progress.stage || "running", progress, updated_at: FieldValue.serverTimestamp() });
         }
       });
+    } else if (data.treatment_id === "T02") {
+      const input = await loadInputT02(jobId);
+      result = await genererGlossaireT02({
+        apiKey,
+        besoin: input.need,
+        treatment: input.treatment,
+        corpus: input.corpus,
+        onProgress: async progress => {
+          await ref.update({ status: "running", stage: progress.stage || "running", progress, updated_at: FieldValue.serverTimestamp() });
+        }
+      });
     } else if (data.treatment_id === "T03") {
       const input = await loadInputT03(jobId);
       result = await genererCarteReflexionT03({
@@ -523,7 +627,7 @@ async function processJob(jobId, taskToken) {
       result,
       progress: {
         stage: "done",
-        message: data.treatment_id === "T03" ? "Carte de réflexion prête" : "Résumé analytique terminé",
+        message: data.treatment_id === "T03" ? "Carte de réflexion prête" : data.treatment_id === "T02" ? "Glossaire terminé" : "Résumé analytique terminé",
         chunks_total: result?.selection?.chunks_recus || data.chunks_total || 0,
         chunks_processed: result?.selection?.chunks_mobilises || result?.selection?.chunks_recus || data.chunks_total || 0
       },
@@ -561,8 +665,8 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         ok: true,
         service: "quirites-veille-lab-cloud",
-        version: "cloud-v0.8.1-public-chat-stable",
-        message: "Backend Cloud Run disponible — T01 + T03 + chatbot public structuré stable",
+        version: "cloud-v0.9.0-t02-glossary",
+        message: "Backend Cloud Run disponible — T01 + T02 + T03 + recherche corpus + chatbot public structuré",
         queue: `${TASK_LOCATION}/${TASK_QUEUE}`,
         model: MODEL_REDACTION,
         input_storage: "firestore-subcollection"
@@ -665,5 +769,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Quiritès Cloud backend T01/T03/graph-chat listening on port ${PORT}`);
+  console.log(`Quiritès Cloud backend T01/T02/T03/graph-chat listening on port ${PORT}`);
 });

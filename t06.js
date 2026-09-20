@@ -839,6 +839,7 @@ N'utilise aucune connaissance extérieure. Les noms propres, chiffres et dates d
 async function construireGrilleGuetT06({ apiKey, besoin = '', cadrage = {}, reponses = [], axes = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
   const need = String(besoin || '').trim();
   if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
+
   const selectedAxes = (Array.isArray(axes) ? axes : [])
     .map((a, i) => ({
       ...a,
@@ -851,53 +852,48 @@ async function construireGrilleGuetT06({ apiKey, besoin = '', cadrage = {}, repo
     }))
     .filter(a => a.titre)
     .slice(0, MAX_AXES_PER_STRUCTURE + 2);
+
   if (!selectedAxes.length) { const e = new Error('Au moins un axe de veille doit être retenu.'); e.statusCode = 400; throw e; }
 
   const answers = sanitizeAnswers(reponses);
   const subject = String(cadrage?.sujet_central || fallbackSubjectFromNeed(need)).trim();
   const { packets, rawByAxis } = buildDynamicPackets(searchFn, selectedAxes, subject, answers);
+  const packetByAxis = new Map(packets.map(packet => [String(packet.axis_id || ''), packet]));
 
   const system = `
-Tu construis une GRILLE DE GUET, pas une analyse prédictive.
-Pour chaque axe :
+Tu construis les OBJETS DE VEILLE pour UN SEUL AXE à la fois.
+Tu produis une grille de guet, pas une analyse prédictive.
+
+Pour l'axe fourni :
 1) TENDANCES DOCUMENTÉES : constats déclaratifs synthétiques. Chaque tendance doit être soutenue par au moins deux matériaux provenant de publications différentes. Si ce n'est pas possible, retourne zéro tendance.
-2) SIGNES DE CHANGEMENT À GUETTER : ce sont des propositions interrogatives/observables sur ce qu'il serait utile de surveiller. Elles peuvent monter en généralité. Elles ne sont PAS présentées comme déjà observées. Elles peuvent être inspirées par le corpus, mais une absence de matériau n'interdit pas de proposer un signe à guetter.
-3) HYPOTHÈSES DE REGROUPEMENT : seulement si au moins deux signes de changement à guetter peuvent converger. Formule explicitement l'incertitude et ce qui invaliderait l'hypothèse. Ne présente jamais cela comme un signal faible déjà établi.
-4) SOURCES À SURVEILLER : privilégie les types ou publications réellement présents dans les matériaux. Ne crée aucun nom propre absent du besoin ou du corpus.
-5) ANGLES MORTS : transforme les lacunes documentaires en points à instruire, sans bloquer le scénario.
+2) SIGNES DE CHANGEMENT À GUETTER : propositions observables sur ce qu'il serait utile de surveiller. Ils ne sont PAS présentés comme déjà observés. Ils peuvent être inspirés par le corpus, et une couverture documentaire limitée n'interdit pas d'en proposer.
+3) HYPOTHÈSES DE REGROUPEMENT : seulement si au moins deux signes à guetter peuvent converger. Formule explicitement l'incertitude et ce qui invaliderait l'hypothèse. Ne présente jamais cela comme un signal faible établi.
+4) SOURCES À SURVEILLER : privilégie les types de sources, organismes ou publications réellement présents dans le besoin ou les matériaux. Ne crée aucun fait sur une source absente.
+5) ANGLES MORTS : transforme les lacunes documentaires en points à instruire, sans bloquer l'axe.
 
-Règles :
-- Aucun chiffre, date, nom propre ou causalité dans une proposition IA s'ils ne figurent pas dans le besoin ou les matériaux fournis.
-- Les tendances sont du CORPUS ; les signes à guetter et hypothèses sont des PROPOSITIONS IA À VALIDER.
-- N'utilise aucune connaissance extérieure.`;
+Règles impératives :
+- Tu réponds uniquement pour l'axis_id fourni.
+- Aucun chiffre, date, nom propre ou causalité dans une proposition s'ils ne figurent pas dans le besoin ou les matériaux fournis.
+- Les tendances sont des synthèses sourcées ; les signes à guetter et hypothèses sont des propositions IA à valider.
+- N'utilise aucune connaissance extérieure.
+- Même en l'absence de tendance suffisamment étayée, propose au moins deux signes de changement à guetter, conformément au schéma de sortie.`;
 
-  const prompt = packets.map(p => [
-    `AXE ${p.axis_id} — ${p.titre}`,
-    `Objectif : ${p.objectif_surveillance}`,
-    `Statut de couverture : ${p.corpus_status}`,
-    'MATÉRIAUX :',
-    p.materials.length ? p.materials.map((m, i) => `${i + 1}. ${m.material_id} | ${m.publication_id} | ${m.publication_title} | ${m.locator || 'sans repère'} | ${clip(m.text, 620)}`).join('\n') : '(aucun matériau pertinent)'
-  ].join('\n')).join('\n\n==========\n\n');
-
-  let raw;
-  try {
-    raw = await callModel({
-      apiKey,
-      system,
-      tool: WATCH_TOOL,
-      userText: `BESOIN : ${need}\nPRÉCISIONS UTILISATEUR :\n${answersText(answers)}\n\n${prompt}`,
-      maxTokens: 6200
-    });
-  } catch {
-    raw = { axes: selectedAxes.map(a => ({ axis_id: a.axis_id, tendances: [], signes_a_guetter: [], hypotheses_regroupement: [], sources_a_surveiller: [], angles_morts: ['La grille de guet doit être complétée manuellement pour cet axe.'] })) };
+  function buildAxisPrompt(axis, packet) {
+    return [
+      `BESOIN : ${need}`,
+      answers.length ? `PRÉCISIONS UTILISATEUR :\n${answersText(answers)}` : '',
+      `AXE ${axis.axis_id} — ${axis.titre}`,
+      `Objectif : ${axis.objectif_surveillance}`,
+      `Statut de couverture : ${axis.corpus_status}`,
+      axis.questions.length ? `Questions de veille :\n- ${axis.questions.join('\n- ')}` : '',
+      'MATÉRIAUX :',
+      packet?.materials?.length
+        ? packet.materials.map((m, i) => `${i + 1}. ${m.material_id} | ${m.publication_id} | ${m.publication_title} | ${m.locator || 'sans repère'} | ${clip(m.text, 620)}`).join('\n')
+        : '(aucun matériau pertinent)'
+    ].filter(Boolean).join('\n\n');
   }
 
-  const rawAxisMap = new Map((Array.isArray(raw?.axes) ? raw.axes : []).map(a => [String(a?.axis_id || ''), a]));
-  const resultAxes = [];
-
-  for (const axis of selectedAxes) {
-    const sourceAxis = rawAxisMap.get(axis.axis_id) || {};
-    const results = rawByAxis.get(axis.axis_id) || [];
+  function normalizeGeneratedAxis(axis, sourceAxis, results) {
     const allowed = allowedMaterialIds(results);
 
     const trends = (Array.isArray(sourceAxis.tendances) ? sourceAxis.tendances : []).map((t, i) => {
@@ -951,21 +947,69 @@ Règles :
       };
     }).filter(s => s.label).slice(0, 6);
 
-    resultAxes.push({
+    return {
       ...axis,
+      object_generation_status: 'disponible',
+      object_generation_error: false,
       tendances: trends,
       signes_a_guetter: signs,
       hypotheses_regroupement: hypotheses,
       sources_a_surveiller: sourcesToWatch,
       angles_morts: [...new Set((Array.isArray(sourceAxis.angles_morts) ? sourceAxis.angles_morts : []).map(x => String(x || '').trim()).filter(Boolean))].slice(0, 4)
-    });
+    };
+  }
+
+  const resultAxes = [];
+  const failedAxisIds = [];
+
+  // Important : un appel LLM indépendant par axe.
+  // Une panne sur un axe ne vide plus silencieusement tous les autres axes.
+  for (const axis of selectedAxes) {
+    const packet = packetByAxis.get(axis.axis_id) || { axis_id: axis.axis_id, materials: [] };
+    const results = rawByAxis.get(axis.axis_id) || [];
+
+    try {
+      const raw = await callModel({
+        apiKey,
+        system,
+        tool: WATCH_TOOL,
+        userText: buildAxisPrompt(axis, packet),
+        maxTokens: 2600
+      });
+
+      const returnedAxes = Array.isArray(raw?.axes) ? raw.axes : [];
+      const sourceAxis = returnedAxes.find(item => String(item?.axis_id || '') === axis.axis_id);
+      if (!sourceAxis) {
+        const error = new Error(`Réponse structurée sans l'axe attendu ${axis.axis_id}.`);
+        error.code = 'T06_MISSING_AXIS_RESULT';
+        throw error;
+      }
+
+      resultAxes.push(normalizeGeneratedAxis(axis, sourceAxis, results));
+    } catch (error) {
+      failedAxisIds.push(axis.axis_id);
+      console.error(`[T06] Échec génération objets axe ${axis.axis_id}:`, error?.message || error);
+      resultAxes.push({
+        ...axis,
+        object_generation_status: 'indisponible',
+        object_generation_error: true,
+        object_generation_message: 'Les objets de veille n’ont pas pu être générés pour cet axe en raison d’une indisponibilité technique. Ce statut ne signifie pas que le corpus ne contient aucun élément pertinent.',
+        tendances: [],
+        signes_a_guetter: [],
+        hypotheses_regroupement: [],
+        sources_a_surveiller: [],
+        angles_morts: []
+      });
+    }
   }
 
   return {
     ok: true,
-    engine: 't06-watch-v1.0-axis-by-axis',
+    engine: 't06-watch-v1.0.2-per-axis-failure-explicit',
     need,
     axes: resultAxes,
+    generation_available: failedAxisIds.length === 0,
+    failed_axis_ids: failedAxisIds,
     methodological_reference: {
       label: 'ESPAS Horizon Scanning — communauté des veilleurs de l’Union européenne',
       url: 'https://espas.eu/horizon.html',
@@ -976,7 +1020,9 @@ Règles :
       weak_signal_claims_generated: false,
       trends_require_two_publications: true,
       watch_signs_are_hypotheses: true,
-      final_step_should_be_deterministic: true
+      final_step_should_be_deterministic: true,
+      generation_isolated_per_axis: true,
+      technical_failure_is_not_empty_corpus: true
     }
   };
 }

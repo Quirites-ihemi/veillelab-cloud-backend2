@@ -92,7 +92,7 @@ async function callModel({tool}){
   assert.equal(support.documentation_available,true);
 
   const dynamics=await construireGrilleGuetT06({apiKey:'fake',besoin:need,cadrage:framing,reponses:[],axes:support.axes,searchFn,callModel});
-  assert.equal(dynamics.engine,'t06-watch-v1.0-axis-by-axis');
+  assert.equal(dynamics.engine,'t06-watch-v1.0.2-per-axis-failure-explicit');
   assert.equal(dynamics.axes.length,1);
   assert.equal(dynamics.axes[0].tendances.length,1);
   assert.equal(dynamics.axes[0].signes_a_guetter.length,2);
@@ -134,5 +134,41 @@ async function callModel({tool}){
   assert.ok(!fallbackSubject.toLowerCase().startsWith('je souhaite'));
   assert.ok(fallbackSubject.length < need.length);
 
-  console.log('T06 V1.0.1 correction prioritaire 1 OK');
+
+  // Régression 4 : la génération des objets est isolée par axe.
+  // Une panne sur A2 ne doit ni vider A1 ni être présentée comme une absence documentaire.
+  const twoAxesForObjects = [
+    { ...support.axes[0], axis_id:'A1', titre:'Mesure de la délinquance', objectif_surveillance:'Suivre les évolutions de la mesure.', requete_rag:'délinquance données mesure' },
+    { axis_id:'A2', titre:'Différenciations territoriales', objectif_surveillance:'Suivre les écarts territoriaux.', pourquoi:'La géographie peut évoluer.', questions:['Quels écarts entre communes ?'], requete_rag:'délinquance territoire commune', corpus_status:'documente', origin:'proposition_ia' }
+  ];
+
+  const perAxisObjectModel = async ({tool,userText}) => {
+    if(tool.name!=='construire_grille_guet_t06') return callModel({tool});
+    if(String(userText).includes('AXE A2')) throw new Error('simulation panne axe A2');
+    return {
+      axes:[{
+        axis_id:'A1',
+        tendances:[{trend_id:'A1-T1',label:'Affinement progressif de la mesure locale',synthese:'Deux matériaux documentent la mesure.',limite:'Séries hétérogènes.',material_ids:['chunk:D1','chunk:D2']}],
+        signes_a_guetter:[
+          {sign_id:'A1-S1',label:'Nouvelles séries communales',pourquoi_guetter:'Amélioration possible du suivi.',ce_qui_confirmerait:'Séries régulières.',ce_qui_affaiblirait:'Publication ponctuelle.',material_ids:['chunk:D1']},
+          {sign_id:'A1-S2',label:'Évolution des catégories statistiques',pourquoi_guetter:'Modification possible de la lecture.',ce_qui_confirmerait:'Méthode stabilisée.',ce_qui_affaiblirait:'Ajustement ponctuel.',material_ids:['chunk:D2']}
+        ],
+        hypotheses_regroupement:[],
+        sources_a_surveiller:[{label:'Publications statistiques territoriales',raison:'Elles documentent la mesure locale.',material_ids:['chunk:D1','chunk:D2']}],
+        angles_morts:[]
+      }]
+    };
+  };
+
+  const partialObjects = await construireGrilleGuetT06({apiKey:'fake',besoin:need,cadrage:framing,reponses:[],axes:twoAxesForObjects,searchFn,callModel:perAxisObjectModel});
+  assert.equal(partialObjects.axes.length,2);
+  assert.equal(partialObjects.axes[0].object_generation_status,'disponible');
+  assert.equal(partialObjects.axes[0].signes_a_guetter.length,2);
+  assert.equal(partialObjects.axes[1].object_generation_status,'indisponible');
+  assert.equal(partialObjects.axes[1].object_generation_error,true);
+  assert.ok(partialObjects.axes[1].object_generation_message.includes('indisponibilité technique'));
+  assert.deepEqual(partialObjects.failed_axis_ids,['A2']);
+  assert.equal(partialObjects.generation_available,false);
+
+  console.log('T06 V1.0.2 objets par axe OK');
 })().catch(err=>{console.error(err);process.exit(1)});

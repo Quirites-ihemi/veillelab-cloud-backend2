@@ -8,7 +8,7 @@ const { genererResumeAnalytiqueT01, nettoyerCorpusT01, MODEL_REDACTION } = requi
 const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { genererGlossaireT02, nettoyerCorpusT02 } = require("./t02");
 const { genererRecommandationsT04, nettoyerCorpusT04 } = require("./t04");
-const { proposerNotionsT06, proposerAxesT06, proposerDynamiquesT06 } = require("./t06");
+const { cadrerBesoinT06, proposerStructurationsT06, documenterAxesT06, construireGrilleGuetT06 } = require("./t06");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
@@ -767,7 +767,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         ok: true,
         service: "quirites-veille-lab-cloud",
-        version: "cloud-v0.12.0-t06-synthesis",
+        version: "cloud-v0.13.0-t06-scenario-refonte",
         message: "Backend Cloud Run disponible — T01 + T02 + T03 + T04 + T06 scénario synthétisé + recherche corpus + chatbot public structuré",
         queue: `${TASK_LOCATION}/${TASK_QUEUE}`,
         model: MODEL_REDACTION,
@@ -794,7 +794,7 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/scenario-framing") {
       const body = await readJsonBody(req, 512 * 1024);
       const apiKey = await getAnthropicApiKey();
-      const result = await proposerNotionsT06({
+      const result = await cadrerBesoinT06({
         apiKey,
         besoin: String(body.need || body.besoin || "")
       });
@@ -804,10 +804,25 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/scenario-axes") {
       const body = await readJsonBody(req, 512 * 1024);
       const apiKey = await getAnthropicApiKey();
-      const result = await proposerAxesT06({
+      const result = await proposerStructurationsT06({
         apiKey,
         besoin: String(body.need || body.besoin || ""),
-        notions: Array.isArray(body.notions) ? body.notions : []
+        cadrage: body.cadrage && typeof body.cadrage === "object" ? body.cadrage : {},
+        reponses: Array.isArray(body.reponses) ? body.reponses : []
+      });
+      return sendJson(res, 200, result);
+    }
+
+
+    if (req.method === "POST" && req.url === "/scenario-axis-support") {
+      const body = await readJsonBody(req, 1024 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await documenterAxesT06({
+        apiKey,
+        besoin: String(body.need || body.besoin || ""),
+        cadrage: body.cadrage && typeof body.cadrage === "object" ? body.cadrage : {},
+        reponses: Array.isArray(body.reponses) ? body.reponses : [],
+        axes: Array.isArray(body.axes) ? body.axes : []
       });
       return sendJson(res, 200, result);
     }
@@ -815,9 +830,11 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/scenario-dynamics") {
       const body = await readJsonBody(req, 1024 * 1024);
       const apiKey = await getAnthropicApiKey();
-      const result = await proposerDynamiquesT06({
+      const result = await construireGrilleGuetT06({
         apiKey,
         besoin: String(body.need || body.besoin || ""),
+        cadrage: body.cadrage && typeof body.cadrage === "object" ? body.cadrage : {},
+        reponses: Array.isArray(body.reponses) ? body.reponses : [],
         axes: Array.isArray(body.axes) ? body.axes : []
       });
       return sendJson(res, 200, result);

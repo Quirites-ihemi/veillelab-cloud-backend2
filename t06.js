@@ -1,19 +1,22 @@
 // =====================================================
 // QUIRITES VEILLE LAB — T06 SCÉNARIO DE VEILLE
-// V0.3 : synthèse documentaire multi-niveaux.
-// Le corpus fournit les preuves ; l'IA monte en généralité sans sortir des sources.
+// V1.0 : besoin d'abord, corpus ensuite.
+// - Étape 1 : cadrer le besoin par maïeutique + aperçu brut de couverture corpus.
+// - Étape 2 : proposer deux structurations rivales d'axes, puis documenter chaque axe par RAG.
+// - Étape 3 : construire une grille de guet axe par axe.
+// - Étape 4 : assemblage déterministe côté front, sans nouvelle génération.
 // =====================================================
 
 const { searchCorpus } = require('./globalSearch');
 
 const MODEL_T06 = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
-const T06_MAX_CANDIDATES = 56;
-const T06_MAX_NOTIONS = 4;
-const T06_MAX_AXES = 5;
-const T06_MAX_TRENDS_PER_AXIS = 3;
-const T06_MAX_SIGNS_PER_AXIS = 4;
-const T06_MAX_WEAK_PER_AXIS = 2;
 const T06_ANTHROPIC_MAX_ATTEMPTS = 4;
+const MAX_CLARIFYING_QUESTIONS = 5;
+const MAX_AXES_PER_STRUCTURE = 5;
+const MAX_AXIS_CANDIDATES = 14;
+const MAX_TRENDS_PER_AXIS = 2;
+const MAX_WATCH_SIGNS_PER_AXIS = 4;
+const MAX_CLUSTER_HYPOTHESES_PER_AXIS = 2;
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
@@ -28,13 +31,13 @@ function normalize(value) {
     .trim();
 }
 
-function clip(value, max = 680) {
+function clip(value, max = 760) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (text.length <= max) return text;
   return `${text.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
 
-async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxTokens = 3200 }) {
+async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxTokens = 3600 }) {
   const payload = {
     model: MODEL_T06,
     max_tokens: maxTokens,
@@ -89,129 +92,103 @@ async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxToken
   throw lastError || new Error('Échec de l’appel Anthropic T06.');
 }
 
-const NEED_ANALYSIS_TOOL = {
-  name: 'analyser_besoin_t06',
-  description: "Décompose le besoin sans le reformuler pour identifier le sujet central et les dimensions secondaires.",
+// ---------- Schémas Claude ----------
+
+const FRAMING_TOOL = {
+  name: 'cadrer_besoin_t06',
+  description: 'Analyse le besoin sans le reformuler et propose quelques questions utiles de clarification.',
   input_schema: {
     type: 'object',
     properties: {
       sujet_central: { type: 'string' },
-      requete_recherche: { type: 'string' },
-      dimensions: {
+      requete_corpus: { type: 'string' },
+      dimensions_deja_precisees: {
         type: 'array', maxItems: 8,
         items: {
           type: 'object',
           properties: {
-            type: { type: 'string', enum: ['echelle', 'territoire', 'temporalite', 'public', 'finalite', 'angle', 'autre'] },
-            valeur: { type: 'string' },
-            role: { type: 'string', enum: ['secondaire', 'contrainte', 'intention'] }
+            type: { type: 'string', enum: ['territoire', 'echelle', 'horizon', 'destinataire', 'finalite', 'phenomene', 'mesure', 'autre'] },
+            valeur: { type: 'string' }
           },
-          required: ['type', 'valeur', 'role'], additionalProperties: false
-        }
-      }
-    },
-    required: ['sujet_central', 'requete_recherche', 'dimensions'], additionalProperties: false
-  }
-};
-
-const FRAME_SYNTHESIS_TOOL = {
-  name: 'synthetiser_cadrage_t06',
-  description: 'Fait émerger 0 à 4 notions de cadrage à partir de plusieurs matériaux du corpus.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      notions: {
-        type: 'array', maxItems: T06_MAX_NOTIONS,
-        items: {
-          type: 'object',
-          properties: {
-            label: { type: 'string' },
-            dimension_eclairee: { type: 'string' },
-            pourquoi: { type: 'string' },
-            limite: { type: 'string' },
-            material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } }
-          },
-          required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
+          required: ['type', 'valeur'], additionalProperties: false
         }
       },
-      limites_couverture: { type: 'array', maxItems: 4, items: { type: 'string' } }
-    },
-    required: ['notions', 'limites_couverture'], additionalProperties: false
-  }
-};
-
-const FRAME_AUDIT_TOOL = {
-  name: 'auditer_cadrage_t06',
-  description: 'Vérifie le soutien documentaire des notions sans imposer un rejet excessif.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      notions: {
-        type: 'array',
+      questions: {
+        type: 'array', minItems: 3, maxItems: MAX_CLARIFYING_QUESTIONS,
         items: {
           type: 'object',
           properties: {
-            label: { type: 'string' },
+            question_id: { type: 'string' },
+            question: { type: 'string' },
             pourquoi: { type: 'string' },
-            limite: { type: 'string' },
-            material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } },
-            statut: { type: 'string', enum: ['solide', 'partiel', 'rejeter'] }
+            dimension: { type: 'string', enum: ['territoire', 'echelle', 'horizon', 'destinataire', 'finalite', 'phenomene', 'mesure', 'autre'] }
           },
-          required: ['label', 'pourquoi', 'limite', 'material_ids', 'statut'], additionalProperties: false
+          required: ['question_id', 'question', 'pourquoi', 'dimension'], additionalProperties: false
         }
       }
     },
-    required: ['notions'], additionalProperties: false
+    required: ['sujet_central', 'requete_corpus', 'dimensions_deja_precisees', 'questions'],
+    additionalProperties: false
   }
 };
 
-const AXES_SYNTHESIS_TOOL = {
-  name: 'synthetiser_axes_t06',
-  description: 'Propose 2 à 5 axes de veille à un niveau de généralité supérieur aux sources.',
+const STRUCTURES_TOOL = {
+  name: 'proposer_structurations_t06',
+  description: 'Propose deux structurations rivales d’un scénario de veille à partir du besoin, sans prétendre décrire le monde.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      structurations: {
+        type: 'array', minItems: 2, maxItems: 2,
+        items: {
+          type: 'object',
+          properties: {
+            structure_id: { type: 'string' },
+            titre: { type: 'string' },
+            logique: { type: 'string' },
+            axes: {
+              type: 'array', minItems: 3, maxItems: MAX_AXES_PER_STRUCTURE,
+              items: {
+                type: 'object',
+                properties: {
+                  axis_id: { type: 'string' },
+                  titre: { type: 'string' },
+                  objectif_surveillance: { type: 'string' },
+                  pourquoi: { type: 'string' },
+                  questions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
+                  requete_rag: { type: 'string' }
+                },
+                required: ['axis_id', 'titre', 'objectif_surveillance', 'pourquoi', 'questions', 'requete_rag'],
+                additionalProperties: false
+              }
+            }
+          },
+          required: ['structure_id', 'titre', 'logique', 'axes'], additionalProperties: false
+        }
+      }
+    },
+    required: ['structurations'], additionalProperties: false
+  }
+};
+
+const AXIS_SUPPORT_TOOL = {
+  name: 'documenter_axes_t06',
+  description: 'Sélectionne, pour chaque axe, les matériaux du corpus réellement utiles et résume ce qu’ils apportent.',
   input_schema: {
     type: 'object',
     properties: {
       axes: {
-        type: 'array', maxItems: T06_MAX_AXES,
+        type: 'array', minItems: 1, maxItems: 1,
         items: {
           type: 'object',
           properties: {
-            titre: { type: 'string' },
-            objectif_surveillance: { type: 'string' },
-            pourquoi: { type: 'string' },
-            questions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
-            limite: { type: 'string' },
-            material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } }
+            axis_id: { type: 'string' },
+            material_ids: { type: 'array', maxItems: 5, items: { type: 'string' } },
+            apport_corpus: { type: 'string' },
+            limite_corpus: { type: 'string' }
           },
-          required: ['titre', 'objectif_surveillance', 'pourquoi', 'questions', 'limite', 'material_ids'], additionalProperties: false
-        }
-      },
-      limites_couverture: { type: 'array', maxItems: 4, items: { type: 'string' } }
-    },
-    required: ['axes', 'limites_couverture'], additionalProperties: false
-  }
-};
-
-const AXES_AUDIT_TOOL = {
-  name: 'auditer_axes_t06',
-  description: 'Vérifie qu’un axe est bien un axe de veille et non un simple libellé de source.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      axes: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            titre: { type: 'string' },
-            objectif_surveillance: { type: 'string' },
-            pourquoi: { type: 'string' },
-            questions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
-            limite: { type: 'string' },
-            material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } },
-            statut: { type: 'string', enum: ['solide', 'partiel', 'rejeter'] }
-          },
-          required: ['titre', 'objectif_surveillance', 'pourquoi', 'questions', 'limite', 'material_ids', 'statut'], additionalProperties: false
+          required: ['axis_id', 'material_ids', 'apport_corpus', 'limite_corpus'],
+          additionalProperties: false
         }
       }
     },
@@ -219,9 +196,9 @@ const AXES_AUDIT_TOOL = {
   }
 };
 
-const DYNAMICS_SYNTHESIS_TOOL = {
-  name: 'synthetiser_dynamiques_t06',
-  description: 'Synthétise tendances et signes de changement pour chaque axe à partir des seuls matériaux fournis.',
+const WATCH_TOOL = {
+  name: 'construire_grille_guet_t06',
+  description: 'Construit par axe une grille de guet : tendances documentées, signes de changement à guetter et hypothèses de regroupement.',
   input_schema: {
     type: 'object',
     properties: {
@@ -232,36 +209,66 @@ const DYNAMICS_SYNTHESIS_TOOL = {
           properties: {
             axis_id: { type: 'string' },
             tendances: {
-              type: 'array', maxItems: T06_MAX_TRENDS_PER_AXIS,
+              type: 'array', maxItems: MAX_TRENDS_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  trend_id: { type: 'string' },
+                  label: { type: 'string' },
+                  synthese: { type: 'string' },
+                  limite: { type: 'string' },
+                  material_ids: { type: 'array', minItems: 2, maxItems: 6, items: { type: 'string' } }
+                },
+                required: ['trend_id', 'label', 'synthese', 'limite', 'material_ids'], additionalProperties: false
+              }
+            },
+            signes_a_guetter: {
+              type: 'array', minItems: 2, maxItems: MAX_WATCH_SIGNS_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  sign_id: { type: 'string' },
+                  label: { type: 'string' },
+                  pourquoi_guetter: { type: 'string' },
+                  ce_qui_confirmerait: { type: 'string' },
+                  ce_qui_affaiblirait: { type: 'string' },
+                  material_ids: { type: 'array', maxItems: 4, items: { type: 'string' } }
+                },
+                required: ['sign_id', 'label', 'pourquoi_guetter', 'ce_qui_confirmerait', 'ce_qui_affaiblirait', 'material_ids'],
+                additionalProperties: false
+              }
+            },
+            hypotheses_regroupement: {
+              type: 'array', maxItems: MAX_CLUSTER_HYPOTHESES_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  hypothesis_id: { type: 'string' },
+                  label: { type: 'string' },
+                  interpretation: { type: 'string' },
+                  sign_ids: { type: 'array', minItems: 2, maxItems: 4, items: { type: 'string' } },
+                  ce_qui_invaliderait: { type: 'string' }
+                },
+                required: ['hypothesis_id', 'label', 'interpretation', 'sign_ids', 'ce_qui_invaliderait'],
+                additionalProperties: false
+              }
+            },
+            sources_a_surveiller: {
+              type: 'array', maxItems: 6,
               items: {
                 type: 'object',
                 properties: {
                   label: { type: 'string' },
-                  interpretation: { type: 'string' },
-                  pourquoi: { type: 'string' },
-                  limite: { type: 'string' },
-                  material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } }
+                  raison: { type: 'string' },
+                  material_ids: { type: 'array', maxItems: 4, items: { type: 'string' } }
                 },
-                required: ['label', 'interpretation', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
+                required: ['label', 'raison', 'material_ids'], additionalProperties: false
               }
             },
-            signes_changement: {
-              type: 'array', maxItems: T06_MAX_SIGNS_PER_AXIS,
-              items: {
-                type: 'object',
-                properties: {
-                  label: { type: 'string' },
-                  interpretation: { type: 'string' },
-                  pourquoi: { type: 'string' },
-                  limite: { type: 'string' },
-                  material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } }
-                },
-                required: ['label', 'interpretation', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
-              }
-            },
-            limites_couverture: { type: 'array', maxItems: 3, items: { type: 'string' } }
+            angles_morts: { type: 'array', maxItems: 4, items: { type: 'string' } }
           },
-          required: ['axis_id', 'tendances', 'signes_changement', 'limites_couverture'], additionalProperties: false
+          required: ['axis_id', 'tendances', 'signes_a_guetter', 'hypotheses_regroupement', 'sources_a_surveiller', 'angles_morts'],
+          additionalProperties: false
         }
       }
     },
@@ -269,45 +276,12 @@ const DYNAMICS_SYNTHESIS_TOOL = {
   }
 };
 
-const WEAK_CLUSTER_TOOL = {
-  name: 'clusteriser_signaux_faibles_t06',
-  description: 'Regroupe au moins deux signes de changement convergents en un signal faible, sans inventer de contenu.',
-  input_schema: {
-    type: 'object',
-    properties: {
-      axes: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            axis_id: { type: 'string' },
-            signaux_faibles: {
-              type: 'array', maxItems: T06_MAX_WEAK_PER_AXIS,
-              items: {
-                type: 'object',
-                properties: {
-                  label: { type: 'string' },
-                  interpretation: { type: 'string' },
-                  pourquoi: { type: 'string' },
-                  limite: { type: 'string' },
-                  sign_ids: { type: 'array', minItems: 2, maxItems: 4, items: { type: 'string' } }
-                },
-                required: ['label', 'interpretation', 'pourquoi', 'limite', 'sign_ids'], additionalProperties: false
-              }
-            }
-          },
-          required: ['axis_id', 'signaux_faibles'], additionalProperties: false
-        }
-      }
-    },
-    required: ['axes'], additionalProperties: false
-  }
-};
+// ---------- Helpers corpus ----------
 
 function materialText(result = {}) {
-  if (result.kind === 'chunk') return clip(result.text, 860);
-  if (result.kind === 'node') return clip(result.label, 420);
-  if (result.kind === 'relation') return clip(`${result.source_label || ''} — ${result.relation_type || ''} — ${result.target_label || ''}`, 520);
+  if (result.kind === 'chunk') return clip(result.text, 900);
+  if (result.kind === 'node') return clip(result.label, 460);
+  if (result.kind === 'relation') return clip(`${result.source_label || ''} — ${result.relation_type || ''} — ${result.target_label || ''}`, 560);
   return '';
 }
 
@@ -316,6 +290,24 @@ function materialLabel(result = {}) {
   if (result.kind === 'chunk') return result.section || clip(result.text, 140) || result.chunk_id || result.result_id;
   if (result.kind === 'relation') return `${result.source_label || result.source_id || ''} — ${result.relation_type || 'LIEN'} — ${result.target_label || result.target_id || ''}`;
   return result.result_id || 'Matériau';
+}
+
+function enrichSource(result = {}) {
+  return {
+    material_id: result.result_id || '',
+    kind: result.kind || '',
+    publication_id: result.publication_id || '',
+    titre: result.publication_title || '',
+    organisme_producteur: result.organisme_producteur || '',
+    annee_publication: result.annee_publication || '',
+    type_document: result.type_document || '',
+    repere: result.locator || '',
+    provenance_level: result.provenance_level || '',
+    url: result.url_contenu || result.url_source || '',
+    extrait: materialText(result),
+    libelle: materialLabel(result),
+    origin: 'corpus'
+  };
 }
 
 function dedupeResults(results = []) {
@@ -330,334 +322,678 @@ function dedupeResults(results = []) {
   return out;
 }
 
-function mergeSearchResults(searches = []) {
-  const byId = new Map();
-  for (const search of searches) {
-    const query = String(search?.query || '').trim();
-    const results = Array.isArray(search?.response?.results) ? search.response.results : [];
-    for (const result of results) {
-      const id = String(result?.result_id || '').trim();
-      if (!id) continue;
-      if (!byId.has(id)) byId.set(id, { ...result, _t06_queries: [] });
-      const current = byId.get(id);
-      if (query && !current._t06_queries.includes(query)) current._t06_queries.push(query);
-      if (Number(result.score || 0) > Number(current.score || 0)) current.score = result.score;
-    }
-  }
-  return [...byId.values()];
-}
-
-function buildCandidatePacket(results = [], max = T06_MAX_CANDIDATES) {
-  return results.slice(0, max).map(result => ({
-    material_id: result.result_id,
-    kind: result.kind,
-    label: materialLabel(result),
-    texte: materialText(result),
-    node_type: result.node_type || '',
-    relation_type: result.relation_type || '',
-    publication_id: result.publication_id || '',
-    publication_title: result.publication_title || '',
-    organisme_producteur: result.organisme_producteur || '',
-    annee_publication: result.annee_publication || '',
-    locator: result.locator || '',
-    provenance_level: result.provenance_level || '',
-    score: Number(result.score || 0),
-    retrieved_by: Array.isArray(result._t06_queries) ? result._t06_queries.slice(0, 5) : []
-  }));
-}
-
 function formatCandidatesForPrompt(candidates = []) {
-  return candidates.map((m, index) => [
-    `MATÉRIAU ${index + 1} — ${m.material_id}`,
-    `Type: ${m.kind}${m.node_type ? ` / ${m.node_type}` : ''}${m.relation_type ? ` / ${m.relation_type}` : ''}`,
-    `Publication: ${m.publication_id} — ${m.publication_title}`,
-    `Organisme/année/repère: ${m.organisme_producteur || '—'} | ${m.annee_publication || '—'} | ${m.locator || '—'}`,
-    m.retrieved_by?.length ? `Repéré via: ${m.retrieved_by.join(' | ')}` : '',
-    `Contenu: ${m.texte || m.label}`
-  ].filter(Boolean).join('\n')).join('\n\n---\n\n');
+  return candidates.map((r, i) => [
+    `MATÉRIAU ${i + 1} — ${r.result_id}`,
+    `Type: ${r.kind}${r.node_type ? ` / ${r.node_type}` : ''}${r.relation_type ? ` / ${r.relation_type}` : ''}`,
+    `Publication: ${r.publication_id || '—'} — ${r.publication_title || '—'}`,
+    `Organisme / année / repère: ${r.organisme_producteur || '—'} | ${r.annee_publication || '—'} | ${r.locator || '—'}`,
+    `Contenu: ${materialText(r) || materialLabel(r)}`
+  ].join('\n')).join('\n\n---\n\n');
 }
 
-function enrichSource(result = {}) {
+function sanitizeAnswers(answers = []) {
+  return (Array.isArray(answers) ? answers : [])
+    .map(a => ({
+      question_id: String(a?.question_id || '').trim(),
+      question: String(a?.question || '').trim(),
+      answer: String(a?.answer || '').trim()
+    }))
+    .filter(a => a.answer)
+    .slice(0, MAX_CLARIFYING_QUESTIONS);
+}
+
+function answersText(answers = []) {
+  const safe = sanitizeAnswers(answers);
+  if (!safe.length) return 'Aucune précision supplémentaire fournie.';
+  return safe.map(a => `- ${a.question || a.question_id}: ${a.answer}`).join('\n');
+}
+
+function searchSafe(searchFn, body) {
+  try {
+    const response = searchFn(body);
+    return response && typeof response === 'object' ? response : { results: [] };
+  } catch {
+    return { results: [] };
+  }
+}
+
+function getRepresentativeCoverage(searchFn, query) {
+  if (!query) return { publication_count: 0, material_count: 0, source_engine: '', sources: [], years: [] };
+  const response = searchSafe(searchFn, {
+    query,
+    limit: 18,
+    max_per_publication: 3,
+    diversify_by_publication: true
+  });
+  const results = dedupeResults(Array.isArray(response.results) ? response.results : []);
+  const pubs = new Set(results.map(r => r.publication_id).filter(Boolean));
+  const years = [...new Set(results.map(r => String(r.annee_publication || '').trim()).filter(Boolean))].sort();
+  const seenPub = new Set();
+  const sources = [];
+  for (const r of results) {
+    const key = r.publication_id || r.result_id;
+    if (!key || seenPub.has(key)) continue;
+    seenPub.add(key);
+    sources.push(enrichSource(r));
+    if (sources.length >= 5) break;
+  }
   return {
-    material_id: result.result_id || '', kind: result.kind || '',
-    publication_id: result.publication_id || '', titre: result.publication_title || '',
-    organisme_producteur: result.organisme_producteur || '', annee_publication: result.annee_publication || '',
-    type_document: result.type_document || '', repere: result.locator || '',
-    provenance_level: result.provenance_level || '', url: result.url_contenu || result.url_source || '',
-    extrait: materialText(result), libelle: materialLabel(result)
+    publication_count: pubs.size,
+    material_count: results.length,
+    source_engine: response.engine || '',
+    years,
+    sources
   };
 }
 
-function sanitizeNeedAnalysis(raw = {}, need = '') {
-  const sujet = String(raw.sujet_central || '').trim();
-  const query = String(raw.requete_recherche || sujet || need).trim();
-  const dimensions = (Array.isArray(raw.dimensions) ? raw.dimensions : []).map(d => ({
-    type: ['echelle','territoire','temporalite','public','finalite','angle','autre'].includes(d?.type) ? d.type : 'autre',
-    valeur: String(d?.valeur || '').trim(),
-    role: ['secondaire','contrainte','intention'].includes(d?.role) ? d.role : 'secondaire'
-  })).filter(d => d.valeur).slice(0, 8);
-  return { sujet_central: sujet || query, requete_recherche: query, dimensions };
+
+function fallbackSubjectFromNeed(need = '') {
+  let text = String(need || '').replace(/\s+/g, ' ').trim();
+  text = text
+    .replace(/^[\s"'«»]*(je\s+(souhaite|veux|voudrais|cherche\s+à|cherche\s+a)\s+)/i, '')
+    .replace(/^(faire|mettre\s+en\s+place)\s+(une\s+)?veille\s+(sur|concernant|autour\s+de)\s+/i, '')
+    .replace(/^(suivre|surveiller|observer|analyser)\s+/i, '')
+    .replace(/^(une\s+)?veille\s+(sur|concernant|autour\s+de)\s+/i, '')
+    .replace(/^(?:l[’']\s*)?(?:évolution|evolution|suivi|observation)\s+(?:de\s+|du\s+|des\s+|d[’']\s*)/i, '')
+    .replace(/^(?:le|la|les|un|une)\s+/i, '')
+    .replace(/[.!?]+$/g, '')
+    .trim();
+  if (!text) return 'sujet de veille';
+  const words = text.split(' ').filter(Boolean);
+  return words.slice(0, 12).join(' ');
 }
 
-function compactDimensionValue(dimension = {}) {
-  const raw = String(dimension?.valeur || '').trim();
-  if (!raw) return '';
-  const n = normalize(raw);
-  if (dimension.type === 'echelle') {
-    if (/commun|municip/.test(n)) return 'commune';
-    if (/departement/.test(n)) return 'département';
-    if (/region/.test(n)) return 'région';
-  }
-  if (dimension.type === 'territoire' && /francilien|ile de france/.test(n)) return 'Île-de-France';
-  if (dimension.type === 'temporalite' && /evolu|tendance|avenir|prospect/.test(n)) return 'évolution';
-  return clip(raw, 72);
+function fallbackCorpusQuery(subject = '') {
+  const stop = new Set([
+    'je','souhaite','veux','voudrais','faire','une','veille','sur','suivre','surveiller',
+    'observer','analyser','le','la','les','un','une','des','de','du','d','a','à','au','aux',
+    'en','dans','pour','et','ou','l','echelle','échelle'
+  ]);
+  const words = String(subject || '')
+    .replace(/[’']/g, ' ')
+    .replace(/[^\p{L}\p{N}-]+/gu, ' ')
+    .split(/\s+/)
+    .map(x => x.trim())
+    .filter(Boolean)
+    .filter(x => !stop.has(x.toLowerCase()));
+  const picked = words.slice(0, 8);
+  if (picked.length >= 2) return picked.join(' ');
+  return String(subject || 'sujet veille').split(/\s+/).filter(Boolean).slice(0, 8).join(' ');
 }
 
-function buildRetrievalQueries(analyse = {}, extras = []) {
-  const base = String(analyse.requete_recherche || analyse.sujet_central || '').trim();
-  if (!base) return [];
-  const queries = [base];
-  const priority = ['echelle','territoire','temporalite','angle','public'];
-  for (const type of priority) {
-    const d = (analyse.dimensions || []).find(x => x.type === type && String(x.valeur || '').trim());
-    if (!d) continue;
-    const v = compactDimensionValue(d);
-    const q = `${base} ${v}`.replace(/\s+/g, ' ').trim();
-    if (q && !queries.some(x => normalize(x) === normalize(q))) queries.push(q);
-    if (queries.length >= 4) break;
-  }
-  for (const extra of extras) {
-    const v = String(extra || '').trim();
-    if (!v) continue;
-    const q = `${base} ${v}`.replace(/\s+/g, ' ').trim();
-    if (!queries.some(x => normalize(x) === normalize(q))) queries.push(q);
-    if (queries.length >= 6) break;
-  }
-  return queries.slice(0, 6);
+function fallbackQuestions() {
+  return [
+    { question_id: 'Q1', question: 'À qui ce scénario de veille doit-il être utile ?', pourquoi: 'Le destinataire change les priorités de surveillance et le niveau de détail attendu.', dimension: 'destinataire' },
+    { question_id: 'Q2', question: 'Sur quel horizon souhaitez-vous observer les évolutions ?', pourquoi: 'Un horizon court et un horizon pluriannuel ne conduisent pas aux mêmes signes à guetter.', dimension: 'horizon' },
+    { question_id: 'Q3', question: 'Quel périmètre géographique ou organisationnel faut-il privilégier ?', pourquoi: 'Le périmètre détermine ce qui doit être comparé et les sources pertinentes.', dimension: 'territoire' }
+  ];
 }
 
-function collectCandidates(searchFn, queries, { maxPerQuery = 24, kinds = null, max = T06_MAX_CANDIDATES } = {}) {
-  const searches = [];
-  for (const query of queries) {
-    const body = { query, limit: maxPerQuery, max_per_publication: 4, diversify_by_publication: true };
-    if (Array.isArray(kinds) && kinds.length) body.kinds = kinds;
-    searches.push({ query, response: searchFn(body) });
+function safeQuestionList(raw = []) {
+  const out = (Array.isArray(raw) ? raw : []).map((q, i) => ({
+    question_id: String(q?.question_id || `Q${i + 1}`).trim(),
+    question: String(q?.question || '').trim(),
+    pourquoi: String(q?.pourquoi || '').trim(),
+    dimension: String(q?.dimension || 'autre').trim()
+  })).filter(q => q.question).slice(0, MAX_CLARIFYING_QUESTIONS);
+  return out.length >= 3 ? out : fallbackQuestions();
+}
+
+function fallbackStructurations(subject = 'le sujet') {
+  return [
+    {
+      structure_id: 'A',
+      titre: 'Lire les transformations du phénomène',
+      logique: 'Suivre ce qui change dans le phénomène, sa mesure et sa territorialisation.',
+      axes: [
+        { axis_id: 'A1', titre: `Évolution des formes de ${subject}`, objectif_surveillance: `Repérer comment les formes prises par ${subject} évoluent dans le temps.`, pourquoi: 'Cet axe permet de distinguer une évolution du phénomène d’un simple changement de visibilité.', questions: [`Quelles formes de ${subject} progressent, reculent ou se recomposent ?`], requete_rag: `${subject} évolution formes` },
+        { axis_id: 'A2', titre: 'Mesure et qualité des données', objectif_surveillance: 'Suivre la manière dont le phénomène est mesuré et rendu visible.', pourquoi: 'Les changements d’indicateurs ou de couverture peuvent modifier la lecture du phénomène.', questions: ['Les données disponibles deviennent-elles plus fines, plus complètes ou au contraire plus fragmentées ?'], requete_rag: `${subject} données mesure statistique` },
+        { axis_id: 'A3', titre: 'Différenciations territoriales', objectif_surveillance: 'Repérer les écarts et recompositions entre territoires.', pourquoi: 'La géographie du phénomène peut évoluer indépendamment de son niveau global.', questions: ['Quels écarts territoriaux méritent une surveillance régulière ?'], requete_rag: `${subject} territoire commune` }
+      ]
+    },
+    {
+      structure_id: 'B',
+      titre: 'Lire la chaîne de connaissance et d’action publique',
+      logique: 'Organiser la veille autour de ce qui est observé, interprété puis pris en charge.',
+      axes: [
+        { axis_id: 'B1', titre: 'Production de la connaissance', objectif_surveillance: 'Suivre les évolutions des données, méthodes et catégories de mesure.', pourquoi: 'Une évolution de l’appareil de connaissance peut changer ce que les décideurs voient du sujet.', questions: ['Quels changements de méthode ou de données modifient la compréhension du sujet ?'], requete_rag: `${subject} méthodes données` },
+        { axis_id: 'B2', titre: 'Perceptions et interprétations', objectif_surveillance: 'Suivre les écarts entre phénomène mesuré, perception et problématisation publique.', pourquoi: 'Ces écarts peuvent influencer la mise à l’agenda et les priorités.', questions: ['Quels décalages apparaissent entre données disponibles et perception du phénomène ?'], requete_rag: `${subject} perception opinion` },
+        { axis_id: 'B3', titre: 'Réponses locales et institutionnelles', objectif_surveillance: 'Suivre les dispositifs, coordinations et adaptations de l’action publique.', pourquoi: 'Les réponses apportées constituent elles-mêmes un indicateur de transformation du problème public.', questions: ['Quels dispositifs ou modes de coordination évoluent en réponse au sujet ?'], requete_rag: `${subject} dispositifs action publique` }
+      ]
+    }
+  ];
+}
+
+function sanitizeStructurations(raw = {}, subject = '') {
+  const fallback = fallbackStructurations(subject || 'le sujet');
+  const incoming = Array.isArray(raw?.structurations) ? raw.structurations.slice(0, 2) : [];
+  const out = [];
+
+  for (let si = 0; si < 2; si += 1) {
+    const source = incoming[si] || {};
+    const fb = fallback[si];
+    const rawAxes = Array.isArray(source?.axes) ? source.axes.slice(0, MAX_AXES_PER_STRUCTURE) : [];
+    const axes = [];
+
+    rawAxes.forEach((a, ai) => {
+      const fbAxis = fb.axes[Math.min(ai, fb.axes.length - 1)] || fb.axes[0];
+      const titre = String(a?.titre || '').trim();
+      if (!titre) return;
+      const questions = [...new Set((Array.isArray(a?.questions) ? a.questions : [])
+        .map(x => String(x || '').trim()).filter(Boolean))].slice(0, 3);
+      axes.push({
+        axis_id: String(a?.axis_id || `${si === 0 ? 'A' : 'B'}${ai + 1}`).trim(),
+        titre,
+        objectif_surveillance: String(a?.objectif_surveillance || `Suivre les évolutions relatives à ${titre.toLowerCase()}.`).trim(),
+        pourquoi: String(a?.pourquoi || 'Axe proposé pour structurer durablement la surveillance du besoin exprimé.').trim(),
+        questions: questions.length ? questions : [`Quelles évolutions relatives à ${titre.toLowerCase()} méritent une surveillance régulière ?`],
+        requete_rag: String(a?.requete_rag || `${subject} ${titre}`).trim(),
+        origin: 'proposition_ia',
+        corpus_status: 'non_evalue',
+        apport_corpus: '',
+        limite_corpus: '',
+        sources: []
+      });
+    });
+
+    // Dégradation par axe : on conserve les axes valides et on complète seulement ce qui manque.
+    const usedTitles = new Set(axes.map(a => normalize(a.titre)));
+    for (const fbAxis of fb.axes) {
+      if (axes.length >= 3) break;
+      if (usedTitles.has(normalize(fbAxis.titre))) continue;
+      axes.push({
+        ...fbAxis,
+        origin: 'proposition_ia',
+        corpus_status: 'non_evalue',
+        apport_corpus: '',
+        limite_corpus: '',
+        sources: []
+      });
+      usedTitles.add(normalize(fbAxis.titre));
+    }
+
+    out.push({
+      structure_id: String(source?.structure_id || fb.structure_id || (si === 0 ? 'A' : 'B')).trim(),
+      titre: String(source?.titre || fb.titre || `Structuration ${si + 1}`).trim(),
+      logique: String(source?.logique || fb.logique || '').trim(),
+      axes: axes.slice(0, MAX_AXES_PER_STRUCTURE)
+    });
   }
-  const rawResults = dedupeResults(mergeSearchResults(searches));
-  rawResults.sort((a, b) => {
-    const q = (b._t06_queries?.length || 0) - (a._t06_queries?.length || 0);
-    if (q) return q;
-    return Number(b.score || 0) - Number(a.score || 0);
-  });
-  return { searches, rawResults, candidates: buildCandidatePacket(rawResults, max) };
+  return out;
+}
+
+function axisCoverageStatus(sources = []) {
+  const pubs = new Set(sources.map(s => s.publication_id).filter(Boolean));
+  if (pubs.size >= 2) return 'documente';
+  if (pubs.size === 1 || sources.length) return 'partiellement_documente';
+  return 'a_instruire';
+}
+
+function allowedMaterialIds(results = []) {
+  return new Set(results.map(r => String(r.result_id || '')).filter(Boolean));
 }
 
 function cleanIds(ids, allowed, max = 6) {
   return [...new Set((Array.isArray(ids) ? ids : []).map(String).filter(id => allowed.has(id)))].slice(0, max);
 }
 
-async function analyserBesoin({ apiKey, besoin, callModel = appelerClaudeAvecOutil }) {
-  const system = `
-Tu analyses un besoin de veille uniquement pour préparer une recherche documentaire.
-Tu NE REFORMULES PAS le besoin et tu ne produis aucun conseil.
-Identifie le sujet central et distingue les dimensions secondaires (échelle, territoire, temporalité, public, finalité, angle).
-La requête de recherche doit être courte (2 à 8 mots) et centrée sur le sujet ; les dimensions secondaires ne doivent jamais devenir bloquantes.
-Ne complète rien par connaissance extérieure.`;
-  const raw = await callModel({ apiKey, system, tool: NEED_ANALYSIS_TOOL, userText: besoin, maxTokens: 1200 });
-  return sanitizeNeedAnalysis(raw, besoin);
+function buildAxisCorpusPackets(searchFn, structures, subject, answers) {
+  const packets = [];
+  const rawByAxis = new Map();
+  for (const structure of structures) {
+    for (const axis of structure.axes) {
+      const query = [subject, axis.requete_rag, answers.map(a => a.answer).join(' ')].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+      const response = searchSafe(searchFn, {
+        query,
+        limit: MAX_AXIS_CANDIDATES,
+        max_per_publication: 3,
+        diversify_by_publication: true
+      });
+      const results = dedupeResults(Array.isArray(response.results) ? response.results : []).slice(0, MAX_AXIS_CANDIDATES);
+      rawByAxis.set(axis.axis_id, results);
+      packets.push({
+        axis_id: axis.axis_id,
+        titre: axis.titre,
+        objectif_surveillance: axis.objectif_surveillance,
+        questions: axis.questions,
+        materials: results.map(r => ({
+          material_id: r.result_id,
+          publication_id: r.publication_id || '',
+          publication_title: r.publication_title || '',
+          organisme_producteur: r.organisme_producteur || '',
+          annee_publication: r.annee_publication || '',
+          locator: r.locator || '',
+          kind: r.kind || '',
+          text: materialText(r)
+        }))
+      });
+    }
+  }
+  return { packets, rawByAxis };
 }
 
-async function proposerNotionsT06({ apiKey, besoin = '', searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+function supportPrompt(packets = []) {
+  return packets.map(p => [
+    `AXE ${p.axis_id} — ${p.titre}`,
+    `Objectif: ${p.objectif_surveillance}`,
+    `Questions: ${(p.questions || []).join(' | ')}`,
+    'Matériaux candidats:',
+    p.materials.length ? p.materials.map((m, i) => `${i + 1}. ${m.material_id} | ${m.publication_id} | ${m.publication_title} | ${m.locator || 'sans repère'} | ${clip(m.text, 520)}`).join('\n') : '(aucun)'
+  ].join('\n')).join('\n\n=====\n\n');
+}
+
+function normalizeAxisSupport(raw = {}, structures = [], rawByAxis = new Map()) {
+  const supportById = new Map((Array.isArray(raw.axes) ? raw.axes : []).map(a => [String(a?.axis_id || ''), a]));
+  return structures.map(structure => ({
+    ...structure,
+    axes: structure.axes.map(axis => {
+      const results = rawByAxis.get(axis.axis_id) || [];
+      const allowed = allowedMaterialIds(results);
+      const support = supportById.get(axis.axis_id) || {};
+      const ids = cleanIds(support.material_ids, allowed, 5);
+      const sources = ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource);
+      return {
+        ...axis,
+        corpus_status: axisCoverageStatus(sources),
+        apport_corpus: String(support.apport_corpus || '').trim(),
+        limite_corpus: String(support.limite_corpus || '').trim(),
+        sources
+      };
+    })
+  }));
+}
+
+function buildDynamicPackets(searchFn, axes = [], subject = '', answers = []) {
+  const packets = [];
+  const rawByAxis = new Map();
+  for (const axis of axes) {
+    const query = [subject, axis.requete_rag || axis.titre, axis.objectif_surveillance, answers.map(a => a.answer).join(' ')].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    const response = searchSafe(searchFn, {
+      query,
+      limit: 18,
+      max_per_publication: 4,
+      diversify_by_publication: true
+    });
+    const results = dedupeResults(Array.isArray(response.results) ? response.results : []).slice(0, 18);
+    rawByAxis.set(axis.axis_id, results);
+    packets.push({
+      axis_id: axis.axis_id,
+      titre: axis.titre,
+      objectif_surveillance: axis.objectif_surveillance,
+      corpus_status: axis.corpus_status || 'a_instruire',
+      materials: results.map(r => ({
+        material_id: r.result_id,
+        publication_id: r.publication_id || '',
+        publication_title: r.publication_title || '',
+        organisme_producteur: r.organisme_producteur || '',
+        annee_publication: r.annee_publication || '',
+        locator: r.locator || '',
+        kind: r.kind || '',
+        text: materialText(r)
+      }))
+    });
+  }
+  return { packets, rawByAxis };
+}
+
+function uniquePublicationCount(ids, results) {
+  const pubs = new Set();
+  for (const id of ids) {
+    const r = results.find(x => x.result_id === id);
+    if (r?.publication_id) pubs.add(r.publication_id);
+  }
+  return pubs.size;
+}
+
+// ---------- Étape 1 ----------
+
+async function cadrerBesoinT06({ apiKey, besoin = '', searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
   const need = String(besoin || '').trim();
   if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
-  const analyse = await analyserBesoin({ apiKey, besoin: need, callModel });
-  const queries = buildRetrievalQueries(analyse);
-  const { searches, rawResults, candidates } = collectCandidates(searchFn, queries, { max: 52 });
-  const candidateMap = new Map(candidates.map(c => [c.material_id, c]));
-  const rawMap = new Map(rawResults.map(r => [r.result_id, r]));
-  if (!candidates.length) return { ok:true, engine:'t06-framing-v0.3-grounded-synthesis', need, analysis:analyse, retrieval:{queries,candidates:0,publications:0}, notions:[], limites_couverture:['Aucun matériau suffisamment pertinent n’a été retrouvé pour ce sujet dans cette recherche.'] };
 
   const system = `
-Tu aides un veilleur à préciser son besoin en montant UN NIVEAU au-dessus des sources, sans jamais sortir du corpus.
-À partir des matériaux fournis, fais émerger 2 à 4 notions de cadrage si elles sont soutenues. Une notion peut synthétiser plusieurs matériaux et son libellé n'a pas besoin d'exister mot pour mot.
+Tu aides un veilleur à CLARIFIER son besoin, sans le reformuler et sans conclure à sa place.
+Produis 3 à 5 questions courtes qui l'obligent à préciser ce qui compte réellement : destinataire, finalité décisionnelle, horizon, périmètre, phénomène ou mesure.
+N'invente aucune information sur le monde. N'utilise aucune connaissance extérieure.
+Le besoin utilisateur reste intact. Une question peut rester sans réponse.
+La requête corpus doit être courte (2 à 8 mots), centrée sur le sujet central et dépourvue de formulations comme « je souhaite ».
+N'ajoute aucun nom propre, chiffre ou date absent du besoin.`;
 
-Une bonne notion :
-- structure le besoin (mesure du phénomène, échelle d'observation, disparités territoriales, temporalité, gouvernance) ;
-- est plus générale qu'un extrait ou qu'un dispositif ponctuel ;
-- reste fidèle aux matériaux cités ;
-- explique précisément POURQUOI elle aide le besoin ;
-- indique une LIMITE concrète.
-
-Rejette : sous-thèmes étroits non demandés, simple proximité lexicale, acteur ou dispositif ponctuel déguisé en notion, contenu hors sujet.
-Ne t'abstiens pas seulement parce que les sources sont imparfaites : une notion partiellement couverte peut être proposée si la limite est clairement dite.
-Les dimensions secondaires du besoin (territoire, échelle, temporalité) servent à qualifier les limites et priorités, pas à bloquer la synthèse.
-N'utilise aucune connaissance extérieure et seulement les material_ids fournis.`;
-
-  const dimensions = (analyse.dimensions || []).map(d => `${d.type}: ${d.valeur}`).join(' ; ') || 'aucune';
-  const raw = await callModel({ apiKey, system, tool: FRAME_SYNTHESIS_TOOL, userText:`BESOIN : ${need}\nSUJET CENTRAL : ${analyse.sujet_central}\nDIMENSIONS : ${dimensions}\n\n${formatCandidatesForPrompt(candidates)}`, maxTokens:3400 });
-  const allowed = new Set(candidates.map(c => c.material_id));
-  const proposed = (Array.isArray(raw.notions) ? raw.notions : []).map(n => ({
-    label:String(n?.label||'').trim(), dimension_eclairee:String(n?.dimension_eclairee||'').trim(),
-    pourquoi:String(n?.pourquoi||'').trim(), limite:String(n?.limite||'').trim(), material_ids:cleanIds(n?.material_ids, allowed, 5)
-  })).filter(n => n.label && n.material_ids.length).slice(0,T06_MAX_NOTIONS);
-
-  let audited = proposed;
-  if (proposed.length) {
-    const auditPacket = proposed.map((n,i)=>[`NOTION ${i+1}: ${n.label}`,`Pourquoi: ${n.pourquoi}`,`Limite: ${n.limite}`,`Matériaux: ${n.material_ids.join(', ')}`,n.material_ids.map(id=>{const m=candidateMap.get(id);return `${id}: ${m?.texte||m?.label||''}`}).join('\n')].join('\n')).join('\n\n---\n\n');
-    const auditSystem = `
-Tu contrôles une synthèse documentaire. Le but n'est PAS de tout rejeter : distingue solide, partiel et rejet.
-- solide : notion clairement soutenue et utile au cadrage ;
-- partiel : utile et soutenue, mais couverture incomplète ; elle DOIT être conservée avec une limite explicite ;
-- rejeter : hors sujet, simple rapprochement lexical, sous-thème trop étroit ou généralisation non soutenue.
-Tu peux améliorer pourquoi/limite, sans ajouter de connaissance extérieure. Ne change pas les material_ids.`;
-    const auditRaw = await callModel({ apiKey, system:auditSystem, tool:FRAME_AUDIT_TOOL, userText:`BESOIN : ${need}\n\n${auditPacket}`, maxTokens:2600 });
-    const byLabel = new Map(proposed.map(n=>[normalize(n.label),n]));
-    audited = (Array.isArray(auditRaw.notions)?auditRaw.notions:[]).filter(n=>n?.statut!=='rejeter').map(n=>{
-      const original = byLabel.get(normalize(n.label)) || proposed.find(p=>p.material_ids.some(id=>(n.material_ids||[]).includes(id)));
-      if(!original) return null;
-      return {...original, label:String(n.label||original.label).trim(), pourquoi:String(n.pourquoi||original.pourquoi).trim(), limite:String(n.limite||original.limite).trim(), statut:n.statut||'partiel'};
-    }).filter(Boolean).slice(0,T06_MAX_NOTIONS);
+  let raw;
+  try {
+    raw = await callModel({ apiKey, system, tool: FRAMING_TOOL, userText: need, maxTokens: 1800 });
+  } catch (error) {
+    const fallbackSubject = fallbackSubjectFromNeed(need);
+    raw = {
+      sujet_central: fallbackSubject,
+      requete_corpus: fallbackCorpusQuery(fallbackSubject),
+      dimensions_deja_precisees: [],
+      questions: fallbackQuestions(),
+      fallback_used: true
+    };
   }
 
-  const notions = audited.map((n,i)=>({
-    notion_id:`T06N${String(i+1).padStart(2,'0')}`, label:n.label, dimension_eclairee:n.dimension_eclairee,
-    pourquoi:n.pourquoi, limite:n.limite, statut:n.statut||'solide',
-    sources:n.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)
-  })).filter(n=>n.sources.length);
-  const pubs = new Set(rawResults.map(r=>r.publication_id).filter(Boolean));
-  return { ok:true, engine:'t06-framing-v0.3-grounded-synthesis', need, analysis:analyse, retrieval:{queries,candidates:candidates.length,publications:pubs.size,source_engine:searches.find(s=>s.response?.engine)?.response?.engine||'corpus-search'}, notions, limites_couverture:[...new Set((raw.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,4) };
+  const subject = String(raw?.sujet_central || fallbackSubjectFromNeed(need)).trim();
+  const query = String(raw?.requete_corpus || fallbackCorpusQuery(subject)).trim();
+  const questions = safeQuestionList(raw?.questions);
+  const dimensions = (Array.isArray(raw?.dimensions_deja_precisees) ? raw.dimensions_deja_precisees : [])
+    .map(d => ({ type: String(d?.type || 'autre'), valeur: String(d?.valeur || '').trim() }))
+    .filter(d => d.valeur)
+    .slice(0, 8);
+  const coverage = getRepresentativeCoverage(searchFn, query);
+
+  return {
+    ok: true,
+    engine: 't06-framing-v1.0-maieutique',
+    need,
+    sujet_central: subject,
+    requete_corpus: query,
+    dimensions_deja_precisees: dimensions,
+    questions,
+    couverture_corpus: coverage,
+    guardrails: {
+      need_reformulated: false,
+      corpus_decides_axes: false,
+      user_can_skip_questions: true,
+      note: 'Le cadrage aide à préciser le besoin ; il ne décide pas encore des axes de veille.'
+    }
+  };
 }
 
-async function proposerAxesT06({ apiKey, besoin = '', notions = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+// ---------- Étape 2 ----------
+
+async function proposerStructurationsT06({ apiKey, besoin = '', cadrage = {}, reponses = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
   const need = String(besoin || '').trim();
-  if (!need) { const e=new Error('Le besoin de veille est obligatoire.'); e.statusCode=400; throw e; }
-  const analyse = await analyserBesoin({ apiKey, besoin:need, callModel });
-  const notionLabels = (Array.isArray(notions)?notions:[]).map(n=>String(n?.label||n||'').trim()).filter(Boolean).slice(0,4);
-  const queries = buildRetrievalQueries(analyse, notionLabels);
-  const { rawResults, candidates } = collectCandidates(searchFn, queries, { max:54 });
-  const rawMap = new Map(rawResults.map(r=>[r.result_id,r]));
-  const allowed = new Set(candidates.map(c=>c.material_id));
-  if(!candidates.length) return {ok:true,engine:'t06-axes-v0.1-synthesized',need,axes:[],limites_couverture:['Le corpus ne fournit pas assez de matériaux pour proposer des axes de veille robustes.']};
+  if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
+  const answers = sanitizeAnswers(reponses);
+  const subject = String(cadrage?.sujet_central || fallbackSubjectFromNeed(need)).trim();
 
   const system = `
-Tu construis des AXES DE VEILLE à partir d'un besoin et de matériaux documentaires.
-Tu dois monter en généralité par rapport aux sources : un axe est une direction de surveillance dans le temps, pas un titre de publication, un acteur isolé, un dispositif ponctuel ni un extrait.
-Propose 2 à 5 axes maximum. Chaque axe doit :
-- être directement relié au besoin ;
-- regrouper plusieurs matériaux lorsque possible ;
-- dire ce qu'il faut SURVEILLER ;
-- proposer 1 à 3 questions de veille concrètes ;
-- expliciter pourquoi cet axe est utile et sa limite ;
-- citer uniquement les material_ids fournis.
-Exemples de forme attendue (uniquement si les sources les soutiennent) : « Différenciation territoriale de la délinquance enregistrée », « Évolution des réponses locales de prévention ».
-Évite les axes vagues (« acteurs », « dispositifs ») ou trop proches d'un seul libellé source. Aucune connaissance extérieure.`;
-  const raw = await callModel({apiKey,system,tool:AXES_SYNTHESIS_TOOL,userText:`BESOIN : ${need}\nNOTIONS RETENUES : ${notionLabels.join(' ; ')||'aucune'}\n\n${formatCandidatesForPrompt(candidates)}`,maxTokens:4200});
-  const proposed = (Array.isArray(raw.axes)?raw.axes:[]).map(a=>({
-    titre:String(a?.titre||'').trim(), objectif_surveillance:String(a?.objectif_surveillance||'').trim(), pourquoi:String(a?.pourquoi||'').trim(),
-    questions:[...new Set((a?.questions||[]).map(q=>String(q||'').trim()).filter(Boolean))].slice(0,3), limite:String(a?.limite||'').trim(), material_ids:cleanIds(a?.material_ids,allowed,6)
-  })).filter(a=>a.titre&&a.questions.length&&a.material_ids.length).slice(0,T06_MAX_AXES);
+Tu proposes DEUX structurations rivales d'un scénario de veille.
+Tu travailles d'abord à partir du besoin utilisateur et des précisions qu'il a données. Le corpus n'est PAS utilisé pour autoriser ou interdire les axes à ce stade.
+Chaque structuration comprend 3 à 5 axes. Un axe est une QUESTION DURABLE SUR CE QU'IL FAUT SURVEILLER, pas un constat sur le monde, ni un acteur, ni un dispositif ponctuel.
+Utilise une grille de veille quand elle aide : formes du phénomène, production et mesure de la donnée, acteurs et réponses, cadre normatif, territoires, perceptions, ruptures technologiques, comparaisons.
+Les deux structurations doivent être réellement différentes et aider le veilleur à choisir un angle de lecture.
+Chaque axe contient 1 à 3 questions de veille et une requête RAG courte.
+Aucun chiffre, date ou nom propre ne doit être ajouté s'il n'est pas déjà dans le besoin ou les réponses de l'utilisateur.
+Les axes sont des PROPOSITIONS IA À VALIDER, jamais des faits établis.`;
 
-  let audited=proposed;
-  if(proposed.length){
-    const packet=proposed.map((a,i)=>[`AXE ${i+1}: ${a.titre}`,`Objectif: ${a.objectif_surveillance}`,`Pourquoi: ${a.pourquoi}`,`Questions: ${a.questions.join(' | ')}`,`Limite: ${a.limite}`,`Matériaux: ${a.material_ids.join(', ')}`].join('\n')).join('\n\n---\n\n');
-    const auditSystem=`
-Audite des axes de veille. Ne cherche pas la perfection : conserve comme « partiel » un axe utile mais incomplètement couvert, à condition que sa limite soit explicite.
-Rejette seulement s'il s'agit d'un simple extrait/libellé de source, d'un élément hors sujet, d'un sous-thème trop étroit ou d'une généralisation non soutenue.
-Un bon axe doit être formulé à un niveau supérieur aux sources et être surveillable dans le temps. N'ajoute aucune connaissance extérieure.`;
-    const ar=await callModel({apiKey,system:auditSystem,tool:AXES_AUDIT_TOOL,userText:`BESOIN : ${need}\n\n${packet}`,maxTokens:3000});
-    const byTitle=new Map(proposed.map(a=>[normalize(a.titre),a]));
-    audited=(Array.isArray(ar.axes)?ar.axes:[]).filter(a=>a?.statut!=='rejeter').map(a=>{
-      const original=byTitle.get(normalize(a.titre))||proposed.find(p=>p.material_ids.some(id=>(a.material_ids||[]).includes(id)));
-      if(!original)return null;
-      return {...original,titre:String(a.titre||original.titre).trim(),objectif_surveillance:String(a.objectif_surveillance||original.objectif_surveillance).trim(),pourquoi:String(a.pourquoi||original.pourquoi).trim(),questions:(a.questions||original.questions).map(String).filter(Boolean).slice(0,3),limite:String(a.limite||original.limite).trim(),statut:a.statut||'partiel'};
-    }).filter(Boolean).slice(0,T06_MAX_AXES);
+  let raw;
+  try {
+    raw = await callModel({
+      apiKey,
+      system,
+      tool: STRUCTURES_TOOL,
+      userText: `BESOIN INITIAL : ${need}\nSUJET CENTRAL : ${subject}\nPRÉCISIONS DE L'UTILISATEUR :\n${answersText(answers)}`,
+      maxTokens: 3800
+    });
+  } catch {
+    raw = { structurations: fallbackStructurations(subject) };
   }
-  const axes=audited.map((a,i)=>({axis_id:`T06A${String(i+1).padStart(2,'0')}`,titre:a.titre,objectif_surveillance:a.objectif_surveillance,pourquoi:a.pourquoi,questions:a.questions,limite:a.limite,statut:a.statut||'solide',sources:a.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})).filter(a=>a.sources.length);
-  return {ok:true,engine:'t06-axes-v0.1-synthesized',need,axes,limites_couverture:[...new Set((raw.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,4)};
+
+  const structures = sanitizeStructurations(raw, subject);
+
+  return {
+    ok: true,
+    engine: 't06-axes-v1.0-hypotheses-first',
+    need,
+    sujet_central: subject,
+    reponses: answers,
+    structurations: structures,
+    status_legend: {
+      non_evalue: 'La couverture documentaire sera établie après le choix de la structuration.',
+      documente: 'Le corpus apporte plusieurs sources à cet axe.',
+      partiellement_documente: 'Le corpus apporte un appui limité ou concentré sur une seule publication.',
+      a_instruire: 'Aucun matériau suffisamment pertinent n’a été retenu pour cet axe ; l’axe reste une hypothèse de veille à instruire.',
+      indisponible: 'La documentation du corpus n’a pas pu être établie pour des raisons techniques ; ce statut ne décrit pas une lacune documentaire.'
+    },
+    guardrails: {
+      axes_are_hypotheses: true,
+      corpus_can_block_axis: false,
+      user_must_choose: true,
+      corpus_documentation_after_choice: true,
+      note: 'Les axes viennent du besoin et d’une grille de veille. Le corpus n’est interrogé pour documenter les axes qu’après le choix du veilleur.'
+    }
+  };
 }
 
-async function proposerDynamiquesT06({ apiKey, besoin = '', axes = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
-  const need=String(besoin||'').trim();
-  const selectedAxes=(Array.isArray(axes)?axes:[]).map((a,i)=>({axis_id:String(a?.axis_id||`T06A${String(i+1).padStart(2,'0')}`),titre:String(a?.titre||a?.title||'').trim(),objectif_surveillance:String(a?.objectif_surveillance||'').trim()})).filter(a=>a.titre).slice(0,T06_MAX_AXES);
-  if(!need||!selectedAxes.length){const e=new Error('Le besoin et au moins un axe de veille sont obligatoires.');e.statusCode=400;throw e;}
-  const analyse=await analyserBesoin({apiKey,besoin:need,callModel});
+async function documenterAxesT06({ apiKey, besoin = '', cadrage = {}, reponses = [], axes = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+  const need = String(besoin || '').trim();
+  if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
 
-  const rawMaps=new Map();
-  const candidatesByAxis=new Map();
-  for(const axis of selectedAxes){
-    const queries=[`${analyse.sujet_central} ${axis.titre}`.trim(),axis.titre].filter(Boolean);
-    const {rawResults,candidates}=collectCandidates(searchFn,queries,{maxPerQuery:24,max:32});
-    rawMaps.set(axis.axis_id,new Map(rawResults.map(r=>[r.result_id,r])));
-    candidatesByAxis.set(axis.axis_id,candidates);
-  }
-  const promptSections=selectedAxes.map(axis=>{
-    const c=candidatesByAxis.get(axis.axis_id)||[];
-    return `### AXE ${axis.axis_id} — ${axis.titre}\nObjectif : ${axis.objectif_surveillance||'—'}\n\n${formatCandidatesForPrompt(c)}`;
-  }).join('\n\n====================\n\n');
+  const selectedAxes = (Array.isArray(axes) ? axes : [])
+    .map((a, i) => ({
+      ...a,
+      axis_id: String(a?.axis_id || `AX${i + 1}`).trim(),
+      titre: String(a?.titre || '').trim(),
+      objectif_surveillance: String(a?.objectif_surveillance || '').trim(),
+      pourquoi: String(a?.pourquoi || '').trim(),
+      questions: Array.isArray(a?.questions) ? a.questions.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3) : [],
+      requete_rag: String(a?.requete_rag || a?.titre || '').trim(),
+      origin: String(a?.origin || 'proposition_ia')
+    }))
+    .filter(a => a.titre)
+    .slice(0, MAX_AXES_PER_STRUCTURE + 2);
 
-  const system=`
-Tu analyses les dynamiques d'un sujet de veille à partir d'un corpus, en montant en généralité sans perdre l'ancrage documentaire.
-Pour chaque axe fourni, distingue :
-1) TENDANCE : évolution structurante ou durable. Elle doit être soutenue par plusieurs matériaux convergents ; privilégie plusieurs publications. Si le corpus ne suffit pas, n'en propose pas.
-2) SIGNE DE CHANGEMENT : indice récent ou évolution notable pouvant annoncer une inflexion. Il peut être plus ponctuel qu'une tendance, mais doit être explicitement observable dans les matériaux.
+  if (!selectedAxes.length) { const e = new Error('Au moins un axe de veille doit être retenu.'); e.statusCode = 400; throw e; }
 
-Ne transforme jamais : un titre de section, une méthode, un simple acteur, une table ronde, une recommandation ou une donnée isolée sans dynamique en tendance/signe.
-Chaque proposition doit être une SYNTHÈSE à un niveau supérieur aux sources, avec une interprétation concise, un « pourquoi » et une limite.
-Le besoin et les axes sont les filtres de pertinence. N'utilise aucune connaissance extérieure. Ne cite que les material_ids fournis pour l'axe concerné.
-Si une catégorie n'est pas suffisamment étayée, retourne un tableau vide.`;
-  const raw=await callModel({apiKey,system,tool:DYNAMICS_SYNTHESIS_TOOL,userText:`BESOIN : ${need}\n\n${promptSections}`,maxTokens:5200});
+  const answers = sanitizeAnswers(reponses);
+  const subject = String(cadrage?.sujet_central || fallbackSubjectFromNeed(need)).trim();
+  const fakeStructure = [{ structure_id: 'SELECTED', titre: 'Axes retenus', logique: '', axes: selectedAxes }];
+  const { packets, rawByAxis } = buildAxisCorpusPackets(searchFn, fakeStructure, subject, answers);
 
-  const axisResults=[];
-  for(const axis of selectedAxes){
-    const sourceAxis=(Array.isArray(raw.axes)?raw.axes:[]).find(a=>String(a?.axis_id)===axis.axis_id)||{};
-    const candidates=candidatesByAxis.get(axis.axis_id)||[];
-    const allowed=new Set(candidates.map(c=>c.material_id));
-    const rawMap=rawMaps.get(axis.axis_id)||new Map();
-    const trends=(Array.isArray(sourceAxis.tendances)?sourceAxis.tendances:[]).map((t,i)=>({
-      trend_id:`${axis.axis_id}-T${i+1}`,label:String(t?.label||'').trim(),interpretation:String(t?.interpretation||'').trim(),pourquoi:String(t?.pourquoi||'').trim(),limite:String(t?.limite||'').trim(),material_ids:cleanIds(t?.material_ids,allowed,6)
-    })).filter(t=>t.label&&t.material_ids.length>=2).slice(0,T06_MAX_TRENDS_PER_AXIS);
-    const signs=(Array.isArray(sourceAxis.signes_changement)?sourceAxis.signes_changement:[]).map((s,i)=>({
-      sign_id:`${axis.axis_id}-S${i+1}`,label:String(s?.label||'').trim(),interpretation:String(s?.interpretation||'').trim(),pourquoi:String(s?.pourquoi||'').trim(),limite:String(s?.limite||'').trim(),material_ids:cleanIds(s?.material_ids,allowed,5)
-    })).filter(s=>s.label&&s.material_ids.length).slice(0,T06_MAX_SIGNS_PER_AXIS);
-    axisResults.push({axis_id:axis.axis_id,titre:axis.titre,tendances:trends.map(t=>({...t,sources:t.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})),signes_changement:signs.map(s=>({...s,sources:s.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})),limites_couverture:[...new Set((sourceAxis.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,3)});
-  }
+  const supportSystem = `
+Tu documentes UN axe de veille déjà proposé. Tu ne dois PAS le réécrire ni le supprimer.
+Sélectionne uniquement les matériaux réellement utiles parmi ceux fournis.
+Résume en une ou deux phrases ce que le corpus apporte à l'axe, sans généraliser au-delà des matériaux.
+Si aucun matériau n'est réellement pertinent, retourne material_ids vide et explique simplement la limite du corpus.
+Un axe peut rester « à instruire » : ce n'est pas un échec.
+N'utilise aucune connaissance extérieure. Les noms propres, chiffres et dates dans « apport_corpus » doivent venir des matériaux sélectionnés.`;
 
-  // Les signaux faibles sont explicitement des clusters de >=2 signes de changement.
-  const clusterInput=axisResults.map(a=>({axis_id:a.axis_id,titre:a.titre,signes:a.signes_changement.map(s=>({sign_id:s.sign_id,label:s.label,interpretation:s.interpretation,pourquoi:s.pourquoi,limite:s.limite,source_count:s.sources.length}))})).filter(a=>a.signes.length>=2);
-  let clusters={axes:[]};
-  if(clusterInput.length){
-    const clusterSystem=`
-Tu appliques une définition stricte : un SIGNAL FAIBLE est ici un regroupement (cluster) d'au moins deux signes de changement convergents.
-Tu ne crées aucun signal faible à partir d'un seul signe. Tu n'ajoutes aucune information extérieure.
-Le signal faible doit exprimer la dynamique commune qui devient visible lorsqu'on rapproche les signes, sans prétendre qu'elle est certaine.
-Le champ limite doit rappeler l'incertitude et ce qui manque pour confirmer la dynamique. Si aucun cluster cohérent n'existe, retourne zéro signal faible.`;
-    clusters=await callModel({apiKey,system:clusterSystem,tool:WEAK_CLUSTER_TOOL,userText:`BESOIN : ${need}\n\n${JSON.stringify(clusterInput,null,2)}`,maxTokens:2800});
-  }
-  for(const axisResult of axisResults){
-    const signsById=new Map(axisResult.signes_changement.map(s=>[s.sign_id,s]));
-    const rawClusters=(Array.isArray(clusters.axes)?clusters.axes:[]).find(a=>String(a?.axis_id)===axisResult.axis_id)?.signaux_faibles||[];
-    axisResult.signaux_faibles=rawClusters.map((w,i)=>{
-      const signIds=[...new Set((w?.sign_ids||[]).map(String).filter(id=>signsById.has(id)))];
-      if(signIds.length<2)return null;
-      const sources=[];const seen=new Set();
-      for(const sid of signIds){for(const src of signsById.get(sid)?.sources||[]){const key=`${src.material_id}|${src.publication_id}`;if(!seen.has(key)){seen.add(key);sources.push(src)}}}
-      return {weak_id:`${axisResult.axis_id}-W${i+1}`,label:String(w?.label||'').trim(),interpretation:String(w?.interpretation||'').trim(),pourquoi:String(w?.pourquoi||'').trim(),limite:String(w?.limite||'').trim(),based_on_sign_ids:signIds,sources};
-    }).filter(w=>w?.label).slice(0,T06_MAX_WEAK_PER_AXIS);
+  const documentedAxes = [];
+  let technicalFailure = false;
+
+  for (const packet of packets) {
+    let supportRaw;
+    try {
+      supportRaw = await callModel({
+        apiKey,
+        system: supportSystem,
+        tool: AXIS_SUPPORT_TOOL,
+        userText: `BESOIN : ${need}\n\n${supportPrompt([packet])}`,
+        maxTokens: 1400
+      });
+      const structure = normalizeAxisSupport(supportRaw, [{ structure_id: 'SELECTED', titre: '', logique: '', axes: selectedAxes.filter(a => a.axis_id === packet.axis_id) }], rawByAxis)[0];
+      const axis = structure?.axes?.[0];
+      documentedAxes.push(axis || selectedAxes.find(a => a.axis_id === packet.axis_id));
+    } catch (error) {
+      technicalFailure = true;
+      const axis = selectedAxes.find(a => a.axis_id === packet.axis_id);
+      documentedAxes.push({
+        ...axis,
+        corpus_status: 'indisponible',
+        apport_corpus: '',
+        limite_corpus: 'La documentation du corpus n’a pas pu être établie pour cet axe en raison d’une indisponibilité technique. Ce statut ne signifie pas que le corpus est lacunaire.',
+        sources: [],
+        documentation_error: true
+      });
+    }
   }
 
-  return {ok:true,engine:'t06-dynamics-v0.1-synthesized',need,axes:axisResults,methodological_reference:{label:'ESPAS Horizon Scanning — communauté des veilleurs de l’Union européenne',url:'https://espas.eu/horizon.html',origin:'enrichissement_controle',usage:'Repère méthodologique pour questionner tendances, signes de changement et signaux faibles ; il ne constitue pas une preuve documentaire du scénario.'}};
+  return {
+    ok: true,
+    engine: 't06-axis-support-v1.0-selected-only',
+    need,
+    axes: documentedAxes,
+    documentation_available: !technicalFailure,
+    guardrails: {
+      only_selected_axes_documented: true,
+      technical_failure_is_not_documentary_gap: true
+    }
+  };
 }
 
-module.exports={
+// ---------- Étape 3 ----------
+
+async function construireGrilleGuetT06({ apiKey, besoin = '', cadrage = {}, reponses = [], axes = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+  const need = String(besoin || '').trim();
+  if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
+  const selectedAxes = (Array.isArray(axes) ? axes : [])
+    .map((a, i) => ({
+      ...a,
+      axis_id: String(a?.axis_id || `AX${i + 1}`).trim(),
+      titre: String(a?.titre || '').trim(),
+      objectif_surveillance: String(a?.objectif_surveillance || '').trim(),
+      questions: Array.isArray(a?.questions) ? a.questions.map(x => String(x || '').trim()).filter(Boolean).slice(0, 3) : [],
+      requete_rag: String(a?.requete_rag || a?.titre || '').trim(),
+      corpus_status: String(a?.corpus_status || 'non_evalue').trim()
+    }))
+    .filter(a => a.titre)
+    .slice(0, MAX_AXES_PER_STRUCTURE + 2);
+  if (!selectedAxes.length) { const e = new Error('Au moins un axe de veille doit être retenu.'); e.statusCode = 400; throw e; }
+
+  const answers = sanitizeAnswers(reponses);
+  const subject = String(cadrage?.sujet_central || fallbackSubjectFromNeed(need)).trim();
+  const { packets, rawByAxis } = buildDynamicPackets(searchFn, selectedAxes, subject, answers);
+
+  const system = `
+Tu construis une GRILLE DE GUET, pas une analyse prédictive.
+Pour chaque axe :
+1) TENDANCES DOCUMENTÉES : constats déclaratifs synthétiques. Chaque tendance doit être soutenue par au moins deux matériaux provenant de publications différentes. Si ce n'est pas possible, retourne zéro tendance.
+2) SIGNES DE CHANGEMENT À GUETTER : ce sont des propositions interrogatives/observables sur ce qu'il serait utile de surveiller. Elles peuvent monter en généralité. Elles ne sont PAS présentées comme déjà observées. Elles peuvent être inspirées par le corpus, mais une absence de matériau n'interdit pas de proposer un signe à guetter.
+3) HYPOTHÈSES DE REGROUPEMENT : seulement si au moins deux signes de changement à guetter peuvent converger. Formule explicitement l'incertitude et ce qui invaliderait l'hypothèse. Ne présente jamais cela comme un signal faible déjà établi.
+4) SOURCES À SURVEILLER : privilégie les types ou publications réellement présents dans les matériaux. Ne crée aucun nom propre absent du besoin ou du corpus.
+5) ANGLES MORTS : transforme les lacunes documentaires en points à instruire, sans bloquer le scénario.
+
+Règles :
+- Aucun chiffre, date, nom propre ou causalité dans une proposition IA s'ils ne figurent pas dans le besoin ou les matériaux fournis.
+- Les tendances sont du CORPUS ; les signes à guetter et hypothèses sont des PROPOSITIONS IA À VALIDER.
+- N'utilise aucune connaissance extérieure.`;
+
+  const prompt = packets.map(p => [
+    `AXE ${p.axis_id} — ${p.titre}`,
+    `Objectif : ${p.objectif_surveillance}`,
+    `Statut de couverture : ${p.corpus_status}`,
+    'MATÉRIAUX :',
+    p.materials.length ? p.materials.map((m, i) => `${i + 1}. ${m.material_id} | ${m.publication_id} | ${m.publication_title} | ${m.locator || 'sans repère'} | ${clip(m.text, 620)}`).join('\n') : '(aucun matériau pertinent)'
+  ].join('\n')).join('\n\n==========\n\n');
+
+  let raw;
+  try {
+    raw = await callModel({
+      apiKey,
+      system,
+      tool: WATCH_TOOL,
+      userText: `BESOIN : ${need}\nPRÉCISIONS UTILISATEUR :\n${answersText(answers)}\n\n${prompt}`,
+      maxTokens: 6200
+    });
+  } catch {
+    raw = { axes: selectedAxes.map(a => ({ axis_id: a.axis_id, tendances: [], signes_a_guetter: [], hypotheses_regroupement: [], sources_a_surveiller: [], angles_morts: ['La grille de guet doit être complétée manuellement pour cet axe.'] })) };
+  }
+
+  const rawAxisMap = new Map((Array.isArray(raw?.axes) ? raw.axes : []).map(a => [String(a?.axis_id || ''), a]));
+  const resultAxes = [];
+
+  for (const axis of selectedAxes) {
+    const sourceAxis = rawAxisMap.get(axis.axis_id) || {};
+    const results = rawByAxis.get(axis.axis_id) || [];
+    const allowed = allowedMaterialIds(results);
+
+    const trends = (Array.isArray(sourceAxis.tendances) ? sourceAxis.tendances : []).map((t, i) => {
+      const ids = cleanIds(t?.material_ids, allowed, 6);
+      if (ids.length < 2 || uniquePublicationCount(ids, results) < 2) return null;
+      return {
+        trend_id: String(t?.trend_id || `${axis.axis_id}-T${i + 1}`).trim(),
+        label: String(t?.label || '').trim(),
+        synthese: String(t?.synthese || '').trim(),
+        limite: String(t?.limite || '').trim(),
+        origin: 'corpus',
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
+      };
+    }).filter(t => t?.label).slice(0, MAX_TRENDS_PER_AXIS);
+
+    const signs = (Array.isArray(sourceAxis.signes_a_guetter) ? sourceAxis.signes_a_guetter : []).map((s, i) => {
+      const ids = cleanIds(s?.material_ids, allowed, 4);
+      return {
+        sign_id: String(s?.sign_id || `${axis.axis_id}-S${i + 1}`).trim(),
+        label: String(s?.label || '').trim(),
+        pourquoi_guetter: String(s?.pourquoi_guetter || '').trim(),
+        ce_qui_confirmerait: String(s?.ce_qui_confirmerait || '').trim(),
+        ce_qui_affaiblirait: String(s?.ce_qui_affaiblirait || '').trim(),
+        origin: 'proposition_ia',
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
+      };
+    }).filter(s => s.label).slice(0, MAX_WATCH_SIGNS_PER_AXIS);
+
+    const signIds = new Set(signs.map(s => s.sign_id));
+    const hypotheses = (Array.isArray(sourceAxis.hypotheses_regroupement) ? sourceAxis.hypotheses_regroupement : []).map((h, i) => {
+      const ids = [...new Set((Array.isArray(h?.sign_ids) ? h.sign_ids : []).map(String).filter(id => signIds.has(id)))];
+      if (ids.length < 2) return null;
+      return {
+        hypothesis_id: String(h?.hypothesis_id || `${axis.axis_id}-H${i + 1}`).trim(),
+        label: String(h?.label || '').trim(),
+        interpretation: String(h?.interpretation || '').trim(),
+        sign_ids: ids,
+        ce_qui_invaliderait: String(h?.ce_qui_invaliderait || '').trim(),
+        origin: 'proposition_ia'
+      };
+    }).filter(h => h?.label).slice(0, MAX_CLUSTER_HYPOTHESES_PER_AXIS);
+
+    const sourcesToWatch = (Array.isArray(sourceAxis.sources_a_surveiller) ? sourceAxis.sources_a_surveiller : []).map((s, i) => {
+      const ids = cleanIds(s?.material_ids, allowed, 4);
+      return {
+        source_watch_id: `${axis.axis_id}-SRC${i + 1}`,
+        label: String(s?.label || '').trim(),
+        raison: String(s?.raison || '').trim(),
+        origin: ids.length ? 'corpus' : 'proposition_ia',
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
+      };
+    }).filter(s => s.label).slice(0, 6);
+
+    resultAxes.push({
+      ...axis,
+      tendances: trends,
+      signes_a_guetter: signs,
+      hypotheses_regroupement: hypotheses,
+      sources_a_surveiller: sourcesToWatch,
+      angles_morts: [...new Set((Array.isArray(sourceAxis.angles_morts) ? sourceAxis.angles_morts : []).map(x => String(x || '').trim()).filter(Boolean))].slice(0, 4)
+    });
+  }
+
+  return {
+    ok: true,
+    engine: 't06-watch-v1.0-axis-by-axis',
+    need,
+    axes: resultAxes,
+    methodological_reference: {
+      label: 'ESPAS Horizon Scanning — communauté des veilleurs de l’Union européenne',
+      url: 'https://espas.eu/horizon.html',
+      origin: 'enrichissement_controle',
+      usage: 'Repère méthodologique pour structurer l’observation continue des changements. Cette ressource n’est pas une preuve documentaire du scénario.'
+    },
+    guardrails: {
+      weak_signal_claims_generated: false,
+      trends_require_two_publications: true,
+      watch_signs_are_hypotheses: true,
+      final_step_should_be_deterministic: true
+    }
+  };
+}
+
+module.exports = {
   MODEL_T06,
-  proposerNotionsT06,
-  proposerAxesT06,
-  proposerDynamiquesT06,
-  analyserBesoin,
-  sanitizeNeedAnalysis,
-  buildRetrievalQueries,
-  mergeSearchResults,
-  dedupeResults,
-  buildCandidatePacket,
-  enrichSource
+  cadrerBesoinT06,
+  proposerStructurationsT06,
+  documenterAxesT06,
+  construireGrilleGuetT06,
+  enrichSource,
+  materialText,
+  materialLabel,
+  fallbackQuestions,
+  fallbackStructurations,
+  sanitizeStructurations,
+  axisCoverageStatus,
+  fallbackSubjectFromNeed,
+  fallbackCorpusQuery
 };

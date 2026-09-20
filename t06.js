@@ -1,13 +1,13 @@
 // =====================================================
 // QUIRITES VEILLE LAB — T06 SCÉNARIO DE VEILLE
-// V0.1 : cadrage sémantique du besoin, notions strictement ancrées dans le corpus.
+// V0.2 : cadrage sémantique, récupération multi-requêtes et notions de cadrage synthétisées à partir du corpus.
 // =====================================================
 
 const { searchCorpus } = require('./globalSearch');
 
 const MODEL_T06 = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
-const T06_MAX_CANDIDATES = 36;
-const T06_MAX_NOTIONS = 5;
+const T06_MAX_CANDIDATES = 48;
+const T06_MAX_NOTIONS = 4;
 const T06_ANTHROPIC_MAX_ATTEMPTS = 4;
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -129,7 +129,7 @@ const NOTION_SELECTION_TOOL = {
             pourquoi: { type: 'string' },
             limite: { type: 'string' },
             niveau: { type: 'string', enum: ['structurante', 'utile'] },
-            material_ids: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } }
+            material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } }
           },
           required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'niveau', 'material_ids'],
           additionalProperties: false
@@ -162,7 +162,7 @@ const NOTION_AUDIT_TOOL = {
             pourquoi: { type: 'string' },
             limite: { type: 'string' },
             niveau: { type: 'string', enum: ['structurante', 'utile'] },
-            material_ids: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
+            material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } },
             conserver: { type: 'boolean' }
           },
           required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'niveau', 'material_ids', 'conserver'],
@@ -215,7 +215,8 @@ function buildCandidatePacket(results = []) {
     annee_publication: result.annee_publication || '',
     locator: result.locator || '',
     provenance_level: result.provenance_level || '',
-    score: Number(result.score || 0)
+    score: Number(result.score || 0),
+    retrieved_by: Array.isArray(result._t06_queries) ? result._t06_queries.slice(0, 4) : []
   }));
 }
 
@@ -225,8 +226,9 @@ function formatCandidatesForPrompt(candidates = []) {
     `Type: ${m.kind}${m.node_type ? ` / ${m.node_type}` : ''}${m.relation_type ? ` / ${m.relation_type}` : ''}`,
     `Publication: ${m.publication_id} — ${m.publication_title}`,
     `Organisme/année/repère: ${m.organisme_producteur || '—'} | ${m.annee_publication || '—'} | ${m.locator || '—'}`,
+    m.retrieved_by?.length ? `Repéré via: ${m.retrieved_by.join(' | ')}` : '',
     `Contenu: ${m.texte || m.label}`
-  ].join('\n')).join('\n\n---\n\n');
+  ].filter(Boolean).join('\n')).join('\n\n---\n\n');
 }
 
 function sanitizeNeedAnalysis(raw = {}, need = '') {
@@ -243,6 +245,68 @@ function sanitizeNeedAnalysis(raw = {}, need = '') {
   return { sujet_central: sujet || query, requete_recherche: query, dimensions };
 }
 
+function compactDimensionValue(dimension = {}) {
+  const raw = String(dimension?.valeur || '').trim();
+  if (!raw) return '';
+  const normalized = normalize(raw);
+
+  if (dimension.type === 'echelle') {
+    if (/commun|municip/.test(normalized)) return 'commune';
+    if (/departement/.test(normalized)) return 'département';
+    if (/region/.test(normalized)) return 'région';
+    if (/national/.test(normalized)) return 'national';
+  }
+  if (dimension.type === 'territoire') {
+    if (/francilien|ile de france/.test(normalized)) return 'Île-de-France';
+  }
+  if (dimension.type === 'temporalite') {
+    if (/evolu|tendance|avenir|prospect/.test(normalized)) return 'évolution';
+  }
+
+  return clip(raw, 72);
+}
+
+function buildRetrievalQueries(analyse = {}) {
+  const base = String(analyse.requete_recherche || analyse.sujet_central || '').trim();
+  if (!base) return [];
+
+  const queries = [base];
+  const dimensions = Array.isArray(analyse.dimensions) ? analyse.dimensions : [];
+
+  // Les dimensions servent à enrichir le rappel, jamais à bloquer la recherche.
+  // On privilégie l'échelle et le territoire pour faire remonter des matériaux
+  // utiles au cadrage, puis la temporalité/angle si elles sont explicites.
+  const priority = ['echelle', 'territoire', 'temporalite', 'angle', 'public'];
+  for (const type of priority) {
+    const dimension = dimensions.find(d => d.type === type && String(d.valeur || '').trim());
+    if (!dimension) continue;
+    const value = compactDimensionValue(dimension);
+    if (!value) continue;
+    const q = `${base} ${value}`.replace(/\s+/g, ' ').trim();
+    if (q && !queries.some(existing => normalize(existing) === normalize(q))) queries.push(q);
+    if (queries.length >= 4) break;
+  }
+
+  return queries.slice(0, 4);
+}
+
+function mergeSearchResults(searches = []) {
+  const byId = new Map();
+  for (const search of searches) {
+    const query = String(search?.query || '').trim();
+    const results = Array.isArray(search?.response?.results) ? search.response.results : [];
+    for (const result of results) {
+      const id = String(result?.result_id || '').trim();
+      if (!id) continue;
+      if (!byId.has(id)) byId.set(id, { ...result, _t06_queries: [] });
+      const current = byId.get(id);
+      if (query && !current._t06_queries.includes(query)) current._t06_queries.push(query);
+      if (Number(result.score || 0) > Number(current.score || 0)) current.score = result.score;
+    }
+  }
+  return [...byId.values()];
+}
+
 function sanitizeSelectedNotions(rawNotions = [], allowedIds = new Set()) {
   const out = [];
   const seenLabels = new Set();
@@ -252,7 +316,7 @@ function sanitizeSelectedNotions(rawNotions = [], allowedIds = new Set()) {
     if (!label || !key || seenLabels.has(key)) continue;
     const ids = [...new Set((Array.isArray(notion?.material_ids) ? notion.material_ids : [])
       .map(String)
-      .filter(id => allowedIds.has(id)))].slice(0, 3);
+      .filter(id => allowedIds.has(id)))].slice(0, 4);
     if (!ids.length) continue;
     seenLabels.add(key);
     out.push({
@@ -316,19 +380,30 @@ async function selectionnerNotions({ apiKey, besoin, analyse, candidates, callMo
 Tu aides un veilleur à PRÉCISER son besoin à partir d'un corpus documentaire.
 Tu ne reformules jamais le besoin à sa place.
 
-Ta tâche est très étroite : proposer de 0 à ${T06_MAX_NOTIONS} NOTIONS DE CADRAGE utiles, uniquement à partir des matériaux fournis.
+Ta tâche est très étroite : proposer idéalement 2 à ${T06_MAX_NOTIONS} NOTIONS DE CADRAGE utiles, uniquement à partir des matériaux fournis. Zéro notion reste possible si les matériaux sont réellement insuffisants, mais ne t'abstiens pas simplement parce qu'aucun nœud du graphe ne porte déjà le bon libellé.
+
+IMPORTANT : une notion de cadrage PEUT ÊTRE SYNTHÉTISÉE à partir de plusieurs chunks, nœuds ou relations. Le libellé n'a pas besoin d'exister mot pour mot dans le corpus, à condition que son sens soit entièrement soutenu par les matériaux cités. C'est précisément attendu lorsqu'une synthèse permet de faire émerger un cadrage plus utile que les libellés isolés.
 
 Une bonne notion :
 - est suffisamment générale pour structurer ou préciser le besoin ;
-- éclaire clairement une dimension du besoin (sujet, échelle, mesure, territoire, gouvernance, angle) ;
+- éclaire clairement une dimension du besoin (mesure du phénomène, échelle d'observation, disparités territoriales, temporalité, gouvernance, angle) ;
 - est directement soutenue par un ou plusieurs matériaux fournis ;
-- ne se contente pas d'un chevauchement lexical.
+- peut agréger plusieurs matériaux convergents pour produire un libellé de cadrage fidèle ;
+- ne se contente jamais d'un chevauchement lexical.
+
+Ordre de préférence lorsque les matériaux le permettent :
+1) manière de mesurer ou d'observer le sujet central ;
+2) échelle d'observation explicitement demandée ;
+3) différences ou disparités territoriales pertinentes ;
+4) dimension temporelle / évolution ;
+5) gouvernance ou action locale seulement si elle aide réellement à préciser le besoin.
 
 À REJETER :
 - un sous-thème trop étroit que l'utilisateur n'a pas demandé (ex. mineurs, si le besoin porte sur la délinquance en général) ;
 - un acteur, une recommandation ou un dispositif présenté comme une notion sans valeur de cadrage ;
 - une notion seulement proche par un mot générique ;
-- une notion qui élargit artificiellement le sujet.
+- une notion qui élargit artificiellement le sujet ;
+- un cas particulier (mineurs, élus, type d'infraction précis, dispositif précis) si le besoin porte sur le phénomène général et que ce cas particulier n'aide pas directement au cadrage demandé.
 
 Le champ « pourquoi » doit être explicite et concret, sur le modèle :
 « Il éclaire une dimension de votre besoin liée à l'action locale contre la délinquance, en documentant les relations entre maire et parquet. »
@@ -336,7 +411,7 @@ Le champ « pourquoi » doit être explicite et concret, sur le modèle :
 
 Le champ « limite » doit dire ce que les matériaux cités NE permettent PAS d'établir au regard du besoin (ex. pas d'évolution temporelle, pas de périmètre francilien, échelle différente). Si aucune limite importante n'est identifiable, indique sobrement que la notion aide au cadrage mais ne constitue pas à elle seule un objet de veille.
 
-Tu peux synthétiser un libellé de notion si et seulement s'il est directement soutenu par les matériaux cités.
+Exemples de SYNTHÈSES acceptables si les matériaux les soutiennent : « Délinquance enregistrée à l'échelle communale », « Disparités territoriales de la délinquance », « Prévention locale de la délinquance ». Elles peuvent être construites à partir de plusieurs passages complémentaires.
 N'utilise aucune connaissance extérieure.
 Ne cite que des material_ids fournis.
 Ne force jamais le nombre de notions : zéro bonne notion vaut mieux qu'une proposition faible.
@@ -381,11 +456,13 @@ Tu audites des notions de cadrage proposées pour un besoin de veille.
 Le besoin utilisateur ne doit pas être reformulé.
 
 Conserve une notion uniquement si :
-1) elle est réellement soutenue par les matériaux cités ;
+1) elle est réellement soutenue par les matériaux cités, même si son libellé est une synthèse et n'apparaît pas mot pour mot dans une source ;
 2) elle aide à préciser le besoin sans l'élargir artificiellement ;
 3) elle n'est pas un sous-thème trop étroit par rapport au besoin ;
 4) son « pourquoi » explique précisément la contribution au besoin ;
 5) sa « limite » explicite honnêtement ce que les sources ne permettent pas d'établir.
+
+Ne rejette pas une notion uniquement parce qu'elle synthétise plusieurs matériaux. Au contraire, une synthèse documentaire sourcée est préférable à un libellé de nœud trop étroit lorsque cela aide mieux le veilleur à cadrer son besoin. Si les matériaux permettent 2 à 4 notions solides, conserve-les plutôt que de réduire artificiellement la sortie à zéro.
 
 Rejette une notion fondée sur simple proximité lexicale, sur une source hors sujet, ou sur un cas particulier non demandé.
 Tu peux corriger label, pourquoi et limite pour les rendre plus fidèles et plus précis, sans ajouter de connaissance extérieure.
@@ -432,13 +509,28 @@ async function proposerNotionsT06({ apiKey, besoin = '', searchFn = searchCorpus
 
   const analyse = await analyserBesoin({ apiKey, besoin: need, callModel });
   const query = analyse.requete_recherche || analyse.sujet_central || need;
+  const retrievalQueries = buildRetrievalQueries(analyse);
 
-  const [general, nodes] = [
-    searchFn({ query, limit: 30, max_per_publication: 4, diversify_by_publication: true }),
-    searchFn({ query, kinds: ['node'], limit: 30, max_per_publication: 5, diversify_by_publication: true })
-  ];
+  const searches = [];
+  for (const retrievalQuery of retrievalQueries) {
+    searches.push({
+      query: retrievalQuery,
+      response: searchFn({ query: retrievalQuery, limit: 24, max_per_publication: 4, diversify_by_publication: true })
+    });
+    searches.push({
+      query: retrievalQuery,
+      response: searchFn({ query: retrievalQuery, kinds: ['node'], limit: 18, max_per_publication: 5, diversify_by_publication: true })
+    });
+  }
 
-  const rawResults = dedupeResults([...(general?.results || []), ...(nodes?.results || [])]);
+  const rawResults = dedupeResults(mergeSearchResults(searches));
+  // On remonte en tête les matériaux retrouvés par plusieurs requêtes de cadrage :
+  // ils sont souvent plus utiles que les occurrences lexicales isolées.
+  rawResults.sort((a, b) => {
+    const queryDiff = (b._t06_queries?.length || 0) - (a._t06_queries?.length || 0);
+    if (queryDiff) return queryDiff;
+    return Number(b.score || 0) - Number(a.score || 0);
+  });
   const candidates = buildCandidatePacket(rawResults);
   const candidateMap = new Map(candidates.map(c => [c.material_id, c]));
   const rawResultMap = new Map(rawResults.map(r => [r.result_id, r]));
@@ -446,10 +538,10 @@ async function proposerNotionsT06({ apiKey, besoin = '', searchFn = searchCorpus
   if (!candidates.length) {
     return {
       ok: true,
-      engine: 't06-framing-v0.1-llm-grounded',
+      engine: 't06-framing-v0.2-synthesized',
       need,
       analysis: analyse,
-      retrieval: { query, candidates: 0, publications: 0 },
+      retrieval: { query, queries: retrievalQueries, candidates: 0, publications: 0 },
       notions: [],
       limites_couverture: ['Aucun matériau suffisamment pertinent n’a été retrouvé pour le sujet central dans cette recherche.']
     };
@@ -471,14 +563,15 @@ async function proposerNotionsT06({ apiKey, besoin = '', searchFn = searchCorpus
   const publicationIds = new Set(rawResults.map(r => r.publication_id).filter(Boolean));
   return {
     ok: true,
-    engine: 't06-framing-v0.1-llm-grounded',
+    engine: 't06-framing-v0.2-synthesized',
     need,
     analysis: analyse,
     retrieval: {
       query,
+      queries: retrievalQueries,
       candidates: candidates.length,
       publications: publicationIds.size,
-      source_engine: general?.engine || 'corpus-search'
+      source_engine: searches.find(s => s?.response?.engine)?.response?.engine || 'corpus-search'
     },
     notions,
     limites_couverture: selected.limites_couverture
@@ -494,6 +587,8 @@ module.exports = {
   buildCandidatePacket,
   sanitizeNeedAnalysis,
   sanitizeSelectedNotions,
+  buildRetrievalQueries,
+  mergeSearchResults,
   dedupeResults,
   enrichSource
 };

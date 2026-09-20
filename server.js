@@ -8,6 +8,7 @@ const { genererResumeAnalytiqueT01, nettoyerCorpusT01, MODEL_REDACTION } = requi
 const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { genererGlossaireT02, nettoyerCorpusT02 } = require("./t02");
 const { genererRecommandationsT04, nettoyerCorpusT04 } = require("./t04");
+const { proposerNotionsT06 } = require("./t06");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
@@ -766,8 +767,8 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         ok: true,
         service: "quirites-veille-lab-cloud",
-        version: "cloud-v0.10.0-t04-recommendations",
-        message: "Backend Cloud Run disponible — T01 + T02 + T03 + T04 + recherche corpus + chatbot public structuré",
+        version: "cloud-v0.11.0-t06-framing",
+        message: "Backend Cloud Run disponible — T01 + T02 + T03 + T04 + T06 cadrage + recherche corpus + chatbot public structuré",
         queue: `${TASK_LOCATION}/${TASK_QUEUE}`,
         model: MODEL_REDACTION,
         input_storage: "firestore-subcollection"
@@ -787,6 +788,16 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/reflection-assist") {
       const body = await readJsonBody(req, 512 * 1024);
       const result = runReflectionAssist(body);
+      return sendJson(res, 200, result);
+    }
+
+    if (req.method === "POST" && req.url === "/scenario-framing") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await proposerNotionsT06({
+        apiKey,
+        besoin: String(body.need || body.besoin || "")
+      });
       return sendJson(res, 200, result);
     }
 
@@ -870,5 +881,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Quiritès Cloud backend T01/T02/T03/T04/graph-chat listening on port ${PORT}`);
+  console.log(`Quiritès Cloud backend T01/T02/T03/T04/T06/graph-chat listening on port ${PORT}`);
 });

@@ -1,13 +1,18 @@
 // =====================================================
 // QUIRITES VEILLE LAB — T06 SCÉNARIO DE VEILLE
-// V0.2 : cadrage sémantique, récupération multi-requêtes et notions de cadrage synthétisées à partir du corpus.
+// V0.3 : synthèse documentaire multi-niveaux.
+// Le corpus fournit les preuves ; l'IA monte en généralité sans sortir des sources.
 // =====================================================
 
 const { searchCorpus } = require('./globalSearch');
 
 const MODEL_T06 = process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
-const T06_MAX_CANDIDATES = 48;
+const T06_MAX_CANDIDATES = 56;
 const T06_MAX_NOTIONS = 4;
+const T06_MAX_AXES = 5;
+const T06_MAX_TRENDS_PER_AXIS = 3;
+const T06_MAX_SIGNS_PER_AXIS = 4;
+const T06_MAX_WEAK_PER_AXIS = 2;
 const T06_ANTHROPIC_MAX_ATTEMPTS = 4;
 
 function sleep(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
@@ -23,13 +28,13 @@ function normalize(value) {
     .trim();
 }
 
-function clip(value, max = 620) {
+function clip(value, max = 680) {
   const text = String(value || '').replace(/\s+/g, ' ').trim();
   if (text.length <= max) return text;
   return `${text.slice(0, max).replace(/\s+\S*$/, '')}…`;
 }
 
-async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxTokens = 2600 }) {
+async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxTokens = 3200 }) {
   const payload = {
     model: MODEL_T06,
     max_tokens: maxTokens,
@@ -65,7 +70,7 @@ async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxToken
       const json = JSON.parse(text);
       const toolUse = (json.content || []).find(b => b && b.type === 'tool_use' && b.name === tool.name);
       if (!toolUse?.input) {
-        const err = new Error("Claude n'a pas retourné l'appel structuré attendu pour T06.");
+        const err = new Error(`Claude n'a pas retourné l'appel structuré attendu pour ${tool.name}.`);
         err.status = 503;
         throw err;
       }
@@ -81,20 +86,19 @@ async function appelerClaudeAvecOutil({ apiKey, system, tool, userText, maxToken
       clearTimeout(timeout);
     }
   }
-  throw lastError || new Error("Échec de l'appel Anthropic T06.");
+  throw lastError || new Error('Échec de l’appel Anthropic T06.');
 }
 
 const NEED_ANALYSIS_TOOL = {
   name: 'analyser_besoin_t06',
-  description: "Décompose le besoin sans le reformuler afin d'identifier le sujet central utilisé pour interroger le corpus et les dimensions secondaires à respecter.",
+  description: "Décompose le besoin sans le reformuler pour identifier le sujet central et les dimensions secondaires.",
   input_schema: {
     type: 'object',
     properties: {
       sujet_central: { type: 'string' },
       requete_recherche: { type: 'string' },
       dimensions: {
-        type: 'array',
-        maxItems: 8,
+        type: 'array', maxItems: 8,
         items: {
           type: 'object',
           properties: {
@@ -102,25 +106,22 @@ const NEED_ANALYSIS_TOOL = {
             valeur: { type: 'string' },
             role: { type: 'string', enum: ['secondaire', 'contrainte', 'intention'] }
           },
-          required: ['type', 'valeur', 'role'],
-          additionalProperties: false
+          required: ['type', 'valeur', 'role'], additionalProperties: false
         }
       }
     },
-    required: ['sujet_central', 'requete_recherche', 'dimensions'],
-    additionalProperties: false
+    required: ['sujet_central', 'requete_recherche', 'dimensions'], additionalProperties: false
   }
 };
 
-const NOTION_SELECTION_TOOL = {
-  name: 'selectionner_notions_t06',
-  description: "Sélectionne uniquement des notions de cadrage réellement utiles pour préciser le besoin de veille, en s'appuyant exclusivement sur les matériaux fournis.",
+const FRAME_SYNTHESIS_TOOL = {
+  name: 'synthetiser_cadrage_t06',
+  description: 'Fait émerger 0 à 4 notions de cadrage à partir de plusieurs matériaux du corpus.',
   input_schema: {
     type: 'object',
     properties: {
       notions: {
-        type: 'array',
-        maxItems: T06_MAX_NOTIONS,
+        type: 'array', maxItems: T06_MAX_NOTIONS,
         items: {
           type: 'object',
           properties: {
@@ -128,27 +129,20 @@ const NOTION_SELECTION_TOOL = {
             dimension_eclairee: { type: 'string' },
             pourquoi: { type: 'string' },
             limite: { type: 'string' },
-            niveau: { type: 'string', enum: ['structurante', 'utile'] },
-            material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } }
+            material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } }
           },
-          required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'niveau', 'material_ids'],
-          additionalProperties: false
+          required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
         }
       },
-      limites_couverture: {
-        type: 'array',
-        maxItems: 4,
-        items: { type: 'string' }
-      }
+      limites_couverture: { type: 'array', maxItems: 4, items: { type: 'string' } }
     },
-    required: ['notions', 'limites_couverture'],
-    additionalProperties: false
+    required: ['notions', 'limites_couverture'], additionalProperties: false
   }
 };
 
-const NOTION_AUDIT_TOOL = {
-  name: 'auditer_notions_t06',
-  description: 'Audite la pertinence intellectuelle et la fidélité documentaire de chaque notion proposée.',
+const FRAME_AUDIT_TOOL = {
+  name: 'auditer_cadrage_t06',
+  description: 'Vérifie le soutien documentaire des notions sans imposer un rejet excessif.',
   input_schema: {
     type: 'object',
     properties: {
@@ -158,33 +152,168 @@ const NOTION_AUDIT_TOOL = {
           type: 'object',
           properties: {
             label: { type: 'string' },
-            dimension_eclairee: { type: 'string' },
             pourquoi: { type: 'string' },
             limite: { type: 'string' },
-            niveau: { type: 'string', enum: ['structurante', 'utile'] },
-            material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } },
-            conserver: { type: 'boolean' }
+            material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } },
+            statut: { type: 'string', enum: ['solide', 'partiel', 'rejeter'] }
           },
-          required: ['label', 'dimension_eclairee', 'pourquoi', 'limite', 'niveau', 'material_ids', 'conserver'],
-          additionalProperties: false
+          required: ['label', 'pourquoi', 'limite', 'material_ids', 'statut'], additionalProperties: false
         }
       }
     },
-    required: ['notions'],
-    additionalProperties: false
+    required: ['notions'], additionalProperties: false
+  }
+};
+
+const AXES_SYNTHESIS_TOOL = {
+  name: 'synthetiser_axes_t06',
+  description: 'Propose 2 à 5 axes de veille à un niveau de généralité supérieur aux sources.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      axes: {
+        type: 'array', maxItems: T06_MAX_AXES,
+        items: {
+          type: 'object',
+          properties: {
+            titre: { type: 'string' },
+            objectif_surveillance: { type: 'string' },
+            pourquoi: { type: 'string' },
+            questions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
+            limite: { type: 'string' },
+            material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } }
+          },
+          required: ['titre', 'objectif_surveillance', 'pourquoi', 'questions', 'limite', 'material_ids'], additionalProperties: false
+        }
+      },
+      limites_couverture: { type: 'array', maxItems: 4, items: { type: 'string' } }
+    },
+    required: ['axes', 'limites_couverture'], additionalProperties: false
+  }
+};
+
+const AXES_AUDIT_TOOL = {
+  name: 'auditer_axes_t06',
+  description: 'Vérifie qu’un axe est bien un axe de veille et non un simple libellé de source.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      axes: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            titre: { type: 'string' },
+            objectif_surveillance: { type: 'string' },
+            pourquoi: { type: 'string' },
+            questions: { type: 'array', minItems: 1, maxItems: 3, items: { type: 'string' } },
+            limite: { type: 'string' },
+            material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } },
+            statut: { type: 'string', enum: ['solide', 'partiel', 'rejeter'] }
+          },
+          required: ['titre', 'objectif_surveillance', 'pourquoi', 'questions', 'limite', 'material_ids', 'statut'], additionalProperties: false
+        }
+      }
+    },
+    required: ['axes'], additionalProperties: false
+  }
+};
+
+const DYNAMICS_SYNTHESIS_TOOL = {
+  name: 'synthetiser_dynamiques_t06',
+  description: 'Synthétise tendances et signes de changement pour chaque axe à partir des seuls matériaux fournis.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      axes: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            axis_id: { type: 'string' },
+            tendances: {
+              type: 'array', maxItems: T06_MAX_TRENDS_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  label: { type: 'string' },
+                  interpretation: { type: 'string' },
+                  pourquoi: { type: 'string' },
+                  limite: { type: 'string' },
+                  material_ids: { type: 'array', minItems: 1, maxItems: 6, items: { type: 'string' } }
+                },
+                required: ['label', 'interpretation', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
+              }
+            },
+            signes_changement: {
+              type: 'array', maxItems: T06_MAX_SIGNS_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  label: { type: 'string' },
+                  interpretation: { type: 'string' },
+                  pourquoi: { type: 'string' },
+                  limite: { type: 'string' },
+                  material_ids: { type: 'array', minItems: 1, maxItems: 5, items: { type: 'string' } }
+                },
+                required: ['label', 'interpretation', 'pourquoi', 'limite', 'material_ids'], additionalProperties: false
+              }
+            },
+            limites_couverture: { type: 'array', maxItems: 3, items: { type: 'string' } }
+          },
+          required: ['axis_id', 'tendances', 'signes_changement', 'limites_couverture'], additionalProperties: false
+        }
+      }
+    },
+    required: ['axes'], additionalProperties: false
+  }
+};
+
+const WEAK_CLUSTER_TOOL = {
+  name: 'clusteriser_signaux_faibles_t06',
+  description: 'Regroupe au moins deux signes de changement convergents en un signal faible, sans inventer de contenu.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      axes: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            axis_id: { type: 'string' },
+            signaux_faibles: {
+              type: 'array', maxItems: T06_MAX_WEAK_PER_AXIS,
+              items: {
+                type: 'object',
+                properties: {
+                  label: { type: 'string' },
+                  interpretation: { type: 'string' },
+                  pourquoi: { type: 'string' },
+                  limite: { type: 'string' },
+                  sign_ids: { type: 'array', minItems: 2, maxItems: 4, items: { type: 'string' } }
+                },
+                required: ['label', 'interpretation', 'pourquoi', 'limite', 'sign_ids'], additionalProperties: false
+              }
+            }
+          },
+          required: ['axis_id', 'signaux_faibles'], additionalProperties: false
+        }
+      }
+    },
+    required: ['axes'], additionalProperties: false
   }
 };
 
 function materialText(result = {}) {
-  if (result.kind === 'chunk') return clip(result.text, 760);
-  if (result.kind === 'node') return clip(result.label, 360);
-  if (result.kind === 'relation') return clip(`${result.source_label || ''} — ${result.relation_type || ''} — ${result.target_label || ''}`, 420);
+  if (result.kind === 'chunk') return clip(result.text, 860);
+  if (result.kind === 'node') return clip(result.label, 420);
+  if (result.kind === 'relation') return clip(`${result.source_label || ''} — ${result.relation_type || ''} — ${result.target_label || ''}`, 520);
   return '';
 }
 
 function materialLabel(result = {}) {
   if (result.kind === 'node') return result.label || result.node_id || result.result_id;
-  if (result.kind === 'chunk') return result.section || clip(result.text, 120) || result.chunk_id || result.result_id;
+  if (result.kind === 'chunk') return result.section || clip(result.text, 140) || result.chunk_id || result.result_id;
   if (result.kind === 'relation') return `${result.source_label || result.source_id || ''} — ${result.relation_type || 'LIEN'} — ${result.target_label || result.target_id || ''}`;
   return result.result_id || 'Matériau';
 }
@@ -199,95 +328,6 @@ function dedupeResults(results = []) {
     out.push(item);
   }
   return out;
-}
-
-function buildCandidatePacket(results = []) {
-  return results.slice(0, T06_MAX_CANDIDATES).map(result => ({
-    material_id: result.result_id,
-    kind: result.kind,
-    label: materialLabel(result),
-    texte: materialText(result),
-    node_type: result.node_type || '',
-    relation_type: result.relation_type || '',
-    publication_id: result.publication_id || '',
-    publication_title: result.publication_title || '',
-    organisme_producteur: result.organisme_producteur || '',
-    annee_publication: result.annee_publication || '',
-    locator: result.locator || '',
-    provenance_level: result.provenance_level || '',
-    score: Number(result.score || 0),
-    retrieved_by: Array.isArray(result._t06_queries) ? result._t06_queries.slice(0, 4) : []
-  }));
-}
-
-function formatCandidatesForPrompt(candidates = []) {
-  return candidates.map((m, index) => [
-    `MATÉRIAU ${index + 1} — ${m.material_id}`,
-    `Type: ${m.kind}${m.node_type ? ` / ${m.node_type}` : ''}${m.relation_type ? ` / ${m.relation_type}` : ''}`,
-    `Publication: ${m.publication_id} — ${m.publication_title}`,
-    `Organisme/année/repère: ${m.organisme_producteur || '—'} | ${m.annee_publication || '—'} | ${m.locator || '—'}`,
-    m.retrieved_by?.length ? `Repéré via: ${m.retrieved_by.join(' | ')}` : '',
-    `Contenu: ${m.texte || m.label}`
-  ].filter(Boolean).join('\n')).join('\n\n---\n\n');
-}
-
-function sanitizeNeedAnalysis(raw = {}, need = '') {
-  const sujet = String(raw.sujet_central || '').trim();
-  const query = String(raw.requete_recherche || sujet || need).trim();
-  const dimensions = (Array.isArray(raw.dimensions) ? raw.dimensions : [])
-    .map(d => ({
-      type: ['echelle', 'territoire', 'temporalite', 'public', 'finalite', 'angle', 'autre'].includes(d?.type) ? d.type : 'autre',
-      valeur: String(d?.valeur || '').trim(),
-      role: ['secondaire', 'contrainte', 'intention'].includes(d?.role) ? d.role : 'secondaire'
-    }))
-    .filter(d => d.valeur)
-    .slice(0, 8);
-  return { sujet_central: sujet || query, requete_recherche: query, dimensions };
-}
-
-function compactDimensionValue(dimension = {}) {
-  const raw = String(dimension?.valeur || '').trim();
-  if (!raw) return '';
-  const normalized = normalize(raw);
-
-  if (dimension.type === 'echelle') {
-    if (/commun|municip/.test(normalized)) return 'commune';
-    if (/departement/.test(normalized)) return 'département';
-    if (/region/.test(normalized)) return 'région';
-    if (/national/.test(normalized)) return 'national';
-  }
-  if (dimension.type === 'territoire') {
-    if (/francilien|ile de france/.test(normalized)) return 'Île-de-France';
-  }
-  if (dimension.type === 'temporalite') {
-    if (/evolu|tendance|avenir|prospect/.test(normalized)) return 'évolution';
-  }
-
-  return clip(raw, 72);
-}
-
-function buildRetrievalQueries(analyse = {}) {
-  const base = String(analyse.requete_recherche || analyse.sujet_central || '').trim();
-  if (!base) return [];
-
-  const queries = [base];
-  const dimensions = Array.isArray(analyse.dimensions) ? analyse.dimensions : [];
-
-  // Les dimensions servent à enrichir le rappel, jamais à bloquer la recherche.
-  // On privilégie l'échelle et le territoire pour faire remonter des matériaux
-  // utiles au cadrage, puis la temporalité/angle si elles sont explicites.
-  const priority = ['echelle', 'territoire', 'temporalite', 'angle', 'public'];
-  for (const type of priority) {
-    const dimension = dimensions.find(d => d.type === type && String(d.valeur || '').trim());
-    if (!dimension) continue;
-    const value = compactDimensionValue(dimension);
-    if (!value) continue;
-    const q = `${base} ${value}`.replace(/\s+/g, ' ').trim();
-    if (q && !queries.some(existing => normalize(existing) === normalize(q))) queries.push(q);
-    if (queries.length >= 4) break;
-  }
-
-  return queries.slice(0, 4);
 }
 
 function mergeSearchResults(searches = []) {
@@ -307,288 +347,317 @@ function mergeSearchResults(searches = []) {
   return [...byId.values()];
 }
 
-function sanitizeSelectedNotions(rawNotions = [], allowedIds = new Set()) {
-  const out = [];
-  const seenLabels = new Set();
-  for (const notion of Array.isArray(rawNotions) ? rawNotions : []) {
-    const label = String(notion?.label || '').trim();
-    const key = normalize(label);
-    if (!label || !key || seenLabels.has(key)) continue;
-    const ids = [...new Set((Array.isArray(notion?.material_ids) ? notion.material_ids : [])
-      .map(String)
-      .filter(id => allowedIds.has(id)))].slice(0, 4);
-    if (!ids.length) continue;
-    seenLabels.add(key);
-    out.push({
-      label,
-      dimension_eclairee: String(notion?.dimension_eclairee || '').trim(),
-      pourquoi: String(notion?.pourquoi || '').trim(),
-      limite: String(notion?.limite || '').trim(),
-      niveau: notion?.niveau === 'structurante' ? 'structurante' : 'utile',
-      material_ids: ids
-    });
-    if (out.length >= T06_MAX_NOTIONS) break;
-  }
-  return out;
+function buildCandidatePacket(results = [], max = T06_MAX_CANDIDATES) {
+  return results.slice(0, max).map(result => ({
+    material_id: result.result_id,
+    kind: result.kind,
+    label: materialLabel(result),
+    texte: materialText(result),
+    node_type: result.node_type || '',
+    relation_type: result.relation_type || '',
+    publication_id: result.publication_id || '',
+    publication_title: result.publication_title || '',
+    organisme_producteur: result.organisme_producteur || '',
+    annee_publication: result.annee_publication || '',
+    locator: result.locator || '',
+    provenance_level: result.provenance_level || '',
+    score: Number(result.score || 0),
+    retrieved_by: Array.isArray(result._t06_queries) ? result._t06_queries.slice(0, 5) : []
+  }));
+}
+
+function formatCandidatesForPrompt(candidates = []) {
+  return candidates.map((m, index) => [
+    `MATÉRIAU ${index + 1} — ${m.material_id}`,
+    `Type: ${m.kind}${m.node_type ? ` / ${m.node_type}` : ''}${m.relation_type ? ` / ${m.relation_type}` : ''}`,
+    `Publication: ${m.publication_id} — ${m.publication_title}`,
+    `Organisme/année/repère: ${m.organisme_producteur || '—'} | ${m.annee_publication || '—'} | ${m.locator || '—'}`,
+    m.retrieved_by?.length ? `Repéré via: ${m.retrieved_by.join(' | ')}` : '',
+    `Contenu: ${m.texte || m.label}`
+  ].filter(Boolean).join('\n')).join('\n\n---\n\n');
 }
 
 function enrichSource(result = {}) {
   return {
-    material_id: result.result_id || '',
-    kind: result.kind || '',
-    publication_id: result.publication_id || '',
-    titre: result.publication_title || '',
-    organisme_producteur: result.organisme_producteur || '',
-    annee_publication: result.annee_publication || '',
-    type_document: result.type_document || '',
-    repere: result.locator || '',
-    provenance_level: result.provenance_level || '',
-    url: result.url_contenu || result.url_source || '',
-    extrait: materialText(result),
-    libelle: materialLabel(result)
+    material_id: result.result_id || '', kind: result.kind || '',
+    publication_id: result.publication_id || '', titre: result.publication_title || '',
+    organisme_producteur: result.organisme_producteur || '', annee_publication: result.annee_publication || '',
+    type_document: result.type_document || '', repere: result.locator || '',
+    provenance_level: result.provenance_level || '', url: result.url_contenu || result.url_source || '',
+    extrait: materialText(result), libelle: materialLabel(result)
   };
+}
+
+function sanitizeNeedAnalysis(raw = {}, need = '') {
+  const sujet = String(raw.sujet_central || '').trim();
+  const query = String(raw.requete_recherche || sujet || need).trim();
+  const dimensions = (Array.isArray(raw.dimensions) ? raw.dimensions : []).map(d => ({
+    type: ['echelle','territoire','temporalite','public','finalite','angle','autre'].includes(d?.type) ? d.type : 'autre',
+    valeur: String(d?.valeur || '').trim(),
+    role: ['secondaire','contrainte','intention'].includes(d?.role) ? d.role : 'secondaire'
+  })).filter(d => d.valeur).slice(0, 8);
+  return { sujet_central: sujet || query, requete_recherche: query, dimensions };
+}
+
+function compactDimensionValue(dimension = {}) {
+  const raw = String(dimension?.valeur || '').trim();
+  if (!raw) return '';
+  const n = normalize(raw);
+  if (dimension.type === 'echelle') {
+    if (/commun|municip/.test(n)) return 'commune';
+    if (/departement/.test(n)) return 'département';
+    if (/region/.test(n)) return 'région';
+  }
+  if (dimension.type === 'territoire' && /francilien|ile de france/.test(n)) return 'Île-de-France';
+  if (dimension.type === 'temporalite' && /evolu|tendance|avenir|prospect/.test(n)) return 'évolution';
+  return clip(raw, 72);
+}
+
+function buildRetrievalQueries(analyse = {}, extras = []) {
+  const base = String(analyse.requete_recherche || analyse.sujet_central || '').trim();
+  if (!base) return [];
+  const queries = [base];
+  const priority = ['echelle','territoire','temporalite','angle','public'];
+  for (const type of priority) {
+    const d = (analyse.dimensions || []).find(x => x.type === type && String(x.valeur || '').trim());
+    if (!d) continue;
+    const v = compactDimensionValue(d);
+    const q = `${base} ${v}`.replace(/\s+/g, ' ').trim();
+    if (q && !queries.some(x => normalize(x) === normalize(q))) queries.push(q);
+    if (queries.length >= 4) break;
+  }
+  for (const extra of extras) {
+    const v = String(extra || '').trim();
+    if (!v) continue;
+    const q = `${base} ${v}`.replace(/\s+/g, ' ').trim();
+    if (!queries.some(x => normalize(x) === normalize(q))) queries.push(q);
+    if (queries.length >= 6) break;
+  }
+  return queries.slice(0, 6);
+}
+
+function collectCandidates(searchFn, queries, { maxPerQuery = 24, kinds = null, max = T06_MAX_CANDIDATES } = {}) {
+  const searches = [];
+  for (const query of queries) {
+    const body = { query, limit: maxPerQuery, max_per_publication: 4, diversify_by_publication: true };
+    if (Array.isArray(kinds) && kinds.length) body.kinds = kinds;
+    searches.push({ query, response: searchFn(body) });
+  }
+  const rawResults = dedupeResults(mergeSearchResults(searches));
+  rawResults.sort((a, b) => {
+    const q = (b._t06_queries?.length || 0) - (a._t06_queries?.length || 0);
+    if (q) return q;
+    return Number(b.score || 0) - Number(a.score || 0);
+  });
+  return { searches, rawResults, candidates: buildCandidatePacket(rawResults, max) };
+}
+
+function cleanIds(ids, allowed, max = 6) {
+  return [...new Set((Array.isArray(ids) ? ids : []).map(String).filter(id => allowed.has(id)))].slice(0, max);
 }
 
 async function analyserBesoin({ apiKey, besoin, callModel = appelerClaudeAvecOutil }) {
   const system = `
 Tu analyses un besoin de veille uniquement pour préparer une recherche documentaire.
-IMPORTANT : tu NE REFORMULES PAS le besoin utilisateur et tu ne produis aucun conseil.
-
-Objectif :
-- identifier le SUJET CENTRAL qui doit guider la recherche dans le corpus ;
-- distinguer les dimensions secondaires : échelle d'observation, territoire, temporalité, public, finalité, angle ;
-- produire une requête de recherche COURTE (2 à 8 mots) centrée sur le sujet, sans rendre les dimensions secondaires bloquantes.
-
-Exemple :
-« je veux suivre l'évolution de la délinquance à l'échelle communale dans les communes franciliennes »
-=> sujet central : délinquance
-=> requête de recherche : délinquance
-=> dimensions : évolution = intention ; échelle communale = échelle ; communes franciliennes = territoire/contrainte.
-
-Ne complète rien par connaissance extérieure. Travaille uniquement à partir du texte utilisateur.
-`;
+Tu NE REFORMULES PAS le besoin et tu ne produis aucun conseil.
+Identifie le sujet central et distingue les dimensions secondaires (échelle, territoire, temporalité, public, finalité, angle).
+La requête de recherche doit être courte (2 à 8 mots) et centrée sur le sujet ; les dimensions secondaires ne doivent jamais devenir bloquantes.
+Ne complète rien par connaissance extérieure.`;
   const raw = await callModel({ apiKey, system, tool: NEED_ANALYSIS_TOOL, userText: besoin, maxTokens: 1200 });
   return sanitizeNeedAnalysis(raw, besoin);
 }
 
-async function selectionnerNotions({ apiKey, besoin, analyse, candidates, callModel = appelerClaudeAvecOutil }) {
-  const allowedIds = new Set(candidates.map(c => c.material_id));
-  const packet = formatCandidatesForPrompt(candidates);
-  const dimensionsText = analyse.dimensions.map(d => `${d.type}: ${d.valeur} (${d.role})`).join(' ; ') || 'aucune dimension secondaire explicite';
-
-  const system = `
-Tu aides un veilleur à PRÉCISER son besoin à partir d'un corpus documentaire.
-Tu ne reformules jamais le besoin à sa place.
-
-Ta tâche est très étroite : proposer idéalement 2 à ${T06_MAX_NOTIONS} NOTIONS DE CADRAGE utiles, uniquement à partir des matériaux fournis. Zéro notion reste possible si les matériaux sont réellement insuffisants, mais ne t'abstiens pas simplement parce qu'aucun nœud du graphe ne porte déjà le bon libellé.
-
-IMPORTANT : une notion de cadrage PEUT ÊTRE SYNTHÉTISÉE à partir de plusieurs chunks, nœuds ou relations. Le libellé n'a pas besoin d'exister mot pour mot dans le corpus, à condition que son sens soit entièrement soutenu par les matériaux cités. C'est précisément attendu lorsqu'une synthèse permet de faire émerger un cadrage plus utile que les libellés isolés.
-
-Une bonne notion :
-- est suffisamment générale pour structurer ou préciser le besoin ;
-- éclaire clairement une dimension du besoin (mesure du phénomène, échelle d'observation, disparités territoriales, temporalité, gouvernance, angle) ;
-- est directement soutenue par un ou plusieurs matériaux fournis ;
-- peut agréger plusieurs matériaux convergents pour produire un libellé de cadrage fidèle ;
-- ne se contente jamais d'un chevauchement lexical.
-
-Ordre de préférence lorsque les matériaux le permettent :
-1) manière de mesurer ou d'observer le sujet central ;
-2) échelle d'observation explicitement demandée ;
-3) différences ou disparités territoriales pertinentes ;
-4) dimension temporelle / évolution ;
-5) gouvernance ou action locale seulement si elle aide réellement à préciser le besoin.
-
-À REJETER :
-- un sous-thème trop étroit que l'utilisateur n'a pas demandé (ex. mineurs, si le besoin porte sur la délinquance en général) ;
-- un acteur, une recommandation ou un dispositif présenté comme une notion sans valeur de cadrage ;
-- une notion seulement proche par un mot générique ;
-- une notion qui élargit artificiellement le sujet ;
-- un cas particulier (mineurs, élus, type d'infraction précis, dispositif précis) si le besoin porte sur le phénomène général et que ce cas particulier n'aide pas directement au cadrage demandé.
-
-Le champ « pourquoi » doit être explicite et concret, sur le modèle :
-« Il éclaire une dimension de votre besoin liée à l'action locale contre la délinquance, en documentant les relations entre maire et parquet. »
-Évite absolument les phrases vagues du type « cette notion est liée au sujet central ».
-
-Le champ « limite » doit dire ce que les matériaux cités NE permettent PAS d'établir au regard du besoin (ex. pas d'évolution temporelle, pas de périmètre francilien, échelle différente). Si aucune limite importante n'est identifiable, indique sobrement que la notion aide au cadrage mais ne constitue pas à elle seule un objet de veille.
-
-Exemples de SYNTHÈSES acceptables si les matériaux les soutiennent : « Délinquance enregistrée à l'échelle communale », « Disparités territoriales de la délinquance », « Prévention locale de la délinquance ». Elles peuvent être construites à partir de plusieurs passages complémentaires.
-N'utilise aucune connaissance extérieure.
-Ne cite que des material_ids fournis.
-Ne force jamais le nombre de notions : zéro bonne notion vaut mieux qu'une proposition faible.
-
-Les « limites_couverture » concernent uniquement les dimensions du besoin qui paraissent peu documentées DANS LES MATÉRIAUX RETROUVÉS. N'affirme pas qu'elles sont absentes de tout le corpus.
-`;
-
-  const userText = [
-    `BESOIN UTILISATEUR (à respecter tel quel) : ${besoin}`,
-    `SUJET CENTRAL INTERNE : ${analyse.sujet_central}`,
-    `DIMENSIONS SECONDAIRES : ${dimensionsText}`,
-    '',
-    packet
-  ].join('\n');
-
-  const raw = await callModel({ apiKey, system, tool: NOTION_SELECTION_TOOL, userText, maxTokens: 3000 });
-  return {
-    notions: sanitizeSelectedNotions(raw.notions, allowedIds),
-    limites_couverture: [...new Set((Array.isArray(raw.limites_couverture) ? raw.limites_couverture : []).map(v => String(v || '').trim()).filter(Boolean))].slice(0, 4)
-  };
-}
-
-async function auditerNotions({ apiKey, besoin, analyse, notions, candidateMap, callModel = appelerClaudeAvecOutil }) {
-  if (!notions.length) return [];
-
-  const packet = notions.map((notion, index) => {
-    const materials = notion.material_ids.map(id => candidateMap.get(id)).filter(Boolean);
-    return [
-      `NOTION ${index + 1}`,
-      `Label: ${notion.label}`,
-      `Dimension éclairée: ${notion.dimension_eclairee}`,
-      `Pourquoi: ${notion.pourquoi}`,
-      `Limite: ${notion.limite}`,
-      `Niveau: ${notion.niveau}`,
-      `Matériaux autorisés: ${notion.material_ids.join(', ')}`,
-      materials.map(m => `${m.material_id}: ${m.texte || m.label} [${m.publication_title} ; repère ${m.locator || '—'}]`).join('\n')
-    ].join('\n');
-  }).join('\n\n---\n\n');
-
-  const system = `
-Tu audites des notions de cadrage proposées pour un besoin de veille.
-Le besoin utilisateur ne doit pas être reformulé.
-
-Conserve une notion uniquement si :
-1) elle est réellement soutenue par les matériaux cités, même si son libellé est une synthèse et n'apparaît pas mot pour mot dans une source ;
-2) elle aide à préciser le besoin sans l'élargir artificiellement ;
-3) elle n'est pas un sous-thème trop étroit par rapport au besoin ;
-4) son « pourquoi » explique précisément la contribution au besoin ;
-5) sa « limite » explicite honnêtement ce que les sources ne permettent pas d'établir.
-
-Ne rejette pas une notion uniquement parce qu'elle synthétise plusieurs matériaux. Au contraire, une synthèse documentaire sourcée est préférable à un libellé de nœud trop étroit lorsque cela aide mieux le veilleur à cadrer son besoin. Si les matériaux permettent 2 à 4 notions solides, conserve-les plutôt que de réduire artificiellement la sortie à zéro.
-
-Rejette une notion fondée sur simple proximité lexicale, sur une source hors sujet, ou sur un cas particulier non demandé.
-Tu peux corriger label, pourquoi et limite pour les rendre plus fidèles et plus précis, sans ajouter de connaissance extérieure.
-N'utilise que les material_ids déjà associés à chaque notion.
-`;
-
-  const userText = `BESOIN : ${besoin}\nSUJET CENTRAL : ${analyse.sujet_central}\n\n${packet}`;
-  const raw = await callModel({ apiKey, system, tool: NOTION_AUDIT_TOOL, userText, maxTokens: 3000 });
-
-  const originalByLabel = new Map(notions.map(n => [normalize(n.label), n]));
-  const audited = [];
-  for (const item of Array.isArray(raw.notions) ? raw.notions : []) {
-    if (!item?.conserver) continue;
-    const original = originalByLabel.get(normalize(item.label)) || notions.find(n => n.material_ids.some(id => (item.material_ids || []).includes(id)));
-    if (!original) continue;
-    const allowed = new Set(original.material_ids);
-    const ids = [...new Set((Array.isArray(item.material_ids) ? item.material_ids : []).map(String).filter(id => allowed.has(id) && candidateMap.has(id)))];
-    if (!ids.length) continue;
-    audited.push({
-      label: String(item.label || original.label).trim(),
-      dimension_eclairee: String(item.dimension_eclairee || original.dimension_eclairee).trim(),
-      pourquoi: String(item.pourquoi || original.pourquoi).trim(),
-      limite: String(item.limite || original.limite).trim(),
-      niveau: item.niveau === 'structurante' ? 'structurante' : 'utile',
-      material_ids: ids
-    });
-    if (audited.length >= T06_MAX_NOTIONS) break;
-  }
-  return audited;
-}
-
 async function proposerNotionsT06({ apiKey, besoin = '', searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
   const need = String(besoin || '').trim();
-  if (!need) {
-    const error = new Error('Le besoin de veille est obligatoire.');
-    error.statusCode = 400;
-    throw error;
-  }
-  if (need.length > 4000) {
-    const error = new Error('Le besoin de veille est trop long (4000 caractères maximum).');
-    error.statusCode = 400;
-    throw error;
-  }
-
+  if (!need) { const e = new Error('Le besoin de veille est obligatoire.'); e.statusCode = 400; throw e; }
   const analyse = await analyserBesoin({ apiKey, besoin: need, callModel });
-  const query = analyse.requete_recherche || analyse.sujet_central || need;
-  const retrievalQueries = buildRetrievalQueries(analyse);
-
-  const searches = [];
-  for (const retrievalQuery of retrievalQueries) {
-    searches.push({
-      query: retrievalQuery,
-      response: searchFn({ query: retrievalQuery, limit: 24, max_per_publication: 4, diversify_by_publication: true })
-    });
-    searches.push({
-      query: retrievalQuery,
-      response: searchFn({ query: retrievalQuery, kinds: ['node'], limit: 18, max_per_publication: 5, diversify_by_publication: true })
-    });
-  }
-
-  const rawResults = dedupeResults(mergeSearchResults(searches));
-  // On remonte en tête les matériaux retrouvés par plusieurs requêtes de cadrage :
-  // ils sont souvent plus utiles que les occurrences lexicales isolées.
-  rawResults.sort((a, b) => {
-    const queryDiff = (b._t06_queries?.length || 0) - (a._t06_queries?.length || 0);
-    if (queryDiff) return queryDiff;
-    return Number(b.score || 0) - Number(a.score || 0);
-  });
-  const candidates = buildCandidatePacket(rawResults);
+  const queries = buildRetrievalQueries(analyse);
+  const { searches, rawResults, candidates } = collectCandidates(searchFn, queries, { max: 52 });
   const candidateMap = new Map(candidates.map(c => [c.material_id, c]));
-  const rawResultMap = new Map(rawResults.map(r => [r.result_id, r]));
+  const rawMap = new Map(rawResults.map(r => [r.result_id, r]));
+  if (!candidates.length) return { ok:true, engine:'t06-framing-v0.3-grounded-synthesis', need, analysis:analyse, retrieval:{queries,candidates:0,publications:0}, notions:[], limites_couverture:['Aucun matériau suffisamment pertinent n’a été retrouvé pour ce sujet dans cette recherche.'] };
 
-  if (!candidates.length) {
-    return {
-      ok: true,
-      engine: 't06-framing-v0.2-synthesized',
-      need,
-      analysis: analyse,
-      retrieval: { query, queries: retrievalQueries, candidates: 0, publications: 0 },
-      notions: [],
-      limites_couverture: ['Aucun matériau suffisamment pertinent n’a été retrouvé pour le sujet central dans cette recherche.']
-    };
+  const system = `
+Tu aides un veilleur à préciser son besoin en montant UN NIVEAU au-dessus des sources, sans jamais sortir du corpus.
+À partir des matériaux fournis, fais émerger 2 à 4 notions de cadrage si elles sont soutenues. Une notion peut synthétiser plusieurs matériaux et son libellé n'a pas besoin d'exister mot pour mot.
+
+Une bonne notion :
+- structure le besoin (mesure du phénomène, échelle d'observation, disparités territoriales, temporalité, gouvernance) ;
+- est plus générale qu'un extrait ou qu'un dispositif ponctuel ;
+- reste fidèle aux matériaux cités ;
+- explique précisément POURQUOI elle aide le besoin ;
+- indique une LIMITE concrète.
+
+Rejette : sous-thèmes étroits non demandés, simple proximité lexicale, acteur ou dispositif ponctuel déguisé en notion, contenu hors sujet.
+Ne t'abstiens pas seulement parce que les sources sont imparfaites : une notion partiellement couverte peut être proposée si la limite est clairement dite.
+Les dimensions secondaires du besoin (territoire, échelle, temporalité) servent à qualifier les limites et priorités, pas à bloquer la synthèse.
+N'utilise aucune connaissance extérieure et seulement les material_ids fournis.`;
+
+  const dimensions = (analyse.dimensions || []).map(d => `${d.type}: ${d.valeur}`).join(' ; ') || 'aucune';
+  const raw = await callModel({ apiKey, system, tool: FRAME_SYNTHESIS_TOOL, userText:`BESOIN : ${need}\nSUJET CENTRAL : ${analyse.sujet_central}\nDIMENSIONS : ${dimensions}\n\n${formatCandidatesForPrompt(candidates)}`, maxTokens:3400 });
+  const allowed = new Set(candidates.map(c => c.material_id));
+  const proposed = (Array.isArray(raw.notions) ? raw.notions : []).map(n => ({
+    label:String(n?.label||'').trim(), dimension_eclairee:String(n?.dimension_eclairee||'').trim(),
+    pourquoi:String(n?.pourquoi||'').trim(), limite:String(n?.limite||'').trim(), material_ids:cleanIds(n?.material_ids, allowed, 5)
+  })).filter(n => n.label && n.material_ids.length).slice(0,T06_MAX_NOTIONS);
+
+  let audited = proposed;
+  if (proposed.length) {
+    const auditPacket = proposed.map((n,i)=>[`NOTION ${i+1}: ${n.label}`,`Pourquoi: ${n.pourquoi}`,`Limite: ${n.limite}`,`Matériaux: ${n.material_ids.join(', ')}`,n.material_ids.map(id=>{const m=candidateMap.get(id);return `${id}: ${m?.texte||m?.label||''}`}).join('\n')].join('\n')).join('\n\n---\n\n');
+    const auditSystem = `
+Tu contrôles une synthèse documentaire. Le but n'est PAS de tout rejeter : distingue solide, partiel et rejet.
+- solide : notion clairement soutenue et utile au cadrage ;
+- partiel : utile et soutenue, mais couverture incomplète ; elle DOIT être conservée avec une limite explicite ;
+- rejeter : hors sujet, simple rapprochement lexical, sous-thème trop étroit ou généralisation non soutenue.
+Tu peux améliorer pourquoi/limite, sans ajouter de connaissance extérieure. Ne change pas les material_ids.`;
+    const auditRaw = await callModel({ apiKey, system:auditSystem, tool:FRAME_AUDIT_TOOL, userText:`BESOIN : ${need}\n\n${auditPacket}`, maxTokens:2600 });
+    const byLabel = new Map(proposed.map(n=>[normalize(n.label),n]));
+    audited = (Array.isArray(auditRaw.notions)?auditRaw.notions:[]).filter(n=>n?.statut!=='rejeter').map(n=>{
+      const original = byLabel.get(normalize(n.label)) || proposed.find(p=>p.material_ids.some(id=>(n.material_ids||[]).includes(id)));
+      if(!original) return null;
+      return {...original, label:String(n.label||original.label).trim(), pourquoi:String(n.pourquoi||original.pourquoi).trim(), limite:String(n.limite||original.limite).trim(), statut:n.statut||'partiel'};
+    }).filter(Boolean).slice(0,T06_MAX_NOTIONS);
   }
 
-  const selected = await selectionnerNotions({ apiKey, besoin: need, analyse, candidates, callModel });
-  const audited = await auditerNotions({ apiKey, besoin: need, analyse, notions: selected.notions, candidateMap, callModel });
-
-  const notions = audited.map((notion, index) => ({
-    notion_id: `T06N${String(index + 1).padStart(2, '0')}`,
-    label: notion.label,
-    dimension_eclairee: notion.dimension_eclairee,
-    pourquoi: notion.pourquoi,
-    limite: notion.limite,
-    niveau: notion.niveau,
-    sources: notion.material_ids.map(id => rawResultMap.get(id)).filter(Boolean).map(enrichSource)
-  })).filter(n => n.sources.length);
-
-  const publicationIds = new Set(rawResults.map(r => r.publication_id).filter(Boolean));
-  return {
-    ok: true,
-    engine: 't06-framing-v0.2-synthesized',
-    need,
-    analysis: analyse,
-    retrieval: {
-      query,
-      queries: retrievalQueries,
-      candidates: candidates.length,
-      publications: publicationIds.size,
-      source_engine: searches.find(s => s?.response?.engine)?.response?.engine || 'corpus-search'
-    },
-    notions,
-    limites_couverture: selected.limites_couverture
-  };
+  const notions = audited.map((n,i)=>({
+    notion_id:`T06N${String(i+1).padStart(2,'0')}`, label:n.label, dimension_eclairee:n.dimension_eclairee,
+    pourquoi:n.pourquoi, limite:n.limite, statut:n.statut||'solide',
+    sources:n.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)
+  })).filter(n=>n.sources.length);
+  const pubs = new Set(rawResults.map(r=>r.publication_id).filter(Boolean));
+  return { ok:true, engine:'t06-framing-v0.3-grounded-synthesis', need, analysis:analyse, retrieval:{queries,candidates:candidates.length,publications:pubs.size,source_engine:searches.find(s=>s.response?.engine)?.response?.engine||'corpus-search'}, notions, limites_couverture:[...new Set((raw.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,4) };
 }
 
-module.exports = {
+async function proposerAxesT06({ apiKey, besoin = '', notions = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+  const need = String(besoin || '').trim();
+  if (!need) { const e=new Error('Le besoin de veille est obligatoire.'); e.statusCode=400; throw e; }
+  const analyse = await analyserBesoin({ apiKey, besoin:need, callModel });
+  const notionLabels = (Array.isArray(notions)?notions:[]).map(n=>String(n?.label||n||'').trim()).filter(Boolean).slice(0,4);
+  const queries = buildRetrievalQueries(analyse, notionLabels);
+  const { rawResults, candidates } = collectCandidates(searchFn, queries, { max:54 });
+  const rawMap = new Map(rawResults.map(r=>[r.result_id,r]));
+  const allowed = new Set(candidates.map(c=>c.material_id));
+  if(!candidates.length) return {ok:true,engine:'t06-axes-v0.1-synthesized',need,axes:[],limites_couverture:['Le corpus ne fournit pas assez de matériaux pour proposer des axes de veille robustes.']};
+
+  const system = `
+Tu construis des AXES DE VEILLE à partir d'un besoin et de matériaux documentaires.
+Tu dois monter en généralité par rapport aux sources : un axe est une direction de surveillance dans le temps, pas un titre de publication, un acteur isolé, un dispositif ponctuel ni un extrait.
+Propose 2 à 5 axes maximum. Chaque axe doit :
+- être directement relié au besoin ;
+- regrouper plusieurs matériaux lorsque possible ;
+- dire ce qu'il faut SURVEILLER ;
+- proposer 1 à 3 questions de veille concrètes ;
+- expliciter pourquoi cet axe est utile et sa limite ;
+- citer uniquement les material_ids fournis.
+Exemples de forme attendue (uniquement si les sources les soutiennent) : « Différenciation territoriale de la délinquance enregistrée », « Évolution des réponses locales de prévention ».
+Évite les axes vagues (« acteurs », « dispositifs ») ou trop proches d'un seul libellé source. Aucune connaissance extérieure.`;
+  const raw = await callModel({apiKey,system,tool:AXES_SYNTHESIS_TOOL,userText:`BESOIN : ${need}\nNOTIONS RETENUES : ${notionLabels.join(' ; ')||'aucune'}\n\n${formatCandidatesForPrompt(candidates)}`,maxTokens:4200});
+  const proposed = (Array.isArray(raw.axes)?raw.axes:[]).map(a=>({
+    titre:String(a?.titre||'').trim(), objectif_surveillance:String(a?.objectif_surveillance||'').trim(), pourquoi:String(a?.pourquoi||'').trim(),
+    questions:[...new Set((a?.questions||[]).map(q=>String(q||'').trim()).filter(Boolean))].slice(0,3), limite:String(a?.limite||'').trim(), material_ids:cleanIds(a?.material_ids,allowed,6)
+  })).filter(a=>a.titre&&a.questions.length&&a.material_ids.length).slice(0,T06_MAX_AXES);
+
+  let audited=proposed;
+  if(proposed.length){
+    const packet=proposed.map((a,i)=>[`AXE ${i+1}: ${a.titre}`,`Objectif: ${a.objectif_surveillance}`,`Pourquoi: ${a.pourquoi}`,`Questions: ${a.questions.join(' | ')}`,`Limite: ${a.limite}`,`Matériaux: ${a.material_ids.join(', ')}`].join('\n')).join('\n\n---\n\n');
+    const auditSystem=`
+Audite des axes de veille. Ne cherche pas la perfection : conserve comme « partiel » un axe utile mais incomplètement couvert, à condition que sa limite soit explicite.
+Rejette seulement s'il s'agit d'un simple extrait/libellé de source, d'un élément hors sujet, d'un sous-thème trop étroit ou d'une généralisation non soutenue.
+Un bon axe doit être formulé à un niveau supérieur aux sources et être surveillable dans le temps. N'ajoute aucune connaissance extérieure.`;
+    const ar=await callModel({apiKey,system:auditSystem,tool:AXES_AUDIT_TOOL,userText:`BESOIN : ${need}\n\n${packet}`,maxTokens:3000});
+    const byTitle=new Map(proposed.map(a=>[normalize(a.titre),a]));
+    audited=(Array.isArray(ar.axes)?ar.axes:[]).filter(a=>a?.statut!=='rejeter').map(a=>{
+      const original=byTitle.get(normalize(a.titre))||proposed.find(p=>p.material_ids.some(id=>(a.material_ids||[]).includes(id)));
+      if(!original)return null;
+      return {...original,titre:String(a.titre||original.titre).trim(),objectif_surveillance:String(a.objectif_surveillance||original.objectif_surveillance).trim(),pourquoi:String(a.pourquoi||original.pourquoi).trim(),questions:(a.questions||original.questions).map(String).filter(Boolean).slice(0,3),limite:String(a.limite||original.limite).trim(),statut:a.statut||'partiel'};
+    }).filter(Boolean).slice(0,T06_MAX_AXES);
+  }
+  const axes=audited.map((a,i)=>({axis_id:`T06A${String(i+1).padStart(2,'0')}`,titre:a.titre,objectif_surveillance:a.objectif_surveillance,pourquoi:a.pourquoi,questions:a.questions,limite:a.limite,statut:a.statut||'solide',sources:a.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})).filter(a=>a.sources.length);
+  return {ok:true,engine:'t06-axes-v0.1-synthesized',need,axes,limites_couverture:[...new Set((raw.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,4)};
+}
+
+async function proposerDynamiquesT06({ apiKey, besoin = '', axes = [], searchFn = searchCorpus, callModel = appelerClaudeAvecOutil }) {
+  const need=String(besoin||'').trim();
+  const selectedAxes=(Array.isArray(axes)?axes:[]).map((a,i)=>({axis_id:String(a?.axis_id||`T06A${String(i+1).padStart(2,'0')}`),titre:String(a?.titre||a?.title||'').trim(),objectif_surveillance:String(a?.objectif_surveillance||'').trim()})).filter(a=>a.titre).slice(0,T06_MAX_AXES);
+  if(!need||!selectedAxes.length){const e=new Error('Le besoin et au moins un axe de veille sont obligatoires.');e.statusCode=400;throw e;}
+  const analyse=await analyserBesoin({apiKey,besoin:need,callModel});
+
+  const rawMaps=new Map();
+  const candidatesByAxis=new Map();
+  for(const axis of selectedAxes){
+    const queries=[`${analyse.sujet_central} ${axis.titre}`.trim(),axis.titre].filter(Boolean);
+    const {rawResults,candidates}=collectCandidates(searchFn,queries,{maxPerQuery:24,max:32});
+    rawMaps.set(axis.axis_id,new Map(rawResults.map(r=>[r.result_id,r])));
+    candidatesByAxis.set(axis.axis_id,candidates);
+  }
+  const promptSections=selectedAxes.map(axis=>{
+    const c=candidatesByAxis.get(axis.axis_id)||[];
+    return `### AXE ${axis.axis_id} — ${axis.titre}\nObjectif : ${axis.objectif_surveillance||'—'}\n\n${formatCandidatesForPrompt(c)}`;
+  }).join('\n\n====================\n\n');
+
+  const system=`
+Tu analyses les dynamiques d'un sujet de veille à partir d'un corpus, en montant en généralité sans perdre l'ancrage documentaire.
+Pour chaque axe fourni, distingue :
+1) TENDANCE : évolution structurante ou durable. Elle doit être soutenue par plusieurs matériaux convergents ; privilégie plusieurs publications. Si le corpus ne suffit pas, n'en propose pas.
+2) SIGNE DE CHANGEMENT : indice récent ou évolution notable pouvant annoncer une inflexion. Il peut être plus ponctuel qu'une tendance, mais doit être explicitement observable dans les matériaux.
+
+Ne transforme jamais : un titre de section, une méthode, un simple acteur, une table ronde, une recommandation ou une donnée isolée sans dynamique en tendance/signe.
+Chaque proposition doit être une SYNTHÈSE à un niveau supérieur aux sources, avec une interprétation concise, un « pourquoi » et une limite.
+Le besoin et les axes sont les filtres de pertinence. N'utilise aucune connaissance extérieure. Ne cite que les material_ids fournis pour l'axe concerné.
+Si une catégorie n'est pas suffisamment étayée, retourne un tableau vide.`;
+  const raw=await callModel({apiKey,system,tool:DYNAMICS_SYNTHESIS_TOOL,userText:`BESOIN : ${need}\n\n${promptSections}`,maxTokens:5200});
+
+  const axisResults=[];
+  for(const axis of selectedAxes){
+    const sourceAxis=(Array.isArray(raw.axes)?raw.axes:[]).find(a=>String(a?.axis_id)===axis.axis_id)||{};
+    const candidates=candidatesByAxis.get(axis.axis_id)||[];
+    const allowed=new Set(candidates.map(c=>c.material_id));
+    const rawMap=rawMaps.get(axis.axis_id)||new Map();
+    const trends=(Array.isArray(sourceAxis.tendances)?sourceAxis.tendances:[]).map((t,i)=>({
+      trend_id:`${axis.axis_id}-T${i+1}`,label:String(t?.label||'').trim(),interpretation:String(t?.interpretation||'').trim(),pourquoi:String(t?.pourquoi||'').trim(),limite:String(t?.limite||'').trim(),material_ids:cleanIds(t?.material_ids,allowed,6)
+    })).filter(t=>t.label&&t.material_ids.length>=2).slice(0,T06_MAX_TRENDS_PER_AXIS);
+    const signs=(Array.isArray(sourceAxis.signes_changement)?sourceAxis.signes_changement:[]).map((s,i)=>({
+      sign_id:`${axis.axis_id}-S${i+1}`,label:String(s?.label||'').trim(),interpretation:String(s?.interpretation||'').trim(),pourquoi:String(s?.pourquoi||'').trim(),limite:String(s?.limite||'').trim(),material_ids:cleanIds(s?.material_ids,allowed,5)
+    })).filter(s=>s.label&&s.material_ids.length).slice(0,T06_MAX_SIGNS_PER_AXIS);
+    axisResults.push({axis_id:axis.axis_id,titre:axis.titre,tendances:trends.map(t=>({...t,sources:t.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})),signes_changement:signs.map(s=>({...s,sources:s.material_ids.map(id=>rawMap.get(id)).filter(Boolean).map(enrichSource)})),limites_couverture:[...new Set((sourceAxis.limites_couverture||[]).map(x=>String(x||'').trim()).filter(Boolean))].slice(0,3)});
+  }
+
+  // Les signaux faibles sont explicitement des clusters de >=2 signes de changement.
+  const clusterInput=axisResults.map(a=>({axis_id:a.axis_id,titre:a.titre,signes:a.signes_changement.map(s=>({sign_id:s.sign_id,label:s.label,interpretation:s.interpretation,pourquoi:s.pourquoi,limite:s.limite,source_count:s.sources.length}))})).filter(a=>a.signes.length>=2);
+  let clusters={axes:[]};
+  if(clusterInput.length){
+    const clusterSystem=`
+Tu appliques une définition stricte : un SIGNAL FAIBLE est ici un regroupement (cluster) d'au moins deux signes de changement convergents.
+Tu ne crées aucun signal faible à partir d'un seul signe. Tu n'ajoutes aucune information extérieure.
+Le signal faible doit exprimer la dynamique commune qui devient visible lorsqu'on rapproche les signes, sans prétendre qu'elle est certaine.
+Le champ limite doit rappeler l'incertitude et ce qui manque pour confirmer la dynamique. Si aucun cluster cohérent n'existe, retourne zéro signal faible.`;
+    clusters=await callModel({apiKey,system:clusterSystem,tool:WEAK_CLUSTER_TOOL,userText:`BESOIN : ${need}\n\n${JSON.stringify(clusterInput,null,2)}`,maxTokens:2800});
+  }
+  for(const axisResult of axisResults){
+    const signsById=new Map(axisResult.signes_changement.map(s=>[s.sign_id,s]));
+    const rawClusters=(Array.isArray(clusters.axes)?clusters.axes:[]).find(a=>String(a?.axis_id)===axisResult.axis_id)?.signaux_faibles||[];
+    axisResult.signaux_faibles=rawClusters.map((w,i)=>{
+      const signIds=[...new Set((w?.sign_ids||[]).map(String).filter(id=>signsById.has(id)))];
+      if(signIds.length<2)return null;
+      const sources=[];const seen=new Set();
+      for(const sid of signIds){for(const src of signsById.get(sid)?.sources||[]){const key=`${src.material_id}|${src.publication_id}`;if(!seen.has(key)){seen.add(key);sources.push(src)}}}
+      return {weak_id:`${axisResult.axis_id}-W${i+1}`,label:String(w?.label||'').trim(),interpretation:String(w?.interpretation||'').trim(),pourquoi:String(w?.pourquoi||'').trim(),limite:String(w?.limite||'').trim(),based_on_sign_ids:signIds,sources};
+    }).filter(w=>w?.label).slice(0,T06_MAX_WEAK_PER_AXIS);
+  }
+
+  return {ok:true,engine:'t06-dynamics-v0.1-synthesized',need,axes:axisResults,methodological_reference:{label:'ESPAS Horizon Scanning — communauté des veilleurs de l’Union européenne',url:'https://espas.eu/horizon.html',origin:'enrichissement_controle',usage:'Repère méthodologique pour questionner tendances, signes de changement et signaux faibles ; il ne constitue pas une preuve documentaire du scénario.'}};
+}
+
+module.exports={
   MODEL_T06,
   proposerNotionsT06,
+  proposerAxesT06,
+  proposerDynamiquesT06,
   analyserBesoin,
-  selectionnerNotions,
-  auditerNotions,
-  buildCandidatePacket,
   sanitizeNeedAnalysis,
-  sanitizeSelectedNotions,
   buildRetrievalQueries,
   mergeSearchResults,
   dedupeResults,
+  buildCandidatePacket,
   enrichSource
 };

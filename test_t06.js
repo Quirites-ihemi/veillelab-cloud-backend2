@@ -92,11 +92,18 @@ async function callModel({tool}){
   assert.equal(support.documentation_available,true);
 
   const dynamics=await construireGrilleGuetT06({apiKey:'fake',besoin:need,cadrage:framing,reponses:[],axes:support.axes,searchFn,callModel});
-  assert.equal(dynamics.engine,'t06-watch-v1.0.2-per-axis-failure-explicit');
+  assert.equal(dynamics.engine,'t06-watch-v1.0.3-source-traceability');
   assert.equal(dynamics.axes.length,1);
   assert.equal(dynamics.axes[0].tendances.length,1);
   assert.equal(dynamics.axes[0].signes_a_guetter.length,2);
   assert.equal(dynamics.axes[0].hypotheses_regroupement.length,1);
+  assert.ok(dynamics.axes[0].tendances[0].sources.length >= 2);
+  assert.ok(dynamics.axes[0].tendances[0].sources.every(source => source.publication_id && source.repere));
+  assert.ok(dynamics.axes[0].tendances[0].sources.every(source => source.url === 'https://example.test/source'));
+  assert.ok(dynamics.axes[0].signes_a_guetter.every(sign => Array.isArray(sign.sources) && sign.sources.length >= 1));
+  assert.ok(dynamics.axes[0].signes_a_guetter.every(sign => sign.sources.every(source => source.url)));
+  assert.ok(dynamics.axes[0].sources_a_surveiller.every(item => Array.isArray(item.sources) && item.sources.length >= 1));
+  assert.ok(dynamics.axes[0].sources_a_surveiller.every(item => item.sources.every(source => source.url)));
   assert.equal(dynamics.methodological_reference.origin,'enrichissement_controle');
   assert.equal(axisCoverageStatus([]),'a_instruire');
   assert.equal(fallbackStructurations('délinquance').length,2);
@@ -170,5 +177,32 @@ async function callModel({tool}){
   assert.deepEqual(partialObjects.failed_axis_ids,['A2']);
   assert.equal(partialObjects.generation_available,false);
 
-  console.log('T06 V1.0.2 objets par axe OK');
+  // Régression 5 : un objet sans material_id valide n'est jamais exposé au front.
+  const unsourcedObjectModel = async ({tool}) => {
+    if(tool.name!=='construire_grille_guet_t06') return callModel({tool});
+    return {
+      axes:[{
+        axis_id:'A1',
+        tendances:[],
+        signes_a_guetter:[
+          {sign_id:'A1-SX',label:'Signe sans preuve',pourquoi_guetter:'Test.',ce_qui_confirmerait:'Test.',ce_qui_affaiblirait:'Test.',material_ids:[]},
+          {sign_id:'A1-S1',label:'Signe sourcé',pourquoi_guetter:'Test.',ce_qui_confirmerait:'Test.',ce_qui_affaiblirait:'Test.',material_ids:['chunk:D1']}
+        ],
+        hypotheses_regroupement:[],
+        sources_a_surveiller:[
+          {label:'Source inventée',raison:'Test.',material_ids:[]},
+          {label:'Publication PUB1',raison:'Test.',material_ids:['chunk:D1']}
+        ],
+        angles_morts:[]
+      }]
+    };
+  };
+  const sourcedOnly = await construireGrilleGuetT06({apiKey:'fake',besoin:need,cadrage:framing,reponses:[],axes:selected,searchFn,callModel:unsourcedObjectModel});
+  assert.equal(sourcedOnly.axes[0].signes_a_guetter.length,1);
+  assert.equal(sourcedOnly.axes[0].signes_a_guetter[0].label,'Signe sourcé');
+  assert.equal(sourcedOnly.axes[0].sources_a_surveiller.length,1);
+  assert.equal(sourcedOnly.axes[0].sources_a_surveiller[0].label,'Publication PUB1');
+  assert.ok(sourcedOnly.axes[0].signes_a_guetter[0].sources[0].url);
+
+  console.log('T06 V1.0.3 traçabilité des objets OK');
 })().catch(err=>{console.error(err);process.exit(1)});

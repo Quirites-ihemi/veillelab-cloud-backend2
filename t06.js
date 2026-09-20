@@ -223,7 +223,7 @@ const WATCH_TOOL = {
               }
             },
             signes_a_guetter: {
-              type: 'array', maxItems: MAX_WATCH_SIGNS_PER_AXIS,
+              type: 'array', minItems: 2, maxItems: MAX_WATCH_SIGNS_PER_AXIS,
               items: {
                 type: 'object',
                 properties: {
@@ -232,7 +232,7 @@ const WATCH_TOOL = {
                   pourquoi_guetter: { type: 'string' },
                   ce_qui_confirmerait: { type: 'string' },
                   ce_qui_affaiblirait: { type: 'string' },
-                  material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } }
+                  material_ids: { type: 'array', maxItems: 4, items: { type: 'string' } }
                 },
                 required: ['sign_id', 'label', 'pourquoi_guetter', 'ce_qui_confirmerait', 'ce_qui_affaiblirait', 'material_ids'],
                 additionalProperties: false
@@ -260,7 +260,7 @@ const WATCH_TOOL = {
                 properties: {
                   label: { type: 'string' },
                   raison: { type: 'string' },
-                  material_ids: { type: 'array', minItems: 1, maxItems: 4, items: { type: 'string' } }
+                  material_ids: { type: 'array', maxItems: 4, items: { type: 'string' } }
                 },
                 required: ['label', 'raison', 'material_ids'], additionalProperties: false
               }
@@ -292,20 +292,7 @@ function materialLabel(result = {}) {
   return result.result_id || 'Matériau';
 }
 
-function sourceAccessUrl(result = {}, allResults = []) {
-  const direct = String(result.url_contenu || result.url_source || '').trim();
-  if (direct) return direct;
-  const publicationId = String(result.publication_id || '').trim();
-  if (!publicationId) return '';
-  const samePublication = (Array.isArray(allResults) ? allResults : []).find(item =>
-    String(item?.publication_id || '').trim() === publicationId &&
-    String(item?.url_contenu || item?.url_source || '').trim()
-  );
-  return samePublication ? String(samePublication.url_contenu || samePublication.url_source || '').trim() : '';
-}
-
-function enrichSource(result = {}, allResults = []) {
-  const url = sourceAccessUrl(result, allResults);
+function enrichSource(result = {}) {
   return {
     material_id: result.result_id || '',
     kind: result.kind || '',
@@ -316,8 +303,7 @@ function enrichSource(result = {}, allResults = []) {
     type_document: result.type_document || '',
     repere: result.locator || '',
     provenance_level: result.provenance_level || '',
-    url,
-    access_available: Boolean(url),
+    url: result.url_contenu || result.url_source || '',
     extrait: materialText(result),
     libelle: materialLabel(result),
     origin: 'corpus'
@@ -389,7 +375,7 @@ function getRepresentativeCoverage(searchFn, query) {
     const key = r.publication_id || r.result_id;
     if (!key || seenPub.has(key)) continue;
     seenPub.add(key);
-    sources.push(enrichSource(r, results));
+    sources.push(enrichSource(r));
     if (sources.length >= 5) break;
   }
   return {
@@ -606,7 +592,7 @@ function normalizeAxisSupport(raw = {}, structures = [], rawByAxis = new Map()) 
       const allowed = allowedMaterialIds(results);
       const support = supportById.get(axis.axis_id) || {};
       const ids = cleanIds(support.material_ids, allowed, 5);
-      const sources = ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(result => enrichSource(result, results));
+      const sources = ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource);
       return {
         ...axis,
         corpus_status: axisCoverageStatus(sources),
@@ -880,18 +866,17 @@ Tu produis une grille de guet, pas une analyse prédictive.
 
 Pour l'axe fourni :
 1) TENDANCES DOCUMENTÉES : constats déclaratifs synthétiques. Chaque tendance doit être soutenue par au moins deux matériaux provenant de publications différentes. Si ce n'est pas possible, retourne zéro tendance.
-2) SIGNES DE CHANGEMENT À GUETTER : propositions observables sur ce qu'il serait utile de surveiller. Ils ne sont PAS présentés comme déjà observés. CHAQUE signe doit obligatoirement être relié à au moins un material_id réellement fourni. Si aucun matériau ne permet de justifier un signe, ne le propose pas.
-3) HYPOTHÈSES DE REGROUPEMENT : seulement si au moins deux signes sourcés peuvent converger. Formule explicitement l'incertitude et ce qui invaliderait l'hypothèse. Ne présente jamais cela comme un signal faible établi.
-4) SOURCES À SURVEILLER : ne propose ici que des publications réellement représentées parmi les matériaux fournis. Le label doit correspondre à la publication (ou à son organisme producteur lorsqu'il est explicitement fourni dans les métadonnées), et CHAQUE source à surveiller doit obligatoirement être reliée à au moins un material_id de cette publication. Ne recommande pas une source seulement mentionnée dans le texte d'un document si elle n'est pas elle-même représentée dans les matériaux. N'invente ni organisme, ni publication, ni URL.
+2) SIGNES DE CHANGEMENT À GUETTER : propositions observables sur ce qu'il serait utile de surveiller. Ils ne sont PAS présentés comme déjà observés. Ils peuvent être inspirés par le corpus, et une couverture documentaire limitée n'interdit pas d'en proposer.
+3) HYPOTHÈSES DE REGROUPEMENT : seulement si au moins deux signes à guetter peuvent converger. Formule explicitement l'incertitude et ce qui invaliderait l'hypothèse. Ne présente jamais cela comme un signal faible établi.
+4) SOURCES À SURVEILLER : privilégie les types de sources, organismes ou publications réellement présents dans le besoin ou les matériaux. Ne crée aucun fait sur une source absente.
 5) ANGLES MORTS : transforme les lacunes documentaires en points à instruire, sans bloquer l'axe.
 
 Règles impératives :
 - Tu réponds uniquement pour l'axis_id fourni.
-- Aucun objet affichable (tendance, signe, source à surveiller) ne doit exister sans material_id valide.
 - Aucun chiffre, date, nom propre ou causalité dans une proposition s'ils ne figurent pas dans le besoin ou les matériaux fournis.
-- Les tendances sont des synthèses sourcées ; les signes à guetter et hypothèses sont des propositions IA à valider, mais restent ancrés dans au moins un matériau du corpus.
+- Les tendances sont des synthèses sourcées ; les signes à guetter et hypothèses sont des propositions IA à valider.
 - N'utilise aucune connaissance extérieure.
-- Si le corpus ne permet pas de sourcer un signe ou une source à surveiller, retourne simplement moins d'objets.`;
+- Même en l'absence de tendance suffisamment étayée, propose au moins deux signes de changement à guetter, conformément au schéma de sortie.`;
 
   function buildAxisPrompt(axis, packet) {
     return [
@@ -920,16 +905,12 @@ Règles impératives :
         synthese: String(t?.synthese || '').trim(),
         limite: String(t?.limite || '').trim(),
         origin: 'corpus',
-        material_ids: ids,
-        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(result => enrichSource(result, results))
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
       };
     }).filter(t => t?.label).slice(0, MAX_TRENDS_PER_AXIS);
 
     const signs = (Array.isArray(sourceAxis.signes_a_guetter) ? sourceAxis.signes_a_guetter : []).map((s, i) => {
       const ids = cleanIds(s?.material_ids, allowed, 4);
-      if (!ids.length) return null;
-      const sources = ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(result => enrichSource(result, results));
-      if (!sources.length) return null;
       return {
         sign_id: String(s?.sign_id || `${axis.axis_id}-S${i + 1}`).trim(),
         label: String(s?.label || '').trim(),
@@ -937,10 +918,9 @@ Règles impératives :
         ce_qui_confirmerait: String(s?.ce_qui_confirmerait || '').trim(),
         ce_qui_affaiblirait: String(s?.ce_qui_affaiblirait || '').trim(),
         origin: 'proposition_ia',
-        material_ids: ids,
-        sources
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
       };
-    }).filter(s => s?.label).slice(0, MAX_WATCH_SIGNS_PER_AXIS);
+    }).filter(s => s.label).slice(0, MAX_WATCH_SIGNS_PER_AXIS);
 
     const signIds = new Set(signs.map(s => s.sign_id));
     const hypotheses = (Array.isArray(sourceAxis.hypotheses_regroupement) ? sourceAxis.hypotheses_regroupement : []).map((h, i) => {
@@ -958,18 +938,14 @@ Règles impératives :
 
     const sourcesToWatch = (Array.isArray(sourceAxis.sources_a_surveiller) ? sourceAxis.sources_a_surveiller : []).map((s, i) => {
       const ids = cleanIds(s?.material_ids, allowed, 4);
-      if (!ids.length) return null;
-      const sources = ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(result => enrichSource(result, results));
-      if (!sources.length) return null;
       return {
         source_watch_id: `${axis.axis_id}-SRC${i + 1}`,
         label: String(s?.label || '').trim(),
         raison: String(s?.raison || '').trim(),
-        origin: 'corpus',
-        material_ids: ids,
-        sources
+        origin: ids.length ? 'corpus' : 'proposition_ia',
+        sources: ids.map(id => results.find(r => r.result_id === id)).filter(Boolean).map(enrichSource)
       };
-    }).filter(s => s?.label).slice(0, 6);
+    }).filter(s => s.label).slice(0, 6);
 
     return {
       ...axis,
@@ -1029,7 +1005,7 @@ Règles impératives :
 
   return {
     ok: true,
-    engine: 't06-watch-v1.0.3-source-traceability',
+    engine: 't06-watch-v1.0.2-per-axis-failure-explicit',
     need,
     axes: resultAxes,
     generation_available: failedAxisIds.length === 0,

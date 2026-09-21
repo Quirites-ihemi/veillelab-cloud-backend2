@@ -9,6 +9,7 @@ const { genererCarteReflexionT03, nettoyerCorpusT03 } = require("./t03");
 const { genererGlossaireT02, nettoyerCorpusT02 } = require("./t02");
 const { genererRecommandationsT04, nettoyerCorpusT04 } = require("./t04");
 const { cadrerBesoinT06, proposerStructurationsT06, documenterAxesT06, construireGrilleGuetT06 } = require("./t06");
+const { proposerAxesV2, construireObjetsAxeV2 } = require("./t06_pipeline_v2");
 const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
@@ -102,6 +103,12 @@ function safeEqualHex(a, b) {
 
 async function getAnthropicApiKey() {
   if (apiKeyCache) return apiKeyCache;
+
+  // Local : clé fournie par variable d'environnement (évite Secret Manager).
+  if (process.env.ANTHROPIC_API_KEY) {
+    apiKeyCache = process.env.ANTHROPIC_API_KEY.trim();
+    return apiKeyCache;
+  }
 
   const name =
     `projects/${PROJECT_ID}/secrets/${ANTHROPIC_SECRET}/versions/latest`;
@@ -767,7 +774,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, {
         ok: true,
         service: "quirites-veille-lab-cloud",
-        version: "cloud-v0.13.0-t06-scenario-refonte",
+        version: "cloud-v0.13.1-t06-v2-test",
         message: "Backend Cloud Run disponible — T01 + T02 + T03 + T04 + T06 scénario synthétisé + recherche corpus + chatbot public structuré",
         queue: `${TASK_LOCATION}/${TASK_QUEUE}`,
         model: MODEL_REDACTION,
@@ -836,6 +843,30 @@ const server = http.createServer(async (req, res) => {
         cadrage: body.cadrage && typeof body.cadrage === "object" ? body.cadrage : {},
         reponses: Array.isArray(body.reponses) ? body.reponses : [],
         axes: Array.isArray(body.axes) ? body.axes : []
+      });
+      return sendJson(res, 200, result);
+    }
+
+    // ---------- T06 V2 (local, en validation) ----------
+    if (req.method === "POST" && req.url === "/scenario-v2/axes") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await proposerAxesV2({
+        apiKey,
+        besoin: String(body.need || body.besoin || ""),
+        sujet_requete: String(body.sujet_requete || "")
+      });
+      return sendJson(res, 200, result);
+    }
+
+    if (req.method === "POST" && req.url === "/scenario-v2/axis-objects") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await construireObjetsAxeV2({
+        apiKey,
+        besoin: String(body.need || body.besoin || ""),
+        subject_query: String(body.subject_query || ""),
+        axis: body.axis && typeof body.axis === "object" ? body.axis : {}
       });
       return sendJson(res, 200, result);
     }

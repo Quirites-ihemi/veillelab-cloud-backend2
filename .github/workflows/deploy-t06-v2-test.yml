@@ -1,0 +1,68 @@
+name: Deploy T06 V2 TEST to Cloud Run
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: t06-v2-test-cloud-run
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref_name == 't06-v2-test'
+    runs-on: ubuntu-latest
+
+    env:
+      PROJECT_ID: quirites-veille-lab-cloud
+      REGION: europe-west9
+      TEST_SERVICE: veillelab-t06-v2-test
+      PROD_SERVICE: veillelab-cloud-backend2
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.GCP_SA_KEY }}'
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Reuse production runtime identity when available
+        id: runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          SA="$(gcloud run services describe "$PROD_SERVICE"             --project "$PROJECT_ID"             --region "$REGION"             --format='value(spec.template.spec.serviceAccountName)' 2>/dev/null || true)"
+          echo "runtime_sa=$SA" >> "$GITHUB_OUTPUT"
+          if [ -n "$SA" ]; then
+            echo "Runtime service account reused from production: $SA"
+          else
+            echo "No explicit production runtime service account found; Cloud Run default identity will be used."
+          fi
+
+      - name: Deploy isolated T06 V2 test service
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EXTRA_ARGS=()
+          if [ -n "${{ steps.runtime.outputs.runtime_sa }}" ]; then
+            EXTRA_ARGS+=(--service-account="${{ steps.runtime.outputs.runtime_sa }}")
+          fi
+
+          gcloud run deploy "$TEST_SERVICE"             --source .             --project "$PROJECT_ID"             --region "$REGION"             --allow-unauthenticated             --quiet             --set-env-vars="GOOGLE_CLOUD_PROJECT=$PROJECT_ID,ANTHROPIC_SECRET=anthropic-api-key,T06_EVIDENCE_KINDS=chunk"             "${EXTRA_ARGS[@]}"
+
+      - name: Verify test service
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="$(gcloud run services describe "$TEST_SERVICE"             --project "$PROJECT_ID"             --region "$REGION"             --format='value(status.url)')"
+          echo "T06 V2 test URL: $URL"
+          curl --fail --silent --show-error "$URL/health"
+          echo

@@ -1,0 +1,5662 @@
+[
+  {
+    "id": "ME001",
+    "label": "Adaptation des capacités cynophiles aux mutations de sécurité publique",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME002",
+    "label": "Adaptation technologique des forces de sécurité aux menaces émergentes",
+    "family": "Problème public",
+    "definition": "Enjeu d’adaptation des capacités techniques des forces de sécurité face à des formes de criminalité ou de menace en mutation.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels",
+      "Sécurité publique",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB073",
+        "titre": "le déploiement de l'intelligence artificielle dans les administrations publiques : analyse comparée, enjeux et conditions de réussite",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB073.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/26008R%20-%20D%C3%A9ploiement%20IA%20dans%20AP.pdf",
+        "url_source": "https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports,https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME060",
+        "count": 1
+      }
+    ],
+    "publication_count": 3,
+    "degree": 1
+  },
+  {
+    "id": "ME003",
+    "label": "Aide à la décision en situation de crise",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à mobiliser données, outils, modèles ou scénarios pour éclairer la décision publique en contexte de crise.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME057",
+        "count": 1
+      },
+      {
+        "id": "ME096",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME004",
+    "label": "Analyse comparative des radicalités violentes",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à comparer plusieurs formes de radicalité violente afin d’en dégager convergences, différences et évolutions.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME067",
+        "count": 1
+      },
+      {
+        "id": "ME086",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME005",
+    "label": "Analyse comparée des politiques publiques numériques",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME006",
+    "label": "Analyse comparée des profils victimes / mis en cause",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à comparer les caractéristiques des victimes et des mis en cause selon l’âge, le sexe ou le type d’atteinte.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME020",
+        "count": 1
+      },
+      {
+        "id": "ME039",
+        "count": 1
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME107",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME007",
+    "label": "Analyse comparée des régimes politiques face au cyberespace",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME008",
+    "label": "Analyse de la gouvernance des données publiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME009",
+    "label": "Analyse de la gouvernance multi-niveaux des risques",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB033",
+        "titre": "la souveraineté numérique. gouverner l'espace symbiotique",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB033.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME065",
+        "count": 1
+      },
+      {
+        "id": "ME091",
+        "count": 1
+      },
+      {
+        "id": "ME108",
+        "count": 1
+      },
+      {
+        "id": "ME138",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME010",
+    "label": "Analyse de l’hacktivisme géopolitique",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser les logiques, cibles, revendications et effets des cyberactions à motivation géopolitique ou idéologique.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME056",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME011",
+    "label": "Analyse de l’évolution d’une filière métier spécialisée",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB064",
+        "titre": "25e anniversaire du cstagn, le soutien au cœur de l’action de la gendarmerie",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB064.png",
+        "url_contenu": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "url_source": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME051",
+        "count": 1
+      },
+      {
+        "id": "ME080",
+        "count": 1
+      },
+      {
+        "id": "ME099",
+        "count": 1
+      },
+      {
+        "id": "ME102",
+        "count": 1
+      },
+      {
+        "id": "ME129",
+        "count": 1
+      },
+      {
+        "id": "ME141",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 6
+  },
+  {
+    "id": "ME012",
+    "label": "Analyse des articulations entre protection de l’enfance, justice et séjour",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME013",
+    "label": "Analyse des chaînes de valeur cybercriminelles",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à comprendre l’organisation économique, technique et relationnelle des écosystèmes cybercriminels.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME027",
+        "count": 1
+      },
+      {
+        "id": "ME100",
+        "count": 1
+      },
+      {
+        "id": "ME105",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME014",
+    "label": "Analyse des profils sociodémographiques des mis en cause",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME015",
+    "label": "Analyse des rapports entre cyberespace, renseignement et influence",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME018",
+        "count": 1
+      },
+      {
+        "id": "ME064",
+        "count": 1
+      },
+      {
+        "id": "ME127",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME016",
+    "label": "Analyse des ressentis de sécurité",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à objectiver statistiquement des perceptions subjectives relatives à la sécurité ou à l’insécurité.",
+    "entities": [
+      "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB004",
+        "titre": "sentiment d’insécurité exprimé par les habitants des quartiers prioritaires de la politique de la ville",
+        "annee": "2026",
+        "organisme": "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+        "image_path": "/images/publications/PUB004.png",
+        "url_contenu": "https://www.onpv.fr/uploads/media_items/onpv-etude-insecurite.original.pdf",
+        "url_source": "https://anct.gouv.fr/ressources/publications/etude-onpv-sentiment-d-insecurite-exprime-par-les-habitants-des-quartiers",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB013",
+        "titre": "rapport d'enquête thématique 2022 vécu et ressenti en matière de sécurité",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB013.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139696/1101982/file/Rapport%20d%E2%80%99enque%CC%82te%20the%CC%81matique%202022%20V%C3%A9cu%20et%20ressenti%20en%20mati%C3%A8re%20de%20s%C3%A9curit%C3%A9.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Rapport-d-enquete-thematique-2022-Vecu-et-ressenti-en-matiere-de-securite-les-interactions-entre-les-forces-de-securite-interieure-et-la-population",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME047",
+        "count": 2
+      },
+      {
+        "id": "ME090",
+        "count": 1
+      },
+      {
+        "id": "ME116",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME017",
+    "label": "Analyse des risques cyber-physiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser les cybermenaces susceptibles de produire des effets matériels sur des infrastructures, équipements ou systèmes industriels.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME088",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME018",
+    "label": "Analyse doctrinale des stratégies informationnelles",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME015",
+        "count": 1
+      },
+      {
+        "id": "ME064",
+        "count": 1
+      },
+      {
+        "id": "ME115",
+        "count": 1
+      },
+      {
+        "id": "ME127",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME019",
+    "label": "Analyse géospatiale",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser la répartition spatiale d’un phénomène public, d’une population, d’un risque ou d’un fait signalé.",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+      "Centre d’analyse et de lutte contre les atteintes aux élus",
+      "Direction générale des étrangers en France",
+      "Revue du Grasco",
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Criminologie",
+      "Migrations/intégration",
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB001",
+        "titre": "présence des ukrainiens adultes ayant une autorisation de séjour en france",
+        "annee": "2026",
+        "organisme": "Direction générale des étrangers en France",
+        "image_path": "/images/publications/PUB001.png",
+        "url_contenu": "https://www.immigration.interieur.gouv.fr/sites/dgef/files/medias/documents/2026-03/IM_127_Presence_des_Ukrainiens_adultes_ayant_une_autorisation_de_sejour_en_France.pdf",
+        "url_source": "https://www.immigration.interieur.gouv.fr/documentation/etudes-et-statistiques/presence-des-ukrainiens-adultes-ayant-autorisation-de-sejour-en-france.html",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB002",
+        "titre": "rapport d'activité 2023-2025 du centre d'analyse et de lutte contre les atteintes aux élus",
+        "annee": "2026",
+        "organisme": "Centre d’analyse et de lutte contre les atteintes aux élus",
+        "image_path": "/images/publications/PUB002.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-01/Mai-2025-rapport-calae.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-dactivite-2023-2025-du-centre-danalyse-et-de-lutte-contre-atteintes-aux-elus-calae.html",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB018",
+        "titre": "les disparités communales en matière de vols sans violence",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139737/1102259/file/IA82.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Les-disparites-communales-en-matiere-de-vols-sans-violence-etat-des-lieux",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME029",
+        "count": 1
+      },
+      {
+        "id": "ME038",
+        "count": 1
+      },
+      {
+        "id": "ME074",
+        "count": 1
+      },
+      {
+        "id": "ME084",
+        "count": 1
+      },
+      {
+        "id": "ME087",
+        "count": 1
+      },
+      {
+        "id": "ME118",
+        "count": 1
+      },
+      {
+        "id": "ME139",
+        "count": 1
+      }
+    ],
+    "publication_count": 5,
+    "degree": 7
+  },
+  {
+    "id": "ME020",
+    "label": "Analyse longitudinale des victimes et mis en cause mineurs",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à suivre sur plusieurs années l’évolution statistique des mineurs victimes et des mineurs mis en cause.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME006",
+        "count": 1
+      },
+      {
+        "id": "ME039",
+        "count": 1
+      },
+      {
+        "id": "ME048",
+        "count": 1
+      },
+      {
+        "id": "ME070",
+        "count": 1
+      },
+      {
+        "id": "ME107",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 5
+  },
+  {
+    "id": "ME021",
+    "label": "Analyse multivariée des facteurs de délinquance enregistrée",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME022",
+    "label": "Analyse multivariée des facteurs d’insécurité",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à mobiliser des modèles statistiques pour isoler les facteurs associés à un phénomène d’insécurité.",
+    "entities": [
+      "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB004",
+        "titre": "sentiment d’insécurité exprimé par les habitants des quartiers prioritaires de la politique de la ville",
+        "annee": "2026",
+        "organisme": "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+        "image_path": "/images/publications/PUB004.png",
+        "url_contenu": "https://www.onpv.fr/uploads/media_items/onpv-etude-insecurite.original.pdf",
+        "url_source": "https://anct.gouv.fr/ressources/publications/etude-onpv-sentiment-d-insecurite-exprime-par-les-habitants-des-quartiers",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME024",
+        "count": 1
+      },
+      {
+        "id": "ME090",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME023",
+    "label": "Analyse quantitative des phénomènes criminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME024",
+    "label": "Analyse socio-territoriale des phénomènes publics",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à croiser des variables sociales et territoriales pour analyser un phénomène public.",
+    "entities": [
+      "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB004",
+        "titre": "sentiment d’insécurité exprimé par les habitants des quartiers prioritaires de la politique de la ville",
+        "annee": "2026",
+        "organisme": "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+        "image_path": "/images/publications/PUB004.png",
+        "url_contenu": "https://www.onpv.fr/uploads/media_items/onpv-etude-insecurite.original.pdf",
+        "url_source": "https://anct.gouv.fr/ressources/publications/etude-onpv-sentiment-d-insecurite-exprime-par-les-habitants-des-quartiers",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME022",
+        "count": 1
+      },
+      {
+        "id": "ME090",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME025",
+    "label": "Analyse statistique de la délinquance routière enregistrée",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME026",
+    "label": "Analyse systémique du parcours administratif et judiciaire des publics vulnérables",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME027",
+    "label": "Analyse technique des vecteurs d’intrusion",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à identifier les modes d’entrée techniques utilisés pour compromettre un système ou une organisation.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME013",
+        "count": 1
+      },
+      {
+        "id": "ME100",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME028",
+    "label": "Articulation entre savoirs scientifiques et besoins opérationnels policiers",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminalités",
+      "Criminologie",
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB090",
+        "titre": "lutte contre la pédocriminalité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB090.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/60033/file/PEPS%20-%20Lutte%20contre%20la%20p%C3%A9docriminalit%C3%A9%20-%20Rapport%20V1.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/le-rapport-peps-lutte-contre-la-pedocriminalite-est-disponible",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME063",
+        "count": 1
+      },
+      {
+        "id": "ME087",
+        "count": 1
+      },
+      {
+        "id": "ME129",
+        "count": 1
+      },
+      {
+        "id": "ME141",
+        "count": 1
+      },
+      {
+        "id": "ME144",
+        "count": 1
+      },
+      {
+        "id": "ME146",
+        "count": 1
+      },
+      {
+        "id": "ME148",
+        "count": 1
+      },
+      {
+        "id": "ME149",
+        "count": 1
+      },
+      {
+        "id": "ME150",
+        "count": 1
+      },
+      {
+        "id": "ME151",
+        "count": 1
+      },
+      {
+        "id": "ME154",
+        "count": 1
+      }
+    ],
+    "publication_count": 4,
+    "degree": 11
+  },
+  {
+    "id": "ME029",
+    "label": "Atteintes aux élus",
+    "family": "Problème public",
+    "definition": "Faits, menaces, violences, injures ou dégradations visant des élus dans l’exercice ou en raison de leurs fonctions.",
+    "entities": [
+      "Centre d’analyse et de lutte contre les atteintes aux élus"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB002",
+        "titre": "rapport d'activité 2023-2025 du centre d'analyse et de lutte contre les atteintes aux élus",
+        "annee": "2026",
+        "organisme": "Centre d’analyse et de lutte contre les atteintes aux élus",
+        "image_path": "/images/publications/PUB002.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-01/Mai-2025-rapport-calae.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-dactivite-2023-2025-du-centre-danalyse-et-de-lutte-contre-atteintes-aux-elus-calae.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME050",
+        "count": 1
+      },
+      {
+        "id": "ME076",
+        "count": 1
+      },
+      {
+        "id": "ME085",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME030",
+    "label": "Audit interministériel de politiques publiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Sécurité nationale",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB010",
+        "titre": "identification de lignes directrices pour des plans de résilience des alpes françaises en réponse aux conséquences des effets du changement climatique",
+        "annee": "2025",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/24121R%20-%20R%C3%A9silience%20Alpes%20Fran%C3%A7aises.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/identification-de-lignes-directrices-pour-des-plans-de-resilience-a-proposer-aux-autorites-et.html",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB073",
+        "titre": "le déploiement de l'intelligence artificielle dans les administrations publiques : analyse comparée, enjeux et conditions de réussite",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB073.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/26008R%20-%20D%C3%A9ploiement%20IA%20dans%20AP.pdf",
+        "url_source": "https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports,https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB101",
+        "titre": "le modèle économique de la sécurité privée",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB101.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/25079R%20-%20S%C3%A9curit%C3%A9%20priv%C3%A9e-web.pdf",
+        "url_source": "https://www.calameo.com/read/008180918d625c3e224b0",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME032",
+        "count": 1
+      },
+      {
+        "id": "ME052",
+        "count": 1
+      },
+      {
+        "id": "ME059",
+        "count": 1
+      },
+      {
+        "id": "ME098",
+        "count": 1
+      },
+      {
+        "id": "ME109",
+        "count": 1
+      },
+      {
+        "id": "ME111",
+        "count": 1
+      }
+    ],
+    "publication_count": 3,
+    "degree": 6
+  },
+  {
+    "id": "ME031",
+    "label": "Collecte et restitution de témoignages professionnels",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME032",
+    "label": "Conduite du changement numérique dans l’administration",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à accompagner l’appropriation d’outils numériques ou d’IA dans les administrations territoriales.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie",
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB073",
+        "titre": "le déploiement de l'intelligence artificielle dans les administrations publiques : analyse comparée, enjeux et conditions de réussite",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB073.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/26008R%20-%20D%C3%A9ploiement%20IA%20dans%20AP.pdf",
+        "url_source": "https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports,https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME042",
+        "count": 2
+      },
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME091",
+        "count": 1
+      },
+      {
+        "id": "ME098",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME033",
+    "label": "Contractualisation de projets innovants",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à sécuriser juridiquement, financièrement et opérationnellement un projet d’innovation par contrat, convention ou partenariat.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME092",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME034",
+    "label": "Croisement des données de sécurité et des caractéristiques socio-territoriales",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à croiser les données de sécurité avec des caractéristiques sociodémographiques et territoriales afin d’analyser les disparités observées.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME045",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME035",
+    "label": "Diagnostic systémique des vulnérabilités territoriales",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME036",
+    "label": "Documentation des situations professionnelles de terrain",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "Préfecture de la région Auvergne-Rhône-Alpes"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB021",
+        "titre": "chaîne podcast de la préfecture de la région auvergne-rhône-alpes",
+        "annee": "2026",
+        "organisme": "Préfecture de la région Auvergne-Rhône-Alpes",
+        "image_path": "/images/publications/PUB021.png",
+        "url_contenu": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "url_source": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB064",
+        "titre": "25e anniversaire du cstagn, le soutien au cœur de l’action de la gendarmerie",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB064.png",
+        "url_contenu": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "url_source": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME073",
+        "count": 1
+      },
+      {
+        "id": "ME075",
+        "count": 1
+      },
+      {
+        "id": "ME141",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME037",
+    "label": "Délinquance des jeunes étrangers se déclarant mineurs",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME038",
+    "label": "Délinquance enregistrée à l’échelle communale",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB018",
+        "titre": "les disparités communales en matière de vols sans violence",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139737/1102259/file/IA82.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Les-disparites-communales-en-matiere-de-vols-sans-violence-etat-des-lieux",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME074",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME039",
+    "label": "Délinquance juvénile enregistrée",
+    "family": "Problème public",
+    "definition": "Faits enregistrés par les services de sécurité intérieure dans lesquels des mineurs sont mis en cause.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME006",
+        "count": 1
+      },
+      {
+        "id": "ME020",
+        "count": 1
+      },
+      {
+        "id": "ME107",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME040",
+    "label": "Délinquance routière enregistrée",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité routière"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB014",
+        "titre": "en 2025, une hausse marquée des refus de contrôle routier - ministère de l'intérieur, service statistique ministériel",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB014.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139720/1102152/file/IR66%20refus%20contro%CC%82le%20routier.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/En-2025-une-hausse-marquee-des-refus-de-controle-routier",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME061",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME041",
+    "label": "Dépendance technologique dans les projets d’IA publique",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME042",
+    "label": "Encadrement éthique et juridique de l’IA publique",
+    "family": "Problème public",
+    "definition": "Enjeu de régulation des usages publics de l’IA afin de garantir transparence, responsabilité, droits fondamentaux et recours.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie",
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB073",
+        "titre": "le déploiement de l'intelligence artificielle dans les administrations publiques : analyse comparée, enjeux et conditions de réussite",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB073.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/26008R%20-%20D%C3%A9ploiement%20IA%20dans%20AP.pdf",
+        "url_source": "https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports,https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME032",
+        "count": 2
+      },
+      {
+        "id": "ME055",
+        "count": 1
+      },
+      {
+        "id": "ME057",
+        "count": 1
+      },
+      {
+        "id": "ME091",
+        "count": 1
+      },
+      {
+        "id": "ME098",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 5
+  },
+  {
+    "id": "ME043",
+    "label": "Essaimage, commercialisation et transfert des innovations régaliennes",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à organiser la circulation, la valorisation externe ou le transfert d’innovations issues d’un besoin régalien.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME077",
+        "count": 1
+      },
+      {
+        "id": "ME083",
+        "count": 1
+      },
+      {
+        "id": "ME092",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME044",
+    "label": "Exploitation de la base communale de la délinquance enregistrée",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME045",
+    "label": "Exploitation des bases d’infractions enregistrées par les forces de sécurité intérieure",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à interroger, structurer et analyser les bases d’infractions enregistrées par les forces de sécurité intérieure.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB018",
+        "titre": "les disparités communales en matière de vols sans violence",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139737/1102259/file/IA82.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Les-disparites-communales-en-matiere-de-vols-sans-violence-etat-des-lieux",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME006",
+        "count": 1
+      },
+      {
+        "id": "ME034",
+        "count": 1
+      },
+      {
+        "id": "ME038",
+        "count": 1
+      },
+      {
+        "id": "ME047",
+        "count": 1
+      },
+      {
+        "id": "ME048",
+        "count": 1
+      },
+      {
+        "id": "ME049",
+        "count": 1
+      },
+      {
+        "id": "ME074",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 8
+  },
+  {
+    "id": "ME046",
+    "label": "Exploitation des données policières à des fins de recherche appliquée",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Les cahiers français"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB052",
+        "titre": "une généalogie des politiques publiques de sécurité",
+        "annee": "2026",
+        "organisme": "Les cahiers français",
+        "image_path": "/images/publications/PUB052.png",
+        "url_contenu": "",
+        "url_source": "https://www.lgdj.fr/cahiers-francais-mai-juin-2026-n451-9782111743533.html",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME066",
+        "count": 1
+      },
+      {
+        "id": "ME071",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME047",
+    "label": "Exploitation d’enquêtes de victimation",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à exploiter des enquêtes déclaratives portant sur les victimations, les expériences de sécurité ou les ressentis.",
+    "entities": [
+      "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB004",
+        "titre": "sentiment d’insécurité exprimé par les habitants des quartiers prioritaires de la politique de la ville",
+        "annee": "2026",
+        "organisme": "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+        "image_path": "/images/publications/PUB004.png",
+        "url_contenu": "https://www.onpv.fr/uploads/media_items/onpv-etude-insecurite.original.pdf",
+        "url_source": "https://anct.gouv.fr/ressources/publications/etude-onpv-sentiment-d-insecurite-exprime-par-les-habitants-des-quartiers",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB013",
+        "titre": "rapport d'enquête thématique 2022 vécu et ressenti en matière de sécurité",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB013.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139696/1101982/file/Rapport%20d%E2%80%99enque%CC%82te%20the%CC%81matique%202022%20V%C3%A9cu%20et%20ressenti%20en%20mati%C3%A8re%20de%20s%C3%A9curit%C3%A9.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Rapport-d-enquete-thematique-2022-Vecu-et-ressenti-en-matiere-de-securite-les-interactions-entre-les-forces-de-securite-interieure-et-la-population",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME016",
+        "count": 2
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME090",
+        "count": 1
+      },
+      {
+        "id": "ME116",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 3,
+    "degree": 5
+  },
+  {
+    "id": "ME048",
+    "label": "Exploitation statistique des procédures de sécurité intérieure",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à exploiter statistiquement les procédures enregistrées par les services de police et de gendarmerie.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME020",
+        "count": 1
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME049",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME049",
+    "label": "Fiabilisation des indicateurs de délinquance enregistrée",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à consolider, contrôler et améliorer la qualité des indicateurs issus de la délinquance enregistrée.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB080",
+        "titre": "insécurité et délinquance en 2025 : bilan statistique et atlas départemental",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB080.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139779/1102543/file/Ins%C3%A9curit%C3%A9%20et%20d%C3%A9linquance%20en%202025%20-%20Bilan%20statistique%20-%20%C3%A9dition%202026.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Insecurite-et-delinquance-en-2025-bilan-statistique-et-atlas-departemental",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME048",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME050",
+    "label": "Fiabilisation des remontées d’information territoriales",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à consolider, harmoniser et fiabiliser des informations issues du terrain ou des échelons territoriaux.",
+    "entities": [
+      "Centre d’analyse et de lutte contre les atteintes aux élus"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB002",
+        "titre": "rapport d'activité 2023-2025 du centre d'analyse et de lutte contre les atteintes aux élus",
+        "annee": "2026",
+        "organisme": "Centre d’analyse et de lutte contre les atteintes aux élus",
+        "image_path": "/images/publications/PUB002.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-01/Mai-2025-rapport-calae.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-dactivite-2023-2025-du-centre-danalyse-et-de-lutte-contre-atteintes-aux-elus-calae.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME029",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME051",
+    "label": "Formation cynophile en gendarmerie",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME080",
+        "count": 1
+      },
+      {
+        "id": "ME104",
+        "count": 1
+      },
+      {
+        "id": "ME129",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME052",
+    "label": "Formulation de recommandations interadministratives",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB010",
+        "titre": "identification de lignes directrices pour des plans de résilience des alpes françaises en réponse aux conséquences des effets du changement climatique",
+        "annee": "2025",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/24121R%20-%20R%C3%A9silience%20Alpes%20Fran%C3%A7aises.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/identification-de-lignes-directrices-pour-des-plans-de-resilience-a-proposer-aux-autorites-et.html",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB101",
+        "titre": "le modèle économique de la sécurité privée",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB101.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/25079R%20-%20S%C3%A9curit%C3%A9%20priv%C3%A9e-web.pdf",
+        "url_source": "https://www.calameo.com/read/008180918d625c3e224b0",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME111",
+        "count": 1
+      },
+      {
+        "id": "ME143",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME053",
+    "label": "Formulation de scénarios institutionnels alternatifs",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME054",
+    "label": "Gestion administrative des titres de séjour",
+    "family": "Instrument / dispositif",
+    "definition": "Maîtrise des régimes, titres, autorisations et changements de statut relatifs au séjour des étrangers.",
+    "entities": [
+      "Direction générale des étrangers en France"
+    ],
+    "domains": [
+      "Migrations/intégration"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB001",
+        "titre": "présence des ukrainiens adultes ayant une autorisation de séjour en france",
+        "annee": "2026",
+        "organisme": "Direction générale des étrangers en France",
+        "image_path": "/images/publications/PUB001.png",
+        "url_contenu": "https://www.immigration.interieur.gouv.fr/sites/dgef/files/medias/documents/2026-03/IM_127_Presence_des_Ukrainiens_adultes_ayant_une_autorisation_de_sejour_en_France.pdf",
+        "url_source": "https://www.immigration.interieur.gouv.fr/documentation/etudes-et-statistiques/presence-des-ukrainiens-adultes-ayant-autorisation-de-sejour-en-france.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME084",
+        "count": 1
+      },
+      {
+        "id": "ME093",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME055",
+    "label": "Gouvernance éthique de l’IA publique",
+    "family": "Instrument / dispositif",
+    "definition": "Dispositif ou cadre d’encadrement des usages publics de l’IA par des principes de transparence, responsabilité et supervision humaine.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME042",
+        "count": 1
+      },
+      {
+        "id": "ME091",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME056",
+    "label": "Hacktivisme géopolitique",
+    "family": "Problème public",
+    "definition": "Cyberactions revendiquées au nom de causes idéologiques, politiques ou géopolitiques.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME010",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME057",
+    "label": "IA appliquée à la sécurité publique et à la gestion de crise",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à identifier, structurer ou déployer des usages de l’IA dans la sécurité publique, la sécurité civile ou la crise.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME003",
+        "count": 1
+      },
+      {
+        "id": "ME042",
+        "count": 1
+      },
+      {
+        "id": "ME096",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME058",
+    "label": "Identification des phénomènes extrémistes émergents",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à repérer des formes nouvelles, peu stabilisées ou en recomposition d’extrémisme violent.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME067",
+        "count": 1
+      },
+      {
+        "id": "ME106",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME059",
+    "label": "Impacts du changement climatique sur les territoires de montagne",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB010",
+        "titre": "identification de lignes directrices pour des plans de résilience des alpes françaises en réponse aux conséquences des effets du changement climatique",
+        "annee": "2025",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/24121R%20-%20R%C3%A9silience%20Alpes%20Fran%C3%A7aises.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/identification-de-lignes-directrices-pour-des-plans-de-resilience-a-proposer-aux-autorites-et.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME109",
+        "count": 1
+      },
+      {
+        "id": "ME111",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME060",
+    "label": "Industrialisation de solutions de sécurité intérieure",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à accompagner le passage d’un prototype ou d’une expérimentation vers une solution opérationnelle produite à plus grande échelle.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME002",
+        "count": 1
+      },
+      {
+        "id": "ME077",
+        "count": 1
+      },
+      {
+        "id": "ME092",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME061",
+    "label": "Infractions routières",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité routière"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB014",
+        "titre": "en 2025, une hausse marquée des refus de contrôle routier - ministère de l'intérieur, service statistique ministériel",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB014.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139720/1102152/file/IR66%20refus%20contro%CC%82le%20routier.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/En-2025-une-hausse-marquee-des-refus-de-controle-routier",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME040",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME062",
+    "label": "Innovation opérationnelle en milieu subaquatique",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à développer ou adapter des solutions technologiques pour les investigations et interventions en milieu subaquatique.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME094",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME063",
+    "label": "Intégration de la recherche criminologique dans la pratique policière",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME087",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME064",
+    "label": "Manipulations de l’information et stratégies d’influence",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME015",
+        "count": 1
+      },
+      {
+        "id": "ME018",
+        "count": 1
+      },
+      {
+        "id": "ME127",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME065",
+    "label": "Maîtrise des dépendances technologiques dans les projets de sécurité",
+    "family": "Problème public",
+    "definition": "Enjeu de limitation des dépendances techniques, juridiques ou industrielles dans les projets technologiques liés à la sécurité.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité nationale",
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB033",
+        "titre": "la souveraineté numérique. gouverner l'espace symbiotique",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB033.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME009",
+        "count": 1
+      },
+      {
+        "id": "ME083",
+        "count": 1
+      },
+      {
+        "id": "ME091",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME066",
+    "label": "Maîtrise des nomenclatures infractionnelles",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à mobiliser les catégories d’infractions pour produire des indicateurs statistiques fiables et comparables.",
+    "entities": [
+      "Les cahiers français",
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique",
+      "Sécurité routière"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB014",
+        "titre": "en 2025, une hausse marquée des refus de contrôle routier - ministère de l'intérieur, service statistique ministériel",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB014.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139720/1102152/file/IR66%20refus%20contro%CC%82le%20routier.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/En-2025-une-hausse-marquee-des-refus-de-controle-routier",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB052",
+        "titre": "une généalogie des politiques publiques de sécurité",
+        "annee": "2026",
+        "organisme": "Les cahiers français",
+        "image_path": "/images/publications/PUB052.png",
+        "url_contenu": "",
+        "url_source": "https://www.lgdj.fr/cahiers-francais-mai-juin-2026-n451-9782111743533.html",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB091",
+        "titre": "entre 2016 et 2025, les vols dans les exploitations agricoles",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB091.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/IA83%20les%20vols%20dans%20les%20exploitations%20agricoles.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Entre-2016-et-2025-les-vols-dans-les-exploitations-agricoles-diminuent-et-visent-en-premier-lieu-le-materiel-electrique",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME040",
+        "count": 1
+      },
+      {
+        "id": "ME046",
+        "count": 1
+      },
+      {
+        "id": "ME048",
+        "count": 1
+      },
+      {
+        "id": "ME049",
+        "count": 1
+      },
+      {
+        "id": "ME061",
+        "count": 1
+      },
+      {
+        "id": "ME070",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME142",
+        "count": 1
+      }
+    ],
+    "publication_count": 4,
+    "degree": 8
+  },
+  {
+    "id": "ME067",
+    "label": "Menace terroriste en France",
+    "family": "Problème public",
+    "definition": "Enjeu de sécurité intérieure lié aux projets, actes, réseaux ou dynamiques terroristes affectant le territoire national.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME004",
+        "count": 1
+      },
+      {
+        "id": "ME058",
+        "count": 1
+      },
+      {
+        "id": "ME101",
+        "count": 1
+      },
+      {
+        "id": "ME106",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME068",
+    "label": "Menaces hybrides dans l’espace numérique",
+    "family": "Problème public",
+    "definition": "Menaces combinant dimensions cyber, informationnelles, géopolitiques, criminelles ou physiques dans les espaces numériques.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités",
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB033",
+        "titre": "la souveraineté numérique. gouverner l'espace symbiotique",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB033.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME082",
+        "count": 1
+      },
+      {
+        "id": "ME088",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 2
+  },
+  {
+    "id": "ME069",
+    "label": "Mise en cohérence des instruments d’action publique",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME070",
+    "label": "Mise en contexte législative des séries statistiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à interpréter des évolutions statistiques à la lumière de changements législatifs, réglementaires ou méthodologiques.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME020",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME071",
+    "label": "Mise en perspective historique d’une capacité opérationnelle",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Les cahiers français"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB052",
+        "titre": "une généalogie des politiques publiques de sécurité",
+        "annee": "2026",
+        "organisme": "Les cahiers français",
+        "image_path": "/images/publications/PUB052.png",
+        "url_contenu": "",
+        "url_source": "https://www.lgdj.fr/cahiers-francais-mai-juin-2026-n451-9782111743533.html",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME046",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME072",
+    "label": "Mise en récit de l’action de l’État dans les territoires",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME073",
+    "label": "Mise en récit des métiers et parcours professionnels",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Préfecture de la région Auvergne-Rhône-Alpes",
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB021",
+        "titre": "chaîne podcast de la préfecture de la région auvergne-rhône-alpes",
+        "annee": "2026",
+        "organisme": "Préfecture de la région Auvergne-Rhône-Alpes",
+        "image_path": "/images/publications/PUB021.png",
+        "url_contenu": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "url_source": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME075",
+        "count": 2
+      },
+      {
+        "id": "ME036",
+        "count": 1
+      },
+      {
+        "id": "ME099",
+        "count": 1
+      },
+      {
+        "id": "ME102",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 4
+  },
+  {
+    "id": "ME074",
+    "label": "Modélisation économétrique",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à mobiliser des modèles économétriques pour isoler l’association propre de caractéristiques territoriales avec la fréquence d’un phénomène de délinquance, toutes choses égales par ailleurs.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB018",
+        "titre": "les disparités communales en matière de vols sans violence",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139737/1102259/file/IA82.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Les-disparites-communales-en-matiere-de-vols-sans-violence-etat-des-lieux",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME038",
+        "count": 1
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME075",
+    "label": "Médiation institutionnelle par le podcast",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Préfecture de la région Auvergne-Rhône-Alpes",
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB021",
+        "titre": "chaîne podcast de la préfecture de la région auvergne-rhône-alpes",
+        "annee": "2026",
+        "organisme": "Préfecture de la région Auvergne-Rhône-Alpes",
+        "image_path": "/images/publications/PUB021.png",
+        "url_contenu": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "url_source": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME073",
+        "count": 2
+      },
+      {
+        "id": "ME036",
+        "count": 1
+      },
+      {
+        "id": "ME078",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME076",
+    "label": "Pack sécurité élus",
+    "family": "Instrument / dispositif",
+    "definition": "Dispositif structuré d’information, de prévention, d’accompagnement ou de protection destiné aux élus.",
+    "entities": [
+      "Centre d’analyse et de lutte contre les atteintes aux élus"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB002",
+        "titre": "rapport d'activité 2023-2025 du centre d'analyse et de lutte contre les atteintes aux élus",
+        "annee": "2026",
+        "organisme": "Centre d’analyse et de lutte contre les atteintes aux élus",
+        "image_path": "/images/publications/PUB002.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-01/Mai-2025-rapport-calae.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-dactivite-2023-2025-du-centre-danalyse-et-de-lutte-contre-atteintes-aux-elus-calae.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME029",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME077",
+    "label": "Passage à l’échelle des innovations régaliennes",
+    "family": "Problème public",
+    "definition": "Enjeu de transformation d’une expérimentation ou d’un prototype régalien en solution déployable, industrialisable ou transférable.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME043",
+        "count": 1
+      },
+      {
+        "id": "ME060",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME078",
+    "label": "Podcast institutionnel",
+    "family": "Instrument / dispositif",
+    "definition": "",
+    "entities": [
+      "Préfecture de la région Auvergne-Rhône-Alpes"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB021",
+        "titre": "chaîne podcast de la préfecture de la région auvergne-rhône-alpes",
+        "annee": "2026",
+        "organisme": "Préfecture de la région Auvergne-Rhône-Alpes",
+        "image_path": "/images/publications/PUB021.png",
+        "url_contenu": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "url_source": "https://audioblog.arteradio.com/blog/252815/podcast/276221/echange-avec-benoit-romain-et-adrien-agents-de-l-ofb",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME075",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME079",
+    "label": "Prise en charge des mineurs non accompagnés",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME080",
+    "label": "Professionnalisation des binômes cynophiles",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à structurer la sélection, la formation et la spécialisation des maîtres de chien et de leurs chiens afin d’adapter les binômes à des missions opérationnelles diversifiées.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME051",
+        "count": 1
+      },
+      {
+        "id": "ME129",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME081",
+    "label": "Professionnalisation des cadres policiers",
+    "family": "Problème public",
+    "definition": "Professionnalisation et préparation des cadres policiers à l’exercice de responsabilités de commandement.",
+    "entities": [
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME134",
+        "count": 1
+      },
+      {
+        "id": "ME135",
+        "count": 1
+      },
+      {
+        "id": "ME136",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME082",
+    "label": "Prospective des menaces cyber",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à identifier les évolutions futures possibles des menaces cyber et leurs implications opérationnelles.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME068",
+        "count": 1
+      },
+      {
+        "id": "ME126",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME083",
+    "label": "Protection des actifs immatériels publics",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à protéger les savoir-faire, prototypes, données, logiciels ou inventions issus d’activités publiques de recherche et développement.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME043",
+        "count": 1
+      },
+      {
+        "id": "ME065",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME084",
+    "label": "Présence et trajectoires administratives des populations étrangères",
+    "family": "Problème public",
+    "definition": "Enjeu de suivi de la présence, du séjour et des trajectoires administratives de populations étrangères sur le territoire.",
+    "entities": [
+      "Direction générale des étrangers en France"
+    ],
+    "domains": [
+      "Migrations/intégration"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB001",
+        "titre": "présence des ukrainiens adultes ayant une autorisation de séjour en france",
+        "annee": "2026",
+        "organisme": "Direction générale des étrangers en France",
+        "image_path": "/images/publications/PUB001.png",
+        "url_contenu": "https://www.immigration.interieur.gouv.fr/sites/dgef/files/medias/documents/2026-03/IM_127_Presence_des_Ukrainiens_adultes_ayant_une_autorisation_de_sejour_en_France.pdf",
+        "url_source": "https://www.immigration.interieur.gouv.fr/documentation/etudes-et-statistiques/presence-des-ukrainiens-adultes-ayant-autorisation-de-sejour-en-france.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME054",
+        "count": 1
+      },
+      {
+        "id": "ME093",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME085",
+    "label": "Qualification des faits et maîtrise des nomenclatures de signalement",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à classer des faits signalés dans des catégories stabilisées pour les suivre, les comparer et les restituer.",
+    "entities": [
+      "Centre d’analyse et de lutte contre les atteintes aux élus"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB002",
+        "titre": "rapport d'activité 2023-2025 du centre d'analyse et de lutte contre les atteintes aux élus",
+        "annee": "2026",
+        "organisme": "Centre d’analyse et de lutte contre les atteintes aux élus",
+        "image_path": "/images/publications/PUB002.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-01/Mai-2025-rapport-calae.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-dactivite-2023-2025-du-centre-danalyse-et-de-lutte-contre-atteintes-aux-elus-calae.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME029",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME086",
+    "label": "Radicalités d’ultra-droite et d’ultra-gauche",
+    "family": "Problème public",
+    "definition": "Phénomènes de radicalité politique violente relevant des mouvances d’ultra-droite ou d’ultra-gauche.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME004",
+        "count": 1
+      },
+      {
+        "id": "ME101",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME087",
+    "label": "Recherche criminologique appliquée à la pratique policière",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME063",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME130",
+        "count": 1
+      },
+      {
+        "id": "ME131",
+        "count": 1
+      },
+      {
+        "id": "ME133",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 7
+  },
+  {
+    "id": "ME088",
+    "label": "Risques cyber-physiques",
+    "family": "Problème public",
+    "definition": "Risques liés à des cyberattaques susceptibles de produire des effets matériels ou physiques sur des systèmes, infrastructures ou territoires.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME017",
+        "count": 1
+      },
+      {
+        "id": "ME068",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME089",
+    "label": "Résilience des territoires alpins face au changement climatique",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME090",
+    "label": "Sentiment d’insécurité dans les quartiers prioritaires",
+    "family": "Problème public",
+    "definition": "Ressenti d’insécurité exprimé par les habitants des quartiers prioritaires et ses déterminants sociaux ou territoriaux.",
+    "entities": [
+      "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB004",
+        "titre": "sentiment d’insécurité exprimé par les habitants des quartiers prioritaires de la politique de la ville",
+        "annee": "2026",
+        "organisme": "Agence nationale de la cohésion des territoires / Observatoire national de la politique de la ville",
+        "image_path": "/images/publications/PUB004.png",
+        "url_contenu": "https://www.onpv.fr/uploads/media_items/onpv-etude-insecurite.original.pdf",
+        "url_source": "https://anct.gouv.fr/ressources/publications/etude-onpv-sentiment-d-insecurite-exprime-par-les-habitants-des-quartiers",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME016",
+        "count": 1
+      },
+      {
+        "id": "ME022",
+        "count": 1
+      },
+      {
+        "id": "ME024",
+        "count": 1
+      },
+      {
+        "id": "ME047",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME091",
+    "label": "Souveraineté numérique et maîtrise des données publiques",
+    "family": "Problème public",
+    "definition": "Enjeu de maîtrise des infrastructures, données, modèles et dépendances numériques dans l’action publique.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie",
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité nationale",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB033",
+        "titre": "la souveraineté numérique. gouverner l'espace symbiotique",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB033.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME009",
+        "count": 1
+      },
+      {
+        "id": "ME032",
+        "count": 1
+      },
+      {
+        "id": "ME042",
+        "count": 1
+      },
+      {
+        "id": "ME055",
+        "count": 1
+      },
+      {
+        "id": "ME065",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 5
+  },
+  {
+    "id": "ME092",
+    "label": "Structuration de partenariats public-académique-industriel",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à organiser des coopérations entre institution publique, recherche académique et acteurs industriels autour d’un projet innovant.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME033",
+        "count": 1
+      },
+      {
+        "id": "ME043",
+        "count": 1
+      },
+      {
+        "id": "ME060",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME093",
+    "label": "Suivi longitudinal de population étrangère",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à suivre dans le temps l’évolution administrative, territoriale ou statutaire d’une population étrangère.",
+    "entities": [
+      "Direction générale des étrangers en France"
+    ],
+    "domains": [
+      "Migrations/intégration"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB001",
+        "titre": "présence des ukrainiens adultes ayant une autorisation de séjour en france",
+        "annee": "2026",
+        "organisme": "Direction générale des étrangers en France",
+        "image_path": "/images/publications/PUB001.png",
+        "url_contenu": "https://www.immigration.interieur.gouv.fr/sites/dgef/files/medias/documents/2026-03/IM_127_Presence_des_Ukrainiens_adultes_ayant_une_autorisation_de_sejour_en_France.pdf",
+        "url_source": "https://www.immigration.interieur.gouv.fr/documentation/etudes-et-statistiques/presence-des-ukrainiens-adultes-ayant-autorisation-de-sejour-en-france.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME054",
+        "count": 1
+      },
+      {
+        "id": "ME084",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME094",
+    "label": "Sécurisation des investigations subaquatiques",
+    "family": "Problème public",
+    "definition": "Enjeu de sécurisation, d’appui technique et d’efficacité des investigations ou interventions conduites en milieu subaquatique.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB007",
+        "titre": "valorisation des efforts d’innovation et transfert de technologies : analyse du cas de la gendarmerie nationale et de l’école des mines de paris",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB007.png",
+        "url_contenu": "https://www.calameo.com/read/00271929244184d31226a",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-128-valorisation-des-efforts-d-innovation-et-transfert-de-technologies",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME062",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME095",
+    "label": "Sécurisation du statut juridique des jeunes se déclarant MNA",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME096",
+    "label": "Sécurité publique et gestion de crise à l’ère de l’IA",
+    "family": "Problème public",
+    "definition": "Enjeu d’usage de l’intelligence artificielle pour prévenir, anticiper, gérer ou coordonner les situations de sécurité et de crise.",
+    "entities": [
+      "Association des préfets et représentants de l’État de la francophonie"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB005",
+        "titre": "actes du 5e forum de l’association des préfets et représentants de l’état de la francophonie",
+        "annee": "2026",
+        "organisme": "Association des préfets et représentants de l’État de la francophonie",
+        "image_path": "/images/publications/PUB005.png",
+        "url_contenu": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "url_source": "https://www.linkedin.com/posts/apref-actes-du-forum-de-dakar-ugcPost-7448026029199282176-uVD-/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME003",
+        "count": 1
+      },
+      {
+        "id": "ME057",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME097",
+    "label": "Série audio immersive sur les métiers publics",
+    "family": "Instrument / dispositif",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME098",
+    "label": "Transformation de l’action publique par l’intelligence artificielle",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB073",
+        "titre": "le déploiement de l'intelligence artificielle dans les administrations publiques : analyse comparée, enjeux et conditions de réussite",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB073.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/26008R%20-%20D%C3%A9ploiement%20IA%20dans%20AP.pdf",
+        "url_source": "https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports,https://www.vie-publique.fr/rapport/303927-le-deploiement-de-lintelligence-artificielle-dans-les-administrations?egn-publisher=dila_vp&egn-name=informer_rss_rapports",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME032",
+        "count": 1
+      },
+      {
+        "id": "ME042",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME099",
+    "label": "Transmission de la culture professionnelle institutionnelle",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Sécurité publique",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB064",
+        "titre": "25e anniversaire du cstagn, le soutien au cœur de l’action de la gendarmerie",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB064.png",
+        "url_contenu": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "url_source": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME073",
+        "count": 1
+      },
+      {
+        "id": "ME141",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME100",
+    "label": "Typologie des modes opératoires cybercriminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à classer les formes d’attaque, techniques et stratégies utilisées par les cybercriminels.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME013",
+        "count": 1
+      },
+      {
+        "id": "ME027",
+        "count": 1
+      },
+      {
+        "id": "ME105",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME101",
+    "label": "Typologie des mouvances radicales",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à distinguer, classer et caractériser différentes mouvances radicales ou extrémistes.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME067",
+        "count": 1
+      },
+      {
+        "id": "ME086",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME102",
+    "label": "Valorisation des métiers publics",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale",
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Sécurité publique",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB064",
+        "titre": "25e anniversaire du cstagn, le soutien au cœur de l’action de la gendarmerie",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB064.png",
+        "url_contenu": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "url_source": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME073",
+        "count": 1
+      },
+      {
+        "id": "ME141",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 3
+  },
+  {
+    "id": "ME103",
+    "label": "Valorisation éditoriale des parcours professionnels",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME104",
+    "label": "Valorisation éditoriale d’un savoir-faire opérationnel",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME051",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME105",
+    "label": "Veille des espaces cybercriminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à suivre les forums, messageries, plateformes, blogs ou canaux utilisés par les acteurs cybercriminels.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME013",
+        "count": 1
+      },
+      {
+        "id": "ME100",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME106",
+    "label": "Veille stratégique sur les radicalités violentes",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à suivre dans la durée les évolutions des radicalités violentes et à en produire une lecture actualisée.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Radicalités / Terrorisme"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB003",
+        "titre": "terrorisme en france. panorama des mouvances radicales en 2025",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB003.png",
+        "url_contenu": "https://www.calameo.com/read/00271929218ac8078c92f",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-crgn-125-france-panorama-des-mouvances-radicales-en-2025",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME058",
+        "count": 1
+      },
+      {
+        "id": "ME067",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME107",
+    "label": "Victimation des mineurs",
+    "family": "Problème public",
+    "definition": "Faits enregistrés par les services de sécurité intérieure dont les mineurs sont victimes.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB008",
+        "titre": "victimes et mis en cause mineurs enregistrés par les services de sécurité intérieure : état des lieux sur dix ans",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB008.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139681/1101889/file/IA81%20Panorama%2010%20ans.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Victimes-et-mis-en-cause-mineurs-enregistres-par-les-services-de-securite-interieure-etat-des-lieux-sur-dix-ans",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME006",
+        "count": 1
+      },
+      {
+        "id": "ME020",
+        "count": 1
+      },
+      {
+        "id": "ME039",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME108",
+    "label": "Visibilité de l’action préfectorale",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME009",
+        "count": 1
+      },
+      {
+        "id": "ME139",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME109",
+    "label": "Économie du tourisme",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB010",
+        "titre": "identification de lignes directrices pour des plans de résilience des alpes françaises en réponse aux conséquences des effets du changement climatique",
+        "annee": "2025",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/24121R%20-%20R%C3%A9silience%20Alpes%20Fran%C3%A7aises.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/identification-de-lignes-directrices-pour-des-plans-de-resilience-a-proposer-aux-autorites-et.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME059",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME110",
+    "label": "Évaluation de la minorité et de l’isolement",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME111",
+    "label": "Évaluation des doctrines de prévention des risques naturels",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB010",
+        "titre": "identification de lignes directrices pour des plans de résilience des alpes françaises en réponse aux conséquences des effets du changement climatique",
+        "annee": "2025",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/24121R%20-%20R%C3%A9silience%20Alpes%20Fran%C3%A7aises.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/identification-de-lignes-directrices-pour-des-plans-de-resilience-a-proposer-aux-autorites-et.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME030",
+        "count": 1
+      },
+      {
+        "id": "ME052",
+        "count": 1
+      },
+      {
+        "id": "ME059",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME112",
+    "label": "Évaluation des gains et coûts complets des solutions d’IA",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME114",
+    "label": "Parentalité",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB031",
+        "titre": "les violences intrafamiliales non conjugales en 2024",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB031.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139224/1098858/file/IR59%20Les%20violences%20intrafamiliales%20non%20conjugales%20en%202024.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/etudes-et-statistiques/interstats-info-rapide-ndeg-59-violences-intrafamiliales-non-conjugales-enregistrees-par-services-de.html",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME140",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME115",
+    "label": "Techniques de sécurité informationnelle",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME018",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME116",
+    "label": "Le sentiment d'insécurité",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB013",
+        "titre": "rapport d'enquête thématique 2022 vécu et ressenti en matière de sécurité",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB013.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139696/1101982/file/Rapport%20d%E2%80%99enque%CC%82te%20the%CC%81matique%202022%20V%C3%A9cu%20et%20ressenti%20en%20mati%C3%A8re%20de%20s%C3%A9curit%C3%A9.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Rapport-d-enquete-thematique-2022-Vecu-et-ressenti-en-matiere-de-securite-les-interactions-entre-les-forces-de-securite-interieure-et-la-population",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME016",
+        "count": 1
+      },
+      {
+        "id": "ME047",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME117",
+    "label": "Traitement et analyse des données",
+    "family": "Méthode / savoir-faire",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration",
+      "Revue du Grasco",
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Criminalités",
+      "Criminologie",
+      "Sécurité nationale",
+      "Sécurité publique",
+      "Sécurité routière"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB013",
+        "titre": "rapport d'enquête thématique 2022 vécu et ressenti en matière de sécurité",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB013.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139696/1101982/file/Rapport%20d%E2%80%99enque%CC%82te%20the%CC%81matique%202022%20V%C3%A9cu%20et%20ressenti%20en%20mati%C3%A8re%20de%20s%C3%A9curit%C3%A9.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Rapport-d-enquete-thematique-2022-Vecu-et-ressenti-en-matiere-de-securite-les-interactions-entre-les-forces-de-securite-interieure-et-la-population",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB014",
+        "titre": "en 2025, une hausse marquée des refus de contrôle routier - ministère de l'intérieur, service statistique ministériel",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB014.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139720/1102152/file/IR66%20refus%20contro%CC%82le%20routier.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/En-2025-une-hausse-marquee-des-refus-de-controle-routier",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB018",
+        "titre": "les disparités communales en matière de vols sans violence",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139737/1102259/file/IA82.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Les-disparites-communales-en-matiere-de-vols-sans-violence-etat-des-lieux",
+        "has_graph": true
+      },
+      {
+        "publication_id": "PUB031",
+        "titre": "les violences intrafamiliales non conjugales en 2024",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB031.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139224/1098858/file/IR59%20Les%20violences%20intrafamiliales%20non%20conjugales%20en%202024.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/etudes-et-statistiques/interstats-info-rapide-ndeg-59-violences-intrafamiliales-non-conjugales-enregistrees-par-services-de.html",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB091",
+        "titre": "entre 2016 et 2025, les vols dans les exploitations agricoles",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB091.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/IA83%20les%20vols%20dans%20les%20exploitations%20agricoles.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Entre-2016-et-2025-les-vols-dans-les-exploitations-agricoles-diminuent-et-visent-en-premier-lieu-le-materiel-electrique",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB101",
+        "titre": "le modèle économique de la sécurité privée",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB101.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/25079R%20-%20S%C3%A9curit%C3%A9%20priv%C3%A9e-web.pdf",
+        "url_source": "https://www.calameo.com/read/008180918d625c3e224b0",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME014",
+        "count": 1
+      },
+      {
+        "id": "ME016",
+        "count": 1
+      },
+      {
+        "id": "ME040",
+        "count": 1
+      },
+      {
+        "id": "ME045",
+        "count": 1
+      },
+      {
+        "id": "ME047",
+        "count": 1
+      },
+      {
+        "id": "ME061",
+        "count": 1
+      },
+      {
+        "id": "ME066",
+        "count": 1
+      },
+      {
+        "id": "ME074",
+        "count": 1
+      },
+      {
+        "id": "ME087",
+        "count": 1
+      },
+      {
+        "id": "ME124",
+        "count": 1
+      },
+      {
+        "id": "ME125",
+        "count": 1
+      },
+      {
+        "id": "ME140",
+        "count": 1
+      },
+      {
+        "id": "ME142",
+        "count": 1
+      },
+      {
+        "id": "ME143",
+        "count": 1
+      }
+    ],
+    "publication_count": 7,
+    "degree": 14
+  },
+  {
+    "id": "ME118",
+    "label": "Territoires et populations ultra-marins",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME138",
+        "count": 1
+      },
+      {
+        "id": "ME139",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME119",
+    "label": "Criminalités internationales",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME120",
+    "label": "Typologies et usages de stupéfiants",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME121",
+    "label": "Migrations et intégration des immigrés et de leurs descendants",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME122",
+    "label": "Obligations et déontologie des métiers de la sécurité publique",
+    "family": "Problème public",
+    "definition": "Maîtrise des obligations professionnelles, règles déontologiques et garanties encadrant l’exercice des métiers de la sécurité publique.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB034",
+        "titre": "penser différemment la déontologie des forces de sécurité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB034.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME144",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME123",
+    "label": "Sécurité des biens et des établissements culturels",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [],
+    "domains": [],
+    "publications": [],
+    "associated": [],
+    "publication_count": 0,
+    "degree": 0
+  },
+  {
+    "id": "ME124",
+    "label": "Catégories d'infractions",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB031",
+        "titre": "les violences intrafamiliales non conjugales en 2024",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB031.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139224/1098858/file/IR59%20Les%20violences%20intrafamiliales%20non%20conjugales%20en%202024.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/etudes-et-statistiques/interstats-info-rapide-ndeg-59-violences-intrafamiliales-non-conjugales-enregistrees-par-services-de.html",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME140",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME125",
+    "label": "Métiers, personnels et organisations de la sécurité privée",
+    "family": "Problème public",
+    "definition": "",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB101",
+        "titre": "le modèle économique de la sécurité privée",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB101.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/25079R%20-%20S%C3%A9curit%C3%A9%20priv%C3%A9e-web.pdf",
+        "url_source": "https://www.calameo.com/read/008180918d625c3e224b0",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME143",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME126",
+    "label": "Anticipation des risques quantiques pour le chiffrement et de la transition post-quantique",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser la vulnérabilité des mécanismes de chiffrement face à l’informatique quantique et à anticiper la transition vers des solutions cryptographiques post-quantiques.",
+    "entities": [
+      "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB006",
+        "titre": "rapport annuel sur la cybercriminalité 2026",
+        "annee": "2026",
+        "organisme": "Commandement du ministère de l’Intérieur dans le cyberespace / Centre d’analyse des cybermenaces",
+        "image_path": "/images/publications/PUB006.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-04/Rapport-cybercriminalite2026-WebA.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/rapports/rapport-annuel-sur-cybercriminalite-2026.html",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME082",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME127",
+    "label": "Analyse géopolitique des stratégies informationnelles et des rapports de puissance",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser l’usage de l’information, du cyberespace et de l’influence dans les stratégies étatiques, les rapports de puissance et les relations entre États.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Démocraties et sujets informationnels"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB011",
+        "titre": "rapport à la sphère informationnelle des régimes autoritaires et des démocraties : des conceptions stratégiques distinctes",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB011.png",
+        "url_contenu": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "url_source": "https://www.calameo.com/read/00271929242a5433e0d29",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME015",
+        "count": 1
+      },
+      {
+        "id": "ME018",
+        "count": 1
+      },
+      {
+        "id": "ME064",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME129",
+    "label": "Adaptation des technicités cynophiles aux besoins opérationnels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à faire évoluer les spécialités et usages cynophiles en fonction de nouveaux besoins opérationnels, notamment par la diversification des capacités de détection et de recherche.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB012",
+        "titre": "1945–2025 : 80 ans de formation cynophile à gramat",
+        "annee": "2025",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB012.png",
+        "url_contenu": "https://www.calameo.com/read/002719292fed72e70a1fa",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/note-du-crgn-121-80-ans-de-formation-cynophile-a-gramat",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME051",
+        "count": 1
+      },
+      {
+        "id": "ME080",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME130",
+    "label": "Analyse descriptive des phénomènes criminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à décrire les caractéristiques, fréquences et configurations d’un phénomène criminel à partir des données disponibles.",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME087",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME131",
+    "label": "Analyse comparative des phénomènes criminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à comparer des phénomènes criminels, des groupes, des périodes ou des territoires afin d’identifier leurs différences et similitudes.",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME087",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME133",
+    "label": "Analyse typologique des phénomènes et profils criminels",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à construire et analyser des catégories ou profils permettant de différencier des configurations criminologiques.",
+    "entities": [
+      "Revue du Grasco"
+    ],
+    "domains": [
+      "Criminologie"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB015",
+        "titre": "la recherche criminologique intégrée à la pratique policière",
+        "annee": "2026",
+        "organisme": "Revue du Grasco",
+        "image_path": "/images/publications/PUB015.png",
+        "url_contenu": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "url_source": "https://larevuedugrasco.eu/2026/06/05/n46-juin-2026/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME087",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME134",
+    "label": "Formation par simulation opérationnelle des cadres policiers",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à former des cadres par des mises en situation proches du réel, suivies de débriefings fondés sur l’expertise opérationnelle.",
+    "entities": [
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME081",
+        "count": 1
+      },
+      {
+        "id": "ME135",
+        "count": 1
+      },
+      {
+        "id": "ME136",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME135",
+    "label": "Coordination du commandement en gestion de l’ordre public",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à articuler les responsabilités de l’autorité civile et du commandant de la force publique et à coordonner leur action dans un dispositif d’ordre public.",
+    "entities": [
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME081",
+        "count": 1
+      },
+      {
+        "id": "ME134",
+        "count": 1
+      },
+      {
+        "id": "ME136",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME136",
+    "label": "Prise de décision et commandement en situation d’urgence",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à décider, coordonner et exercer le commandement sous contrainte de temps, d’intensité et de multiplicité des événements.",
+    "entities": [
+      "École nationale supérieure de la police"
+    ],
+    "domains": [
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB016",
+        "titre": "« en immersion à l'école des commissaires de police »",
+        "annee": "2026",
+        "organisme": "École nationale supérieure de la police",
+        "image_path": "/images/publications/PUB016.png",
+        "url_contenu": "https://audio.ausha.co/QQVm5Fw02070.mp3",
+        "url_source": "https://podcast.ausha.co/les-podcasts-de-l-ensp",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME081",
+        "count": 1
+      },
+      {
+        "id": "ME134",
+        "count": 1
+      },
+      {
+        "id": "ME135",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME138",
+    "label": "Gestion territoriale de la ressource en eau",
+    "family": "Problème public",
+    "definition": "Capacité à analyser et organiser la gestion d’une ressource en eau contrainte à l’échelle d’un territoire.",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME009",
+        "count": 1
+      },
+      {
+        "id": "ME118",
+        "count": 1
+      },
+      {
+        "id": "ME139",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME139",
+    "label": "Sécurisation de l’approvisionnement en eau potable",
+    "family": "Problème public",
+    "definition": "Capacité à traiter les difficultés de disponibilité et de continuité de l’approvisionnement en eau potable pour les populations.",
+    "entities": [
+      "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur"
+    ],
+    "domains": [
+      "Administration territoriale de l'Etat"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB022",
+        "titre": "l’insularité",
+        "annee": "2026",
+        "organisme": "Association du corps préfectoral et des hauts fonctionnaires du ministère de l’Intérieur",
+        "image_path": "/images/publications/PUB022.png",
+        "url_contenu": "https://droit.cairn.info/revue-administration-2026-1-page-30?lang=fr",
+        "url_source": "https://www.acphfmi.fr/la-revue-administration-2/",
+        "has_graph": true
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME019",
+        "count": 1
+      },
+      {
+        "id": "ME108",
+        "count": 1
+      },
+      {
+        "id": "ME118",
+        "count": 1
+      },
+      {
+        "id": "ME138",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 4
+  },
+  {
+    "id": "ME140",
+    "label": "Violences intrafamiliales non conjugales",
+    "family": "Problème public",
+    "definition": "Analyse des violences commises au sein de la famille en dehors des relations conjugales, notamment selon les liens entre victimes et auteurs et les catégories d’infractions.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB031",
+        "titre": "les violences intrafamiliales non conjugales en 2024",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB031.png",
+        "url_contenu": "https://www.interieur.gouv.fr/content/download/139224/1098858/file/IR59%20Les%20violences%20intrafamiliales%20non%20conjugales%20en%202024.pdf",
+        "url_source": "https://www.interieur.gouv.fr/documentation/etudes-et-statistiques/interstats-info-rapide-ndeg-59-violences-intrafamiliales-non-conjugales-enregistrees-par-services-de.html",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME114",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME124",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME141",
+    "label": "Organisation du soutien technique, administratif et logistique des forces",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à organiser et assurer les fonctions administratives, logistiques et techniques nécessaires à la continuité et à l’efficacité de l’action opérationnelle.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB064",
+        "titre": "25e anniversaire du cstagn, le soutien au cœur de l’action de la gendarmerie",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB064.png",
+        "url_contenu": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "url_source": "https://www.calameo.com/read/002719292eb4c1ed9d634",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME011",
+        "count": 1
+      },
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME036",
+        "count": 1
+      },
+      {
+        "id": "ME099",
+        "count": 1
+      },
+      {
+        "id": "ME102",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 5
+  },
+  {
+    "id": "ME142",
+    "label": "Vols dans les exploitations agricoles",
+    "family": "Problème public",
+    "definition": "Analyse des vols enregistrés au préjudice des exploitations agricoles, de leur évolution et des biens principalement ciblés.",
+    "entities": [
+      "Service statistique ministériel de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB091",
+        "titre": "entre 2016 et 2025, les vols dans les exploitations agricoles",
+        "annee": "2026",
+        "organisme": "Service statistique ministériel de la sécurité intérieure",
+        "image_path": "/images/publications/PUB091.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/IA83%20les%20vols%20dans%20les%20exploitations%20agricoles.pdf",
+        "url_source": "https://www.interieur.gouv.fr/Interstats/Actualites/Entre-2016-et-2025-les-vols-dans-les-exploitations-agricoles-diminuent-et-visent-en-premier-lieu-le-materiel-electrique",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME066",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME143",
+    "label": "Fragilités économiques du secteur de la sécurité privée",
+    "family": "Problème public",
+    "definition": "Analyse des fragilités économiques du secteur de la sécurité privée, de leurs causes et conséquences et des conditions d’une éventuelle intervention publique.",
+    "entities": [
+      "Inspection générale de l’administration"
+    ],
+    "domains": [
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB101",
+        "titre": "le modèle économique de la sécurité privée",
+        "annee": "2026",
+        "organisme": "Inspection générale de l’administration",
+        "image_path": "/images/publications/PUB101.png",
+        "url_contenu": "https://www.interieur.gouv.fr/sites/minint/files/medias/documents/2026-07/25079R%20-%20S%C3%A9curit%C3%A9%20priv%C3%A9e-web.pdf",
+        "url_source": "https://www.calameo.com/read/008180918d625c3e224b0",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME052",
+        "count": 1
+      },
+      {
+        "id": "ME117",
+        "count": 1
+      },
+      {
+        "id": "ME125",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME144",
+    "label": "Analyse en droit public de la sécurité intérieure",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser les missions, pouvoirs, obligations et protections des forces de sécurité intérieure à partir des normes de droit public qui les encadrent.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique",
+      "Travail, emploi, formation"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB034",
+        "titre": "penser différemment la déontologie des forces de sécurité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB034.png",
+        "url_contenu": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "url_source": "https://www.calameo.com/read/002719292c360a12ddcfc",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME122",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 2
+  },
+  {
+    "id": "ME145",
+    "label": "Épistémologie et méthodologie de la recherche",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à mobiliser le doute, la vérification et la réflexivité comme principes méthodologiques de production de connaissances scientifiques.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Criminalités",
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      },
+      {
+        "publication_id": "PUB090",
+        "titre": "lutte contre la pédocriminalité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB090.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/60033/file/PEPS%20-%20Lutte%20contre%20la%20p%C3%A9docriminalit%C3%A9%20-%20Rapport%20V1.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/le-rapport-peps-lutte-contre-la-pedocriminalite-est-disponible",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME154",
+        "count": 1
+      }
+    ],
+    "publication_count": 2,
+    "degree": 1
+  },
+  {
+    "id": "ME146",
+    "label": "Tueries de masse",
+    "family": "Problème public",
+    "definition": "Phénomène de violence de masse caractérisé par des modes d’action et des configurations nécessitant une adaptation de la réponse opérationnelle des forces de l’ordre.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME147",
+    "label": "Analyse historique des groupes politiques violents et des mémoires gendarmiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser historiquement les groupes politiques violents et les dynamiques de construction et de transmission des mémoires gendarmiques.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [],
+    "publication_count": 1,
+    "degree": 0
+  },
+  {
+    "id": "ME148",
+    "label": "Analyse criminalistique des traces et indices",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser, comparer et exploiter des traces biologiques, chimiques, pédologiques ou documentaires à des fins criminalistiques.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME149",
+    "label": "Analyse sociologique des pratiques professionnelles des forces de l’ordre",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser les effets des dispositifs institutionnels, des cultures professionnelles et des mécanismes sociaux sur les pratiques des forces de l’ordre.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME150",
+    "label": "Analyse comportementale à des fins de renseignement et d’évaluation de la dangerosité",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à analyser des indices comportementaux et des facteurs de dangerosité afin de produire du renseignement et d’appuyer la décision policière.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME151",
+    "label": "Analyse des déterminants de l’innovation au travail dans la Gendarmerie nationale",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à étudier les facteurs individuels et organisationnels influençant le comportement innovant et la performance au travail dans la Gendarmerie nationale.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Sécurité publique"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB050",
+        "titre": "parution du livret des communications - 6ème édition de la journée des chercheurs",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB050.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/58564/file/Livret%20des%20communications%20-%20Journ%C3%A9e%20des%20chercheurs.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/parution-du-livret-des-communications-6eme-edition-de-la-journee-des-chercheurs",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME152",
+    "label": "Prévention des ingérences économiques et protection des savoir-faire stratégiques",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à identifier les risques d’ingérence économique et à protéger les savoirs, savoir-faire et actifs stratégiques des entreprises.",
+    "entities": [
+      "Direction générale de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB084",
+        "titre": "conseils aux entreprises : flash ingérence",
+        "annee": "2026",
+        "organisme": "Direction générale de la sécurité intérieure",
+        "image_path": "/images/publications/PUB084.png",
+        "url_contenu": "https://www.dgsi.interieur.gouv.fr/sites/dgsi/files/medias/documents/2026-08/Flash_Ing%C3%A9rence_122.pdf",
+        "url_source": "https://www.dgsi.interieur.gouv.fr/dgsi-a-vos-cotes/contre-espionnage/conseils-aux-entreprises-flash-ingerence",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME153",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME153",
+    "label": "Intelligence économique",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à collecter, analyser et protéger l’information stratégique afin d’anticiper les risques et de soutenir la décision.",
+    "entities": [
+      "Direction générale de la sécurité intérieure"
+    ],
+    "domains": [
+      "Sécurité nationale"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB084",
+        "titre": "conseils aux entreprises : flash ingérence",
+        "annee": "2026",
+        "organisme": "Direction générale de la sécurité intérieure",
+        "image_path": "/images/publications/PUB084.png",
+        "url_contenu": "https://www.dgsi.interieur.gouv.fr/sites/dgsi/files/medias/documents/2026-08/Flash_Ing%C3%A9rence_122.pdf",
+        "url_source": "https://www.dgsi.interieur.gouv.fr/dgsi-a-vos-cotes/contre-espionnage/conseils-aux-entreprises-flash-ingerence",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME152",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  },
+  {
+    "id": "ME154",
+    "label": "Modèle PEPs, intelligence collective et prospective appliquées à l’action publique",
+    "family": "Instrument / dispositif",
+    "definition": "Dispositif structuré articulant recherche scientifique, prospective, intelligence collective et formalisation de propositions pour l’action publique.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB090",
+        "titre": "lutte contre la pédocriminalité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB090.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/60033/file/PEPS%20-%20Lutte%20contre%20la%20p%C3%A9docriminalit%C3%A9%20-%20Rapport%20V1.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/le-rapport-peps-lutte-contre-la-pedocriminalite-est-disponible",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME028",
+        "count": 1
+      },
+      {
+        "id": "ME145",
+        "count": 1
+      },
+      {
+        "id": "ME155",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 3
+  },
+  {
+    "id": "ME155",
+    "label": "Prévention et lutte contre la pédocriminalité",
+    "family": "Problème public",
+    "definition": "Capacité à analyser les formes de pédocriminalité et à élaborer des leviers de prévention, de détection, de protection des victimes et de régulation.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB090",
+        "titre": "lutte contre la pédocriminalité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB090.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/60033/file/PEPS%20-%20Lutte%20contre%20la%20p%C3%A9docriminalit%C3%A9%20-%20Rapport%20V1.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/le-rapport-peps-lutte-contre-la-pedocriminalite-est-disponible",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME154",
+        "count": 1
+      },
+      {
+        "id": "ME156",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 2
+  },
+  {
+    "id": "ME156",
+    "label": "Recueil, protection et exploitation de la parole de l’enfant victime",
+    "family": "Méthode / savoir-faire",
+    "definition": "Capacité à recueillir, protéger, contextualiser et exploiter la parole de l’enfant victime dans un cadre adapté, confidentiel et coordonné.",
+    "entities": [
+      "Centre de recherche de la Gendarmerie nationale"
+    ],
+    "domains": [
+      "Criminalités"
+    ],
+    "publications": [
+      {
+        "publication_id": "PUB090",
+        "titre": "lutte contre la pédocriminalité",
+        "annee": "2026",
+        "organisme": "Centre de recherche de la Gendarmerie nationale",
+        "image_path": "/images/publications/PUB090.png",
+        "url_contenu": "https://www.gendarmerie.interieur.gouv.fr/crgn/content/download/60033/file/PEPS%20-%20Lutte%20contre%20la%20p%C3%A9docriminalit%C3%A9%20-%20Rapport%20V1.pdf",
+        "url_source": "https://www.gendarmerie.interieur.gouv.fr/crgn/actus/le-rapport-peps-lutte-contre-la-pedocriminalite-est-disponible",
+        "has_graph": false
+      }
+    ],
+    "associated": [
+      {
+        "id": "ME155",
+        "count": 1
+      }
+    ],
+    "publication_count": 1,
+    "degree": 1
+  }
+]

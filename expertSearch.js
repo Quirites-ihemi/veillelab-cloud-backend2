@@ -160,7 +160,6 @@ async function callSelector({ apiKey, query }) {
       properties: {
         selected: {
           type: "array",
-          maxItems: MAX_SELECTED_EXPERTS,
           items: {
             type: "object",
             properties: {

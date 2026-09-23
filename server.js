@@ -15,6 +15,7 @@ const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
 const { runReflectionAssist } = require("./reflectionAssist");
 const { searchExperts } = require("./expertSearch");
+const { searchReflectionCorpus } = require("./reflectionSearch");
 
 const PORT = process.env.PORT || 8080;
 
@@ -793,6 +794,12 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, result);
     }
 
+    if (req.method === "POST" && req.url === "/reflection-assist") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const result = runReflectionAssist(body);
+      return sendJson(res, 200, result);
+    }
+
     if (req.method === "POST" && req.url === "/expert-search") {
       const body = await readJsonBody(req, 512 * 1024);
       const apiKey = await getAnthropicApiKey();
@@ -800,9 +807,10 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 200, result);
     }
 
-    if (req.method === "POST" && req.url === "/reflection-assist") {
-      const body = await readJsonBody(req, 512 * 1024);
-      const result = runReflectionAssist(body);
+    if (req.method === "POST" && req.url === "/reflection-search") {
+      const body = await readJsonBody(req, 1024 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await searchReflectionCorpus({ apiKey, body });
       return sendJson(res, 200, result);
     }
 

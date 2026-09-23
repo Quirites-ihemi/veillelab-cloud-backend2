@@ -14,6 +14,7 @@ const { createGraphChatHandler } = require("./graphChat");
 const { getCorpusStatus } = require("./corpusStore");
 const { searchCorpus } = require("./globalSearch");
 const { runReflectionAssist } = require("./reflectionAssist");
+const { searchExperts } = require("./expertSearch");
 
 const PORT = process.env.PORT || 8080;
 
@@ -789,6 +790,13 @@ const server = http.createServer(async (req, res) => {
     if (req.method === "POST" && req.url === "/corpus-search") {
       const body = await readJsonBody(req, 512 * 1024);
       const result = searchCorpus(body);
+      return sendJson(res, 200, result);
+    }
+
+    if (req.method === "POST" && req.url === "/expert-search") {
+      const body = await readJsonBody(req, 512 * 1024);
+      const apiKey = await getAnthropicApiKey();
+      const result = await searchExperts({ apiKey, body });
       return sendJson(res, 200, result);
     }
 

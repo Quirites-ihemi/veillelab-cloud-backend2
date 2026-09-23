@@ -25,6 +25,7 @@
 
 const { searchCorpus } = require('./globalSearch');
 const { enrichSource } = require('./t06');
+const { getCorpusStore } = require('./corpusStore');
 
 const MODEL_T06_V2 = process.env.ANTHROPIC_MODEL_T06 || process.env.ANTHROPIC_MODEL || 'claude-haiku-4-5-20251001';
 
@@ -40,7 +41,24 @@ const CFG = {
   MAX_PER_PUBLICATION: 3,
   // Types de résultats admis comme preuve (doivent porter un repère précis).
   EVIDENCE_KINDS: (process.env.T06_EVIDENCE_KINDS || 'chunk').split(',').map(s => s.trim()).filter(Boolean),
-  ACCENT_VARIANTS: process.env.T06_ACCENT_VARIANTS !== 'off'
+  ACCENT_VARIANTS: process.env.T06_ACCENT_VARIANTS !== 'off',
+
+  // --- Rappel par concept et expansion contrôlée (V2.1) ---
+  // Rappel isolé de chaque concept du sujet : sert à repérer les concepts
+  // que le corpus ne porte que dans une ou deux publications.
+  CONCEPT_RECALL_LIMIT: 8,
+  // Un concept est dit discriminant lorsque son rappel isolé est faible.
+  // La rareté est un signal de discrimination, jamais une preuve de pertinence.
+  DISCRIMINANT_MAX_HITS: 6,
+  MAX_DISCRIMINANT_CONCEPTS: 2,
+  // Expansion : bornée, non récursive, cantonnée aux publications visées.
+  MAX_EXPANSION_TERMS: 3,
+  EXPANSION_SEARCH_LIMIT: 6,
+  EXPANSION_MIN_TERM_LENGTH: 6,
+  // Places réservées, à l'intérieur de MAX_CANDIDATES_TO_FILTER, aux matériaux
+  // issus du rappel contrôlé. Sans cette réserve, une passe principale abondante
+  // occuperait les 24 places et l'expansion serait perdue avant évaluation.
+  RESERVED_RECALL_SLOTS: 8
 };
 
 // ---------------------------------------------------------------------
@@ -92,12 +110,42 @@ const STOP = new Set([
   'veiller', 'suivre', 'surveiller', 'observer', 'analyser', 'etudier', 'evolution', 'evolutions', 'tendance',
   'tendances', 'sujet', 'question', 'questions', 'concernant', 'autour', 'niveau', 'echelle', 'theme', 'thematique',
   'phenomene', 'phenomenes', 'dynamique', 'dynamiques', 'enjeu', 'enjeux', 'plus', 'entre', 'tout', 'tous',
-  'notamment', 'mieux', 'comprendre', 'transformations', 'transformation', 'actuelles', 'actuels', 'recentes', 'recents'
+  'notamment', 'mieux', 'comprendre', 'transformations', 'transformation', 'actuelles', 'actuels', 'recentes', 'recents',
+  // Formes conjuguées et mots d'amorce : ils expriment la démarche du veilleur,
+  // jamais le sujet documentaire. Complètent le retrait des amorces ci-dessous.
+  'fais', 'fait', 'faisais', 'ferai', 'ferais', 'fais-je', 'recherche', 'rechercher', 'trouver',
+  'dois', 'vais', 'compte', 'actuellement', 'lancer', 'demarrer', 'conduire', 'mener', 'realiser',
+  'interesse', 'interessent', 'propos', 'besoin', 'besoins'
 ]);
+
+// Amorces fonctionnelles : formulations qui décrivent l'acte de veille et non
+// son objet. Elles sont retirées AVANT le découpage en mots, pour qu'aucun de
+// leurs termes ne puisse devenir un concept documentaire. La liste est courte
+// et auditable ; les mots substantifs du besoin ne sont jamais touchés.
+const NEED_LEAD_INS = [
+  /^\s*j[e'’]\s*(?:ne\s+)?(?:fais|faisais|ferai|ferais)\s+(?:actuellement\s+)?(?:une|de\s+la|ma|notre)?\s*veille\s*(?:sur|autour\s+de|[àa]\s+propos\s+de|au\s+sujet\s+de|concernant|portant\s+sur|relative\s+[àa])?\s*/i,
+  /^\s*j[e'’]\s*(?:veux|voudrais|souhaite|souhaiterais|aimerais|compte|dois|vais)\s+(?:faire|mettre\s+en\s+place|lancer|d[ée]marrer|conduire|mener|r[ée]aliser)?\s*(?:une|de\s+la|ma|notre)?\s*veille\s*(?:sur|autour\s+de|[àa]\s+propos\s+de|au\s+sujet\s+de|concernant|portant\s+sur)?\s*/i,
+  /^\s*j[e'’]\s*(?:cherche|recherche)\s+(?:des?\s+|les\s+|quelques\s+)?(?:[ée]l[ée]ments?|informations?|donn[ée]es|documents?|publications?|mat[ée]riaux?|sources?|choses?)?\s*(?:sur|[àa]\s+propos\s+de|au\s+sujet\s+de|concernant|autour\s+de)?\s*/i,
+  /^\s*j[e'’]\s*m[e'’]?\s*int[ée]resse\s+(?:[àa]|aux|au)\s*/i,
+  /^\s*(?:mise\s+en\s+place\s+d[e'’]une\s+veille|besoin\s+de\s+veille|sujet\s+de\s+veille)\s*(?:sur|concernant|autour\s+de|portant\s+sur)?\s*/i,
+  /^\s*(?:une|ma|notre|la)\s+veille\s+(?:sur|autour\s+de|concernant|portant\s+sur)\s*/i,
+  /^\s*veille\s+(?:sur|autour\s+de|concernant|portant\s+sur)\s*/i
+];
+
+// Retire la première amorce reconnue. Une seule passe : aucune récursion,
+// aucun risque d'éroder le besoin mot après mot.
+function stripLeadIn(need = '') {
+  const text = String(need || '').trim();
+  for (const pattern of NEED_LEAD_INS) {
+    const stripped = text.replace(pattern, '');
+    if (stripped !== text && stripped.trim()) return stripped.trim();
+  }
+  return text;
+}
 
 // Requête sujet déterministe : mots porteurs du besoin, accents conservés.
 function subjectQueryFromNeed(need = '') {
-  const tokens = String(need).replace(/[’']/g, ' ').split(/[^\p{L}\p{N}-]+/u).filter(Boolean);
+  const tokens = stripLeadIn(need).replace(/[’']/g, ' ').split(/[^\p{L}\p{N}-]+/u).filter(Boolean);
   const kept = [];
   const seen = new Set();
   for (const t of tokens) {
@@ -157,6 +205,256 @@ function runSearch(searchFn, query, limit) {
     results.push(r);
   }
   return { results, raw_count: raw.length, non_evidence_count: nonEvidence, engine: response?.engine || '' };
+}
+
+// ---------------------------------------------------------------------
+// RAPPEL PAR CONCEPT ET EXPANSION CONTRÔLÉE (V2.1)
+//
+// Le rappel est élargi, la preuve ne l'est pas : seuls des chunks entrent
+// dans les matériaux évalués. Les libellés du graphe ne servent qu'à
+// retrouver les chunks, jamais à les remplacer.
+// ---------------------------------------------------------------------
+
+function runScopedSearch(searchFn, query, limit, publicationIds) {
+  let response;
+  try {
+    response = searchFn({
+      query,
+      limit,
+      max_per_publication: CFG.MAX_PER_PUBLICATION,
+      diversify_by_publication: true,
+      publication_ids: publicationIds,
+      kinds: CFG.EVIDENCE_KINDS
+    });
+  } catch (error) {
+    return { results: [], raw_count: 0, error: String(error?.message || error) };
+  }
+  const raw = Array.isArray(response?.results) ? response.results : [];
+  return { results: raw.filter(isEvidence), raw_count: raw.length, error: null };
+}
+
+function conceptsOf(subjectQuery) {
+  return String(subjectQuery || '').split(/\s+/).map(s => s.trim()).filter(Boolean);
+}
+
+function publicationsOf(results) {
+  return [...new Set(results.map(r => r.publication_id).filter(Boolean))];
+}
+
+// Rappel isolé de chaque concept : on mesure combien le corpus en porte,
+// et dans quelles publications. Un concept peu porté est discriminant.
+function conceptRecall(searchFn, subjectQuery) {
+  const out = [];
+  const errors = [];
+  for (const concept of conceptsOf(subjectQuery)) {
+    let response;
+    try {
+      response = searchFn({
+        query: withAccentVariant(concept),
+        limit: CFG.CONCEPT_RECALL_LIMIT,
+        max_per_publication: CFG.MAX_PER_PUBLICATION,
+        diversify_by_publication: true
+      });
+    } catch (error) {
+      errors.push(`${concept} : ${String(error?.message || error)}`);
+      out.push({ concept, resultats: 0, plafonne: false, publications: [], results: [] });
+      continue;
+    }
+    const raw = Array.isArray(response?.results) ? response.results : [];
+    out.push({
+      concept,
+      resultats: raw.length,
+      // Le rappel est volontairement plafonné : au-delà, le concept est
+      // manifestement courant et ne peut pas être discriminant.
+      plafonne: raw.length >= CFG.CONCEPT_RECALL_LIMIT,
+      publications: publicationsOf(raw),
+      results: raw.filter(isEvidence)
+    });
+  }
+  return { recalls: out, errors };
+}
+
+function pickDiscriminantConcepts(recalls) {
+  return recalls
+    .filter(r => r.resultats > 0 && r.resultats <= CFG.DISCRIMINANT_MAX_HITS)
+    .sort((a, b) => a.resultats - b.resultats || a.concept.localeCompare(b.concept, 'fr'))
+    .slice(0, CFG.MAX_DISCRIMINANT_CONCEPTS);
+}
+
+// Fréquence documentaire des mots du graphe, calculée une fois par processus.
+let graphIndexCache = null;
+function graphIndex() {
+  if (graphIndexCache) return graphIndexCache;
+  const labelsByPublication = new Map();
+  let store;
+  try {
+    store = getCorpusStore();
+  } catch (error) {
+    // Échec technique : on ne met rien en cache et on le signale, pour qu'il ne
+    // soit jamais confondu avec un graphe sans libellés.
+    return {
+      labelsByPublication,
+      documentFrequency: new Map(),
+      publicationCount: 1,
+      error: `Accès au corpus impossible : ${String(error?.message || error)}`
+    };
+  }
+  for (const node of (store.nodes || [])) {
+    const publicationId = String(node?.publication_id || '').trim();
+    const label = String(node?.libelle || '').trim();
+    if (!publicationId || !label) continue;
+    if (!labelsByPublication.has(publicationId)) labelsByPublication.set(publicationId, []);
+    labelsByPublication.get(publicationId).push(label);
+  }
+  const documentFrequency = new Map();
+  for (const labels of labelsByPublication.values()) {
+    const seen = new Set(normalize(labels.join(' ')).split(' ').filter(t => t.length >= CFG.EXPANSION_MIN_TERM_LENGTH));
+    for (const term of seen) documentFrequency.set(term, (documentFrequency.get(term) || 0) + 1);
+  }
+  graphIndexCache = {
+    labelsByPublication,
+    documentFrequency,
+    publicationCount: Math.max(1, labelsByPublication.size),
+    error: null
+  };
+  return graphIndexCache;
+}
+
+// Termes métier des seules publications visées, pondérés par leur rareté
+// dans le graphe. Aucun dictionnaire, aucune donnée extérieure au corpus.
+function graphExpansionTerms(publicationIds, subjectQuery) {
+  const index = graphIndex();
+  if (index.error) return { terms: [], error: index.error };
+  const queryTerms = new Set(normalize(subjectQuery).split(' ').filter(Boolean));
+  const weights = new Map();
+  for (const publicationId of publicationIds) {
+    const labels = index.labelsByPublication.get(publicationId);
+    if (!labels) continue;
+    const tokens = normalize(labels.join(' ')).split(' ')
+      .filter(t => t.length >= CFG.EXPANSION_MIN_TERM_LENGTH && !queryTerms.has(t) && !/^[0-9]+$/.test(t));
+    const frequency = new Map();
+    for (const token of tokens) frequency.set(token, (frequency.get(token) || 0) + 1);
+    for (const [token, count] of frequency) {
+      const df = index.documentFrequency.get(token) || 1;
+      const weight = count * Math.log(index.publicationCount / df);
+      if (weight > (weights.get(token) || 0)) weights.set(token, weight);
+    }
+  }
+  const terms = [...weights.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'fr'))
+    .slice(0, CFG.MAX_EXPANSION_TERMS)
+    .map(([term]) => term);
+  return { terms, error: null };
+}
+
+// Une seule passe d'expansion, terme par terme, bornée aux publications visées.
+function expandCandidates(searchFn, terms, publicationIds) {
+  const seen = new Set();
+  const results = [];
+  const errors = [];
+  for (const term of terms) {
+    const { results: found, error } = runScopedSearch(searchFn, term, CFG.EXPANSION_SEARCH_LIMIT, publicationIds);
+    if (error) errors.push(`${term} : ${error}`);
+    for (const r of found) {
+      const id = String(r.result_id || '').trim();
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      results.push(r);
+    }
+  }
+  return { results, errors };
+}
+
+// Orchestration du rappel : passe principale, rappel par concept, puis
+// expansion uniquement si un concept discriminant désigne des publications
+// que la passe principale n'a jamais atteintes.
+function collectSubjectCandidates(searchFn, subjectQuery, searchQuery) {
+  const main = runSearch(searchFn, searchQuery, CFG.SUBJECT_SEARCH_LIMIT);
+  const { recalls, errors: recallErrors } = conceptRecall(searchFn, subjectQuery);
+  const discriminants = pickDiscriminantConcepts(recalls);
+
+  const seen = new Set();
+  const origins = new Map();
+  const mainPool = [];
+  const recallPool = [];
+  const expansionPool = [];
+  const push = (r, origine, pool) => {
+    const id = String(r?.result_id || '').trim();
+    if (!id || seen.has(id)) return;
+    seen.add(id);
+    origins.set(id, origine);
+    pool.push(r);
+  };
+
+  main.results.forEach(r => push(r, 'passe_principale', mainPool));
+
+  const mainPublications = new Set(publicationsOf(main.results));
+  const targeted = [...new Set(
+    discriminants.flatMap(d => d.publications).filter(p => p && !mainPublications.has(p))
+  )];
+
+  // Les chunks déjà rapportés par un concept discriminant entrent directement.
+  discriminants.forEach(d => d.results.forEach(r => push(r, 'rappel_concept', recallPool)));
+
+  let expansionTerms = [];
+  let expansionErrors = [];
+  let graphError = null;
+  if (targeted.length) {
+    const expansion = graphExpansionTerms(targeted, subjectQuery);
+    expansionTerms = expansion.terms;
+    graphError = expansion.error;
+    if (expansionTerms.length) {
+      const { results, errors } = expandCandidates(searchFn, expansionTerms, targeted);
+      expansionErrors = errors;
+      results.forEach(r => push(r, 'expansion_graphe', expansionPool));
+    }
+  }
+
+  return {
+    mainPool,
+    recallPool,
+    expansionPool,
+    origins,
+    main,
+    recalls,
+    discriminants,
+    targeted,
+    expansionTerms,
+    expansionCount: expansionPool.length,
+    errors: {
+      rappel: recallErrors.length ? recallErrors.join(' ; ') : null,
+      expansion: expansionErrors.length ? expansionErrors.join(' ; ') : null,
+      graphe: graphError
+    }
+  };
+}
+
+// Fusion bornée : la passe principale ne peut pas occuper à elle seule les
+// MAX_CANDIDATES_TO_FILTER places. Une réserve est tenue pour le rappel
+// contrôlé — expansion d'abord, car c'est le signal le plus fragile — et
+// toute place réservée non utilisée retourne à la passe principale.
+function mergeCandidates({ mainPool, recallPool, expansionPool }, max = CFG.MAX_CANDIDATES_TO_FILTER) {
+  const reservePool = [...expansionPool, ...recallPool];
+  const reserved = Math.min(reservePool.length, CFG.RESERVED_RECALL_SLOTS, max);
+  const mainQuota = Math.max(0, max - reserved);
+
+  const merged = mainPool.slice(0, mainQuota);
+  merged.push(...reservePool.slice(0, reserved));
+
+  // Places restantes : on complète avec ce qui n'a pas encore été pris.
+  if (merged.length < max) {
+    for (const r of reservePool.slice(reserved)) {
+      if (merged.length >= max) break;
+      merged.push(r);
+    }
+  }
+  if (merged.length < max) {
+    for (const r of mainPool.slice(mainQuota)) {
+      if (merged.length >= max) break;
+      merged.push(r);
+    }
+  }
+  return merged.slice(0, max);
 }
 
 // ---------------------------------------------------------------------
@@ -419,8 +717,10 @@ async function proposerAxesV2({ apiKey, besoin = '', sujet_requete = '', searchF
   if (!subjectQuery) { const e = new Error('Impossible de dériver une requête sujet du besoin.'); e.statusCode = 400; throw e; }
 
   const searchQuery = withAccentVariant(subjectQuery);
-  const search = runSearch(searchFn, searchQuery, CFG.SUBJECT_SEARCH_LIMIT);
-  const candidates = search.results.slice(0, CFG.MAX_CANDIDATES_TO_FILTER);
+  const recall = collectSubjectCandidates(searchFn, subjectQuery, searchQuery);
+  const candidates = mergeCandidates(recall);
+  const originCount = origine => candidates.filter(r => recall.origins.get(r.result_id) === origine).length;
+  const rappelEnEchec = Boolean(recall.errors.rappel || recall.errors.expansion || recall.errors.graphe);
 
   const base = {
     ok: true,
@@ -429,14 +729,44 @@ async function proposerAxesV2({ apiKey, besoin = '', sujet_requete = '', searchF
     need,
     subject_query: subjectQuery,
     diagnostic: {
+      requete_nettoyee: subjectQuery,
       requete_envoyee: searchQuery,
-      resultats_bruts: search.raw_count,
-      resultats_non_probants_ecartes: search.non_evidence_count,
+      rappels_par_concept: recall.recalls.map(r => ({
+        concept: r.concept,
+        resultats: r.resultats,
+        plafonne: r.plafonne,
+        publications: r.publications
+      })),
+      concepts_discriminants: recall.discriminants.map(d => ({
+        concept: d.concept,
+        resultats: d.resultats,
+        publications: d.publications
+      })),
+      termes_expansion: recall.expansionTerms,
+      publications_ciblees: recall.targeted,
+      chunks_passe_principale: recall.main.results.length,
+      chunks_expansion: recall.expansionCount,
+      candidats_par_origine: {
+        passe_principale: originCount('passe_principale'),
+        rappel_concept: originCount('rappel_concept'),
+        expansion_graphe: originCount('expansion_graphe')
+      },
+      erreur_rappel: recall.errors.rappel,
+      erreur_expansion: recall.errors.expansion,
+      erreur_graphe: recall.errors.graphe,
+      resultats_bruts: recall.main.raw_count,
+      resultats_non_probants_ecartes: recall.main.non_evidence_count,
       candidats_evalues: candidates.length
     }
   };
 
   if (!candidates.length) {
+    // Un échec technique du rappel ne doit jamais être lu comme un silence
+    // documentaire : il reçoit son propre statut.
+    if (rappelEnEchec) {
+      return { ...base, statut: 'rappel_indisponible', materiaux_valides: [], materiaux_ecartes: [], axes: [], rejets: [],
+        message: 'Le mécanisme de rappel a rencontré une erreur technique : l’absence de résultat ne peut pas être interprétée comme un corpus muet.' };
+    }
     return { ...base, statut: 'corpus_muet', materiaux_valides: [], materiaux_ecartes: [], axes: [], rejets: [],
       message: 'La recherche corpus ne renvoie aucun matériau exploitable pour ce sujet.' };
   }
@@ -446,6 +776,15 @@ async function proposerAxesV2({ apiKey, besoin = '', sujet_requete = '', searchF
   const validatedView = validated.map(k => ({ ...enrichSource(k.r, candidates), raison_pertinence: k.raison, extrait_appui: k.extrait }));
   base.diagnostic.materiaux_valides = validated.length;
   base.diagnostic.publications_validees = publicationCount(validated.map(k => k.r));
+
+  // Trois états distincts, jamais confondus :
+  //   corpus_muet              : aucun candidat après tout le mécanisme de rappel
+  //   aucun_materiau_pertinent : des candidats évalués, aucun retenu par le filtre
+  //   corpus_insuffisant       : au moins un matériau pertinent, pas assez pour un axe
+  if (!validated.length) {
+    return { ...base, statut: 'aucun_materiau_pertinent', materiaux_valides: [], materiaux_ecartes: excluded, axes: [], rejets: [],
+      message: `${candidates.length} matériaux ont été évalués, aucun ne traite directement du sujet.` };
+  }
 
   if (validated.length < CFG.MIN_ANCHORS_PER_AXIS) {
     return { ...base, statut: 'corpus_insuffisant', materiaux_valides: validatedView, materiaux_ecartes: excluded, axes: [], rejets: [],
@@ -775,7 +1114,13 @@ module.exports = {
   construireObjetsAxeV2,
   // exportés pour les tests
   subjectQueryFromNeed,
+  stripLeadIn,
   withAccentVariant,
+  conceptRecall,
+  pickDiscriminantConcepts,
+  graphExpansionTerms,
+  collectSubjectCandidates,
+  mergeCandidates,
   quoteFound,
   validateObjects,
   aliasList,

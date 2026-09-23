@@ -1,7 +1,7 @@
 // =====================================================
 // QUIRITÈS VEILLE LAB — RECHERCHE DÉDIÉE
 // « AVANCER AVEC LE CORPUS »
-// V1.0 : sujet réel -> retrieval large -> validation stricte -> diversification finale.
+// V1.1 : contexte du canevas -> sujet réel -> retrieval large -> centralité -> diversification finale.
 //
 // Ce moteur est volontairement isolé de /corpus-search :
 // - globalSearch.js reste inchangé ;
@@ -17,6 +17,7 @@ const MAX_ATTEMPTS = 4;
 const MAX_RETRIEVAL_QUERIES = 4;
 const RETRIEVAL_LIMIT_PER_QUERY = 24;
 const MAX_VALIDATION_CANDIDATES = 48;
+const MAX_CANVAS_CONTEXT_CARDS = 10;
 
 const NEED_LABELS = {
   overview: 'comprendre rapidement ce que le corpus contient sur un thème',
@@ -142,9 +143,12 @@ const INTERPRET_TOOL = {
       subject_query: { type: 'string' },
       retrieval_queries: { type: 'array', items: { type: 'string' } },
       intent_note: { type: 'string' },
+      intent_type: { type: 'string', enum: ['overview', 'precise', 'trends', 'actors', 'public-action', 'unspecified'] },
+      context_used: { type: 'boolean' },
+      context_subject: { type: 'string' },
       reason: { type: 'string' }
     },
-    required: ['sufficient', 'subject_query', 'retrieval_queries', 'intent_note', 'reason'],
+    required: ['sufficient', 'subject_query', 'retrieval_queries', 'intent_note', 'intent_type', 'context_used', 'context_subject', 'reason'],
     additionalProperties: false
   }
 };
@@ -162,9 +166,10 @@ const VALIDATE_TOOL = {
           properties: {
             result_id: { type: 'string' },
             relevance: { type: 'string', enum: ['directe', 'contexte_necessaire'] },
+            centrality: { type: 'string', enum: ['objet_central', 'appui_explicite'] },
             reason: { type: 'string' }
           },
-          required: ['result_id', 'relevance', 'reason'],
+          required: ['result_id', 'relevance', 'centrality', 'reason'],
           additionalProperties: false
         }
       },
@@ -186,19 +191,33 @@ function needInstruction(needId) {
     return 'Retenir uniquement les matériaux qui portent réellement sur le sujet ET documentent un acteur ou son rôle sur ce sujet.';
   }
   if (needId === 'public-action') {
-    return 'Retenir uniquement les matériaux qui portent réellement sur le sujet ET documentent une réponse, un dispositif, un instrument, une mise en œuvre ou un acteur d’action publique.';
+    return 'Retenir uniquement les matériaux qui documentent une politique, une réponse, un dispositif, un instrument, une mise en œuvre ou un acteur d’action publique DONT LE SUJET DEMANDÉ EST EXPLICITEMENT L’OBJET. Une politique portant sur un autre problème qui mentionne seulement le sujet dans une liste, une priorité voisine ou une phrase de contexte doit être rejetée.';
   }
-  return 'Pour une vue d’ensemble, accepter plusieurs facettes du sujet, mais uniquement si le matériau traite réellement du sujet demandé.';
+  return 'Pour une vue d’ensemble, accepter plusieurs facettes du sujet, mais uniquement si le matériau traite réellement du sujet demandé. Une mention incidente ne constitue pas une facette.';
 }
 
-async function interpretQuery({ apiKey, query, needId, callClaudeFn }) {
+async function interpretQuery({ apiKey, query, needId, contextSubject = '', canvasContext = [], callClaudeFn }) {
   const tokens = meaningfulTokens(query);
-  if (!tokens.length) {
+  const cleanContextSubject = String(contextSubject || '').trim().slice(0, 300);
+  const cleanCanvasContext = (Array.isArray(canvasContext) ? canvasContext : [])
+    .slice(0, MAX_CANVAS_CONTEXT_CARDS)
+    .map(card => ({
+      title: String(card?.title || '').trim().slice(0, 140),
+      kind: String(card?.kind || '').trim().slice(0, 80),
+      text: String(card?.text || '').replace(/\s+/g, ' ').trim().slice(0, 420),
+      selected: Boolean(card?.selected)
+    }))
+    .filter(card => card.title || card.text);
+
+  if (!tokens.length && !cleanContextSubject && !cleanCanvasContext.length) {
     return {
       sufficient: false,
       subject_query: '',
       retrieval_queries: [],
       intent_note: '',
+      intent_type: 'unspecified',
+      context_used: false,
+      context_subject: '',
       reason: 'La demande ne contient pas encore de sujet documentaire suffisamment précis.'
     };
   }
@@ -208,7 +227,21 @@ Tu prépares une recherche documentaire dans un corpus fermé Quiritès.
 Tu ne réponds jamais à la question et tu n'ajoutes aucun fait.
 
 OBJECTIF
-Isoler le sujet documentaire réel de la formulation naturelle de l'utilisateur.
+Isoler le SUJET DOCUMENTAIRE réel de la formulation naturelle de l'utilisateur, et distinguer ce sujet de son intention documentaire.
+
+CONTEXTE DU CANEVAS
+Un contexte actif et quelques post-it peuvent être fournis. Ils servent uniquement à résoudre une formulation elliptique ou anaphorique : « ce sujet », « cela », « ces politiques », « et les acteurs ? », « qu'en est-il ? », etc.
+- Une requête explicite prévaut TOUJOURS sur le contexte du canevas.
+- Si la requête nomme un nouveau sujet, ignore l'ancien contexte pour définir le sujet.
+- Si la requête ne nomme pas son sujet mais renvoie clairement au travail en cours, utilise le contexte minimal nécessaire.
+- N'additionne jamais tous les thèmes du canevas : choisis uniquement le sujet nécessaire pour comprendre la demande courante.
+- Si ni la requête ni le contexte ne permettent d'identifier un sujet thématique, sufficient=false.
+
+SÉPARER SUJET ET INTENTION
+- subject_query = uniquement le thème/objet substantiel recherché, avec ses qualificatifs discriminants.
+- Ne mets pas dans subject_query les mots qui expriment seulement l'action attendue : « politiques publiques », « acteurs », « évolutions », « éléments d'analyse », « que dit la recherche », etc., sauf s'ils font réellement partie du thème lui-même.
+- intent_type décrit l'intention : overview, precise, trends, actors, public-action, ou unspecified.
+- Le besoin documentaire sélectionné dans l'interface est un indice d'intention, pas un sujet.
 
 RÈGLES
 - Retire les formulations conversationnelles ou fonctionnelles : « je souhaite », « je veux », « avoir des éléments d'analyse », « que dit la recherche », « en matière de », etc.
@@ -218,7 +251,9 @@ RÈGLES
 - Les variantes peuvent utiliser des synonymes ou variantes grammaticales, mais ne doivent jamais élargir vers un thème voisin.
 - Ne transforme pas une sous-catégorie en thème général et ne transforme pas un thème général en sous-catégorie arbitraire.
 - Un mot générique comme « analyse », « recherche », « évolution », « sécurité », « risque », « territoire » ne doit jamais devenir le sujet à lui seul.
-- Si le sujet est trop vague ou absent, sufficient=false.
+- Une demande portant seulement sur « les politiques publiques », « les acteurs » ou « les évolutions », sans thème explicite ni contexte exploitable, est insuffisante.
+- context_used=true uniquement si le contexte du canevas a réellement été nécessaire pour résoudre le sujet de cette requête.
+- context_subject = le sujet contextuel effectivement utilisé ; sinon chaîne vide.
 `;
 
   const input = await callClaudeFn({
@@ -227,20 +262,27 @@ RÈGLES
     tool: INTERPRET_TOOL,
     userText: JSON.stringify({
       besoin_documentaire: NEED_LABELS[needId] || NEED_LABELS.overview,
-      requete_utilisateur: query
+      requete_utilisateur: query,
+      contexte_actif: cleanContextSubject || null,
+      contexte_canevas: cleanCanvasContext
     }, null, 2),
-    maxTokens: 1000
+    maxTokens: 1200
   });
 
   const subject = String(input?.subject_query || '').trim();
   const sufficient = Boolean(input?.sufficient && subject);
   const retrieval = dedupeStrings([subject, ...(Array.isArray(input?.retrieval_queries) ? input.retrieval_queries : [])]);
+  const allowedIntents = new Set(['overview', 'precise', 'trends', 'actors', 'public-action', 'unspecified']);
+  const intentType = allowedIntents.has(input?.intent_type) ? input.intent_type : 'unspecified';
 
   return {
     sufficient,
     subject_query: sufficient ? subject : '',
     retrieval_queries: sufficient ? retrieval : [],
     intent_note: String(input?.intent_note || '').trim(),
+    intent_type: intentType,
+    context_used: Boolean(input?.context_used && sufficient),
+    context_subject: input?.context_used && sufficient ? String(input?.context_subject || cleanContextSubject || subject).trim() : '',
     reason: String(input?.reason || '').trim()
   };
 }
@@ -318,7 +360,7 @@ function validationPayload(candidates) {
       section: item.section || '',
       locator: item.locator || '',
       matched_queries: entry.matchedQueries,
-      material: clip(candidateText(item), 520)
+      material: clip(candidateText(item), 1000)
     };
   });
 }
@@ -337,21 +379,33 @@ RÈGLE FONDAMENTALE
 Un matériau n'est retenu que s'il apporte réellement quelque chose au sujet demandé.
 Une simple proximité de vocabulaire, un mot générique commun, un thème voisin, un contexte institutionnel proche ou le titre d'une publication ne suffisent jamais.
 
+TEST DE CENTRALITÉ OBLIGATOIRE
+Avant de sélectionner un matériau, demande-toi : « si je retirais la mention du sujet demandé, le passage continuerait-il à traiter essentiellement d'un autre problème ? »
+- Si oui, le sujet n'est qu'une mention incidente : REJET.
+- objet_central = le passage porte principalement sur le sujet demandé ou sur une composante explicitement rattachée à ce sujet.
+- appui_explicite = le passage ne porte pas principalement sur le sujet, mais établit un lien explicite et indispensable avec lui. Cette catégorie doit rester rare.
+- Une simple occurrence dans une liste, une priorité voisine, une comparaison, un exemple périphérique ou une phrase de transition n'est jamais un appui explicite.
+
 À REJETER NOTAMMENT
 - un passage qui contient seulement une partie générique des mots de la demande ;
 - un passage où le même mot est employé dans un autre sens ;
 - un passage sur un domaine voisin sans lien explicite avec le sujet ;
+- un passage qui traite d'une autre politique publique et ne fait que citer le sujet demandé parmi d'autres enjeux ;
 - un passage rendu « pertinent » uniquement par une inférence extérieure au matériau ;
 - un résultat ajouté uniquement pour diversifier les publications.
 
+EXEMPLES DE REJET DE PRINCIPE
+- un passage consacré aux discriminations qui mentionne la radicalisation parmi d'autres priorités n'est pas une politique publique de lutte contre la radicalisation ;
+- un passage consacré au changement climatique qui mentionne des « risques cyber » n'est pas, pour cette seule raison, un matériau sur la cybercriminalité.
+
 À RETENIR
 - pertinence directe : le matériau traite explicitement du sujet ;
-- contexte nécessaire : le matériau est explicitement relié au sujet et nécessaire pour comprendre ce qui est demandé.
+- contexte nécessaire : seulement si le lien avec le sujet est explicite et réellement nécessaire pour répondre à la demande.
 
 ${needInstruction(needId)}
 
 La fiabilité prime sur le nombre de résultats. Il est préférable de sélectionner zéro matériau plutôt qu'un faux positif.
-Pour chaque résultat sélectionné, donne une justification très brève fondée uniquement sur le matériau fourni.
+Pour chaque résultat sélectionné, indique aussi sa centralité et donne une justification très brève fondée uniquement sur le matériau fourni.
 `;
 
   const input = await callClaudeFn({
@@ -374,13 +428,14 @@ Pour chaque résultat sélectionné, donne une justification très brève fondé
   };
 }
 
-function finalizeValidated(candidates, validation, body) {
+function finalizeValidated(candidates, validation, body, effectiveNeedId = 'overview') {
   const selectedMap = new Map();
   for (const selected of validation.selected || []) {
     const id = String(selected?.result_id || '').trim();
     if (!id || selectedMap.has(id)) continue;
     selectedMap.set(id, {
       relevance: selected?.relevance === 'contexte_necessaire' ? 'contexte_necessaire' : 'directe',
+      centrality: selected?.centrality === 'appui_explicite' ? 'appui_explicite' : 'objet_central',
       reason: String(selected?.reason || '').trim()
     });
   }
@@ -390,6 +445,9 @@ function finalizeValidated(candidates, validation, body) {
     const id = String(entry?.item?.result_id || '').trim();
     const decision = selectedMap.get(id);
     if (!decision) continue;
+    // Pour une recherche d'action publique, une simple information d'appui ne suffit pas :
+    // le matériau retenu doit réellement avoir le sujet comme objet central.
+    if (effectiveNeedId === 'public-action' && decision.centrality !== 'objet_central') continue;
     validated.push({
       ...entry,
       validation: decision
@@ -397,9 +455,11 @@ function finalizeValidated(candidates, validation, body) {
   }
 
   validated.sort((a, b) => {
+    const ac = a.validation.centrality === 'objet_central' ? 2 : 1;
+    const bc = b.validation.centrality === 'objet_central' ? 2 : 1;
     const ar = a.validation.relevance === 'directe' ? 2 : 1;
     const br = b.validation.relevance === 'directe' ? 2 : 1;
-    return br - ar || b.hits - a.hits || b.bestScore - a.bestScore;
+    return bc - ac || br - ar || b.hits - a.hits || b.bestScore - a.bestScore;
   });
 
   const limit = Math.max(1, Math.min(60, Number(body.limit) || 30));
@@ -420,6 +480,7 @@ function finalizeValidated(candidates, validation, body) {
       score: Number(entry.bestScore.toFixed(3)),
       semantic_validation: {
         relevance: entry.validation.relevance,
+        centrality: entry.validation.centrality,
         reason: entry.validation.reason,
         matched_queries: entry.matchedQueries
       }
@@ -449,14 +510,19 @@ async function searchReflectionCorpus({
   }
 
   const needId = Object.prototype.hasOwnProperty.call(NEED_LABELS, body.need_id) ? body.need_id : 'overview';
-  const interpretation = await interpretQuery({ apiKey, query, needId, callClaudeFn });
+  const contextSubject = String(body.context_subject || '').trim();
+  const canvasContext = Array.isArray(body.canvas_context) ? body.canvas_context : [];
+  const interpretation = await interpretQuery({ apiKey, query, needId, contextSubject, canvasContext, callClaudeFn });
+  const detectedSpecialIntent = ['trends', 'actors', 'public-action'].includes(interpretation.intent_type) ? interpretation.intent_type : null;
+  const effectiveNeedId = detectedSpecialIntent && (needId === 'overview' || needId === 'precise') ? detectedSpecialIntent : needId;
 
   if (!interpretation.sufficient) {
     return {
       ok: true,
-      engine: 'reflection-search-v1.0-semantic-gate',
+      engine: 'reflection-search-v1.1-context-centrality',
       query,
       need_id: needId,
+      effective_need_id: effectiveNeedId,
       interpretation,
       search: {
         retrieval_queries: [],
@@ -489,19 +555,20 @@ async function searchReflectionCorpus({
   const validation = await validateCandidates({
     apiKey,
     query,
-    needId,
+    needId: effectiveNeedId,
     interpretation,
     candidates,
     callClaudeFn
   });
-  const results = finalizeValidated(candidates, validation, body);
+  const results = finalizeValidated(candidates, validation, body, effectiveNeedId);
   const publications = new Set(results.map(item => item.publication_id).filter(Boolean));
 
   return {
     ok: true,
-    engine: 'reflection-search-v1.0-semantic-gate',
+    engine: 'reflection-search-v1.1-context-centrality',
     query,
     need_id: needId,
+    effective_need_id: effectiveNeedId,
     interpretation,
     corpus: corpusMeta,
     search: {

@@ -27,6 +27,13 @@ const NEED_LABELS = {
   'public-action': 'voir comment l’action publique répond au problème'
 };
 
+const CORPUS_SCOPE = {
+  corpus_type: 'bulletin_quirites',
+  closed_corpus: true,
+  label: 'Publications du bulletin Quiritès intégrées au corpus actif',
+  limitation_message: 'Une absence ou une faible couverture dans ce corpus ne signifie pas que le sujet est absent de la littérature ou des connaissances disponibles en dehors du bulletin.'
+};
+
 const QUERY_NOISE = new Set([
   'je','j','veux','voudrais','souhaite','souhaiterais','cherche','recherche','rechercher','trouver','avoir','obtenir','repérer','reperer',
   'des','de','du','d','un','une','le','la','les','l','en','dans','sur','pour','au','aux','avec','qui','que','quoi','dit','dire',
@@ -520,6 +527,7 @@ async function searchReflectionCorpus({
     return {
       ok: true,
       engine: 'reflection-search-v1.1-context-centrality',
+      scope: CORPUS_SCOPE,
       query,
       need_id: needId,
       effective_need_id: effectiveNeedId,
@@ -566,6 +574,7 @@ async function searchReflectionCorpus({
   return {
     ok: true,
     engine: 'reflection-search-v1.1-context-centrality',
+    scope: CORPUS_SCOPE,
     query,
     need_id: needId,
     effective_need_id: effectiveNeedId,

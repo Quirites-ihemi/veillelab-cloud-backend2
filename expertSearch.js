@@ -5,7 +5,8 @@ const publications = require(path.join(__dirname, "corpus", "publications.json")
 const expertiseNodes = require(path.join(__dirname, "corpus", "expertise_nodes.json"));
 
 const MODEL_EXPERTS = process.env.MODEL_EXPERTS || "claude-haiku-4-5-20251001";
-const MAX_SELECTED_EXPERTS = 27;
+const MAX_RETRIEVED_UNITS = 36;
+const MAX_FINAL_EXPERTS = 27;
 
 function clean(value) {
   return String(value == null ? "" : value).trim();
@@ -52,6 +53,7 @@ for (const expertise of expertiseNodes || []) {
     definition: clean(expertise?.definition)
   };
   if (!compact.id || !compact.label) continue;
+
   for (const publication of expertise?.publications || []) {
     const publicationId = clean(publication?.publication_id);
     if (!publicationId || !PUBLICATION_BY_ID.has(publicationId)) continue;
@@ -77,14 +79,10 @@ function buildExpertProfiles() {
     for (const name of authors) {
       const key = norm(name);
       if (!byName.has(key)) {
-        byName.set(key, {
-          name,
-          publications: []
-        });
+        byName.set(key, { name, publications: [] });
       }
 
-      const profile = byName.get(key);
-      profile.publications.push({
+      byName.get(key).publications.push({
         publication_id: publicationId,
         titre: clean(pub?.titre),
         année_publication: clean(pub?.["année_publication"] || pub?.annee_publication),
@@ -113,6 +111,42 @@ const EXPERT_PROFILES = buildExpertProfiles();
 const PROFILE_BY_ID = new Map(EXPERT_PROFILES.map(x => [x.profile_id, x]));
 const DIRECTORY_EXPERTS = EXPERT_PROFILES.length;
 
+function buildEvidenceUnits() {
+  const units = new Map();
+
+  for (const profile of EXPERT_PROFILES) {
+    for (const pub of profile.publications) {
+      for (const expertise of pub.expertises) {
+        const unitId = `${pub.publication_id}::${expertise.id}`;
+        if (!units.has(unitId)) {
+          units.set(unitId, {
+            unit_id: unitId,
+            publication_id: pub.publication_id,
+            publication_title: pub.titre,
+            organisation: pub.organisme_producteur,
+            domain: pub.domaine,
+            expertise_id: expertise.id,
+            expertise_label: expertise.label,
+            expertise_family: expertise.family,
+            expertise_definition: expertise.definition,
+            profile_ids: []
+          });
+        }
+        const unit = units.get(unitId);
+        if (!unit.profile_ids.includes(profile.profile_id)) unit.profile_ids.push(profile.profile_id);
+      }
+    }
+  }
+
+  return [...units.values()].sort((a, b) =>
+    a.publication_id.localeCompare(b.publication_id) ||
+    a.expertise_id.localeCompare(b.expertise_id)
+  );
+}
+
+const EVIDENCE_UNITS = buildEvidenceUnits();
+const EVIDENCE_UNIT_BY_ID = new Map(EVIDENCE_UNITS.map(x => [x.unit_id, x]));
+
 const QUERY_NOISE = new Set([
   "je","j","veux","voudrais","souhaite","souhaiterais","cherche","recherche","rechercher","besoin","avoir","trouver","identifier","repérer","reperer",
   "un","une","des","de","du","d","en","dans","sur","pour","au","aux","le","la","les","l","qui","que","quoi","est","suis","soit",
@@ -127,114 +161,13 @@ function contentTokens(query) {
 }
 
 function queryIsUnderspecified(query) {
-  const tokens = contentTokens(query);
-  return tokens.length === 0;
+  return contentTokens(query).length === 0;
 }
 
-function compactProfileForModel(profile) {
-  return {
-    profile_id: profile.profile_id,
-    name: profile.name,
-    publication_contexts: profile.publications.map(pub => ({
-      publication_id: pub.publication_id,
-      title: pub.titre,
-      organisation: pub.organisme_producteur,
-      domain: pub.domaine,
-      micro_expertises: pub.expertises.map(x => ({
-        id: x.id,
-        label: x.label,
-        family: x.family,
-        definition: x.definition
-      }))
-    }))
-  };
-}
-
-async function callSelector({ apiKey, query }) {
-  const tool = {
-    name: "selectionner_experts",
-    description: "Sélectionne uniquement les experts dont le profil documentaire apporte une preuve directe et suffisamment précise de l'expertise demandée.",
-    strict: true,
-    input_schema: {
-      type: "object",
-      properties: {
-        selected: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              profile_id: { type: "string" },
-              reason: { type: "string" },
-              evidence: {
-                type: "array",
-                minItems: 1,
-                items: {
-                  type: "object",
-                  properties: {
-                    publication_id: { type: "string" },
-                    expertise_ids: {
-                      type: "array",
-                      minItems: 1,
-                      items: { type: "string" }
-                    }
-                  },
-                  required: ["publication_id", "expertise_ids"],
-                  additionalProperties: false
-                }
-              }
-            },
-            required: ["profile_id", "reason", "evidence"],
-            additionalProperties: false
-          }
-        }
-      },
-      required: ["selected"],
-      additionalProperties: false
-    }
-  };
-
-  const system = `
-Tu es un filtre documentaire STRICT chargé d'identifier des EXPERTS MINISTÉRIELS à partir d'un corpus fermé.
-
-Tu ne sélectionnes PAS d'abord des micro-expertises globales. Tu évalues CHAQUE PERSONNE à partir de son propre profil documentaire.
-
-Chaque profil contient :
-- les publications effectivement associées à cette personne dans le corpus ;
-- pour chaque publication, uniquement les micro-expertises rattachées à CETTE publication.
-
-OBJECTIF :
-Retenir une personne uniquement si son propre profil fournit une preuve directe, précise et cohérente de l'expertise demandée.
-
-RÈGLES IMPÉRATIVES :
-- Utilise exclusivement les profils fournis. Aucune connaissance extérieure.
-- La présence d'un nom comme auteur permet seulement d'entrer dans le répertoire ; elle ne suffit JAMAIS à prouver l'expertise demandée.
-- Un domaine général de publication ne suffit jamais à qualifier une expertise.
-- Une simple proximité lexicale ne suffit jamais.
-- Ne transfère JAMAIS une micro-expertise d'une publication à une autre publication qui porte le même identifiant de micro-expertise.
-- Une micro-expertise générique comme « analyse géospatiale », « traitement et analyse des données » ou « analyse comparative » ne prouve pas, à elle seule, une expertise thématique. Le CONTEXTE DE LA PUBLICATION doit aussi correspondre au sujet demandé.
-- Toute dimension essentielle de la demande doit être soutenue par la MÊME preuve documentaire : sujet + nature de l'expertise + qualificatifs utiles.
-- Ne combine pas artificiellement un mot provenant d'une micro-expertise avec un autre mot provenant d'une publication sans rapport pour fabriquer une expertise.
-- Distingue strictement les champs voisins : criminologie, analyse criminelle, criminalistique, statistiques de délinquance, politique publique de sécurité, prévention, etc. Ils ne sont pas interchangeables.
-- Distingue strictement le SUJET étudié de la NATURE DE L'EXPERTISE demandée.
-- Une expertise statistique ou descriptive sur un phénomène ne devient pas une expertise de conception, de pilotage ou de mise en œuvre d'une politique publique.
-- Pour une demande large portant seulement sur un sujet (ex. immigration), une publication et des micro-expertises explicitement consacrées à ce sujet ou à ses dimensions administratives peuvent constituer une preuve suffisante.
-- Pour une demande technique ou professionnelle précise (ex. analyse criminelle), n'accepte pas des compétences seulement voisines ou génériques : la pratique demandée doit être explicitement documentée par le profil.
-- Si aucune personne ne satisfait ces critères, retourne selected: [].
-- En cas de doute, ne sélectionne pas.
-
-PREUVE OBLIGATOIRE :
-Pour chaque personne retenue, fournis au moins un bloc evidence contenant :
-- un publication_id appartenant réellement à son profil ;
-- un ou plusieurs expertise_ids appartenant réellement à cette même publication ;
-- un reason bref expliquant pourquoi CET ensemble précis répond à la demande.
-`;
-
-  const catalogForModel = EXPERT_PROFILES.map(compactProfileForModel);
-  const userText = `DEMANDE :\n${query}\n\nPROFILS DOCUMENTAIRES FERMÉS :\n${JSON.stringify(catalogForModel)}`;
-
+async function callAnthropicTool({ apiKey, tool, system, userText, maxTokens = 2200 }) {
   const payload = {
     model: MODEL_EXPERTS,
-    max_tokens: 2600,
+    max_tokens: maxTokens,
     temperature: 0,
     system,
     tools: [tool],
@@ -255,12 +188,14 @@ Pour chaque personne retenue, fournis au moins un bloc evidence contenant :
       body: JSON.stringify(payload),
       signal: controller.signal
     });
+
     const text = await response.text();
     if (!response.ok) {
       const err = new Error(`Anthropic HTTP ${response.status}: ${text.slice(0, 800)}`);
       err.statusCode = response.status;
       throw err;
     }
+
     const json = JSON.parse(text);
     const toolUse = (json.content || []).find(b => b?.type === "tool_use" && b.name === tool.name);
     if (!toolUse?.input) {
@@ -274,35 +209,220 @@ Pour chaque personne retenue, fournis au moins un bloc evidence contenant :
   }
 }
 
-function validateSelection(selection) {
-  const out = [];
+function compactEvidenceUnit(unit) {
+  return {
+    unit_id: unit.unit_id,
+    publication_id: unit.publication_id,
+    publication_title: unit.publication_title,
+    organisation: unit.organisation,
+    domain: unit.domain,
+    expertise_id: unit.expertise_id,
+    expertise_label: unit.expertise_label,
+    expertise_family: unit.expertise_family,
+    expertise_definition: unit.expertise_definition
+  };
+}
+
+async function retrieveRelevantEvidence({ apiKey, query }) {
+  const tool = {
+    name: "selectionner_preuves_expertise",
+    description: "Repère les unités documentaires qui peuvent réellement documenter l'expertise demandée, sans encore décider quels auteurs sont experts.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        selected_units: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              unit_id: { type: "string" },
+              reason: { type: "string" }
+            },
+            required: ["unit_id", "reason"],
+            additionalProperties: false
+          }
+        }
+      },
+      required: ["selected_units"],
+      additionalProperties: false
+    }
+  };
+
+  const system = `
+Tu réalises l'ÉTAPE 1 d'un moteur documentaire d'identification d'experts ministériels.
+
+Tu ne sélectionnes PAS des personnes. Tu sélectionnes des UNITÉS DE PREUVE rattachées à une publication précise.
+Chaque unité associe : une micro-expertise validée + le titre, le domaine et l'organisme de la publication qui la documente.
+
+OBJECTIF :
+Retrouver avec un BON RAPPEL les unités réellement pertinentes pour la demande, afin qu'une seconde étape plus stricte valide ensuite les experts.
+
+RÈGLES :
+- Utilise exclusivement les unités fournies. Aucune connaissance extérieure.
+- Raisonne sur le sens, les reformulations et les équivalences sémantiques normales : par exemple « effets » peut correspondre à « impacts » si le reste du contexte est cohérent.
+- Une demande large portant sur un THÈME (ex. « sécurité routière », « changement climatique sur les territoires », « immigration ») peut être documentée par des micro-expertises de problème public, d'instrument ou de méthode clairement ancrées dans ce thème.
+- Une demande portant sur une PRATIQUE ou une NATURE D'EXPERTISE précise (ex. « analyse criminelle », « politique publique de lutte contre la délinquance », « pilotage ») exige des unités dont la micro-expertise ET/OU le contexte explicite de la publication soutiennent cette nature précise.
+- Le TITRE de publication est une composante de preuve importante : il peut préciser le thème ou la nature de l'expertise quand le libellé de micro-expertise est plus générique.
+- Ne sélectionne pas une méthode générique (« analyse géospatiale », « traitement des données », etc.) uniquement parce qu'un mot de la demande apparaît : le contexte de la publication doit aussi être pertinent.
+- Ne confonds pas des champs voisins : criminologie, analyse criminelle, criminalistique, statistiques de délinquance, politique publique de sécurité, prévention, etc.
+- N'exige pas à cette étape une certitude absolue sur la PERSONNE : si une unité est substantiellement pertinente, inclus-la. La seconde étape éliminera les faux positifs.
+- Si aucune unité n'est réellement pertinente, retourne selected_units: [].
+`;
+
+  const userText = `DEMANDE :\n${query}\n\nUNITÉS DOCUMENTAIRES FERMÉES :\n${JSON.stringify(EVIDENCE_UNITS.map(compactEvidenceUnit))}`;
+  const raw = await callAnthropicTool({ apiKey, tool, system, userText, maxTokens: 2200 });
+
+  const selected = [];
   const seen = new Set();
+  for (const item of raw?.selected_units || []) {
+    const unitId = clean(item?.unit_id);
+    if (!EVIDENCE_UNIT_BY_ID.has(unitId) || seen.has(unitId)) continue;
+    seen.add(unitId);
+    selected.push({ unit_id: unitId, reason: clean(item?.reason) });
+    if (selected.length >= MAX_RETRIEVED_UNITS) break;
+  }
+  return selected;
+}
 
-  for (const item of selection?.selected || []) {
+function buildCandidateProfiles(retrievedUnits) {
+  const byProfile = new Map();
+
+  for (const retrieved of retrievedUnits) {
+    const unit = EVIDENCE_UNIT_BY_ID.get(retrieved.unit_id);
+    if (!unit) continue;
+
+    for (const profileId of unit.profile_ids) {
+      const profile = PROFILE_BY_ID.get(profileId);
+      if (!profile) continue;
+      if (!byProfile.has(profileId)) {
+        byProfile.set(profileId, {
+          profile_id: profileId,
+          name: profile.name,
+          publication_contexts: []
+        });
+      }
+
+      const candidate = byProfile.get(profileId);
+      let context = candidate.publication_contexts.find(x => x.publication_id === unit.publication_id);
+      if (!context) {
+        context = {
+          publication_id: unit.publication_id,
+          title: unit.publication_title,
+          organisation: unit.organisation,
+          domain: unit.domain,
+          selected_evidence: []
+        };
+        candidate.publication_contexts.push(context);
+      }
+
+      if (!context.selected_evidence.some(x => x.unit_id === unit.unit_id)) {
+        context.selected_evidence.push({
+          unit_id: unit.unit_id,
+          expertise_id: unit.expertise_id,
+          expertise_label: unit.expertise_label,
+          expertise_family: unit.expertise_family,
+          expertise_definition: unit.expertise_definition,
+          retrieval_reason: retrieved.reason
+        });
+      }
+    }
+  }
+
+  return [...byProfile.values()].sort((a, b) => a.name.localeCompare(b.name, "fr"));
+}
+
+async function validateCandidateExperts({ apiKey, query, candidates }) {
+  const tool = {
+    name: "valider_experts",
+    description: "Valide uniquement les experts dont le contexte documentaire propre établit suffisamment l'expertise demandée.",
+    strict: true,
+    input_schema: {
+      type: "object",
+      properties: {
+        selected: {
+          type: "array",
+          items: {
+            type: "object",
+            properties: {
+              profile_id: { type: "string" },
+              reason: { type: "string" },
+              evidence_unit_ids: {
+                type: "array",
+                items: { type: "string" }
+              }
+            },
+            required: ["profile_id", "reason", "evidence_unit_ids"],
+            additionalProperties: false
+          }
+        }
+      },
+      required: ["selected"],
+      additionalProperties: false
+    }
+  };
+
+  const system = `
+Tu réalises l'ÉTAPE 2, stricte, d'un moteur documentaire d'identification d'experts ministériels.
+
+L'étape 1 a présélectionné des unités de preuve potentiellement pertinentes. Tu dois maintenant décider si le PROFIL DOCUMENTAIRE PROPRE de chaque personne établit réellement l'expertise demandée.
+
+RÈGLES IMPÉRATIVES :
+- Utilise exclusivement les candidats et unités fournis. Aucune connaissance extérieure.
+- Une signature seule n'est jamais une preuve suffisante.
+- Chaque unité est strictement rattachée à SA publication : ne transfère jamais une micro-expertise vers une autre publication ou un autre contexte.
+- Pour une demande LARGE DE THÈME (ex. « sécurité routière », « effets du changement climatique sur les territoires », « immigration »), accepte un profil quand sa propre publication et ses unités sélectionnées portent explicitement et substantiellement sur ce thème. N'exige pas que le libellé contienne mot pour mot la demande.
+- Pour une demande de PRATIQUE, MÉTHODE ou RÔLE précis (ex. « analyse criminelle », « pilotage d'une politique publique »), exige une preuve de cette nature précise ; un domaine voisin ne suffit pas.
+- Pour une demande de POLITIQUE PUBLIQUE, une publication explicitement consacrée aux politiques publiques correspondantes peut constituer un contexte probant, même si la micro-expertise associée est formulée comme méthode ou mise en perspective. En revanche, une simple publication statistique sur le phénomène ne suffit pas.
+- Une méthode générique (« analyse géospatiale », « traitement et analyse des données », etc.) ne suffit jamais seule à prouver une expertise thématique : le titre et le sujet de la publication doivent confirmer la pertinence.
+- Distingue les champs voisins : criminologie / analyse criminelle / criminalistique ; statistiques de délinquance / politique publique de lutte contre la délinquance ; étude d'un risque / pilotage d'une politique de prévention.
+- Si plusieurs personnes sont coauteurs de la même publication et qu'aucune donnée du corpus ne permet de distinguer leurs contributions, traite-les de la même façon : ne crée pas artificiellement une différence.
+- En cas de doute substantiel, ne retiens pas la personne.
+- Pour chaque personne retenue, cite uniquement des evidence_unit_ids présents dans son profil candidat.
+- Si aucune personne n'est suffisamment étayée, retourne selected: [].
+`;
+
+  const userText = `DEMANDE :\n${query}\n\nCANDIDATS ET PREUVES PRÉSÉLECTIONNÉES :\n${JSON.stringify(candidates)}`;
+  return callAnthropicTool({ apiKey, tool, system, userText, maxTokens: 2200 });
+}
+
+function validateFinalSelection(rawSelection, candidates) {
+  const candidateById = new Map(candidates.map(x => [x.profile_id, x]));
+  const out = [];
+  const seenProfiles = new Set();
+
+  for (const item of rawSelection?.selected || []) {
     const profileId = clean(item?.profile_id);
-    const profile = PROFILE_BY_ID.get(profileId);
-    if (!profile || seen.has(profileId)) continue;
+    const candidate = candidateById.get(profileId);
+    if (!candidate || seenProfiles.has(profileId)) continue;
 
-    const validEvidence = [];
-    for (const evidence of item?.evidence || []) {
-      const publicationId = clean(evidence?.publication_id);
-      const pub = profile.publications.find(p => p.publication_id === publicationId);
-      if (!pub) continue;
+    const allowedUnits = new Set(
+      candidate.publication_contexts.flatMap(ctx => ctx.selected_evidence.map(e => e.unit_id))
+    );
+    const unitIds = [...new Set((item?.evidence_unit_ids || []).map(clean).filter(id => allowedUnits.has(id)))];
+    if (!unitIds.length) continue;
 
-      const allowedIds = new Set(pub.expertises.map(x => x.id));
-      const expertiseIds = [...new Set((evidence?.expertise_ids || []).map(clean).filter(id => allowedIds.has(id)))];
-      if (!expertiseIds.length) continue;
-
-      validEvidence.push({ publication_id: publicationId, expertise_ids: expertiseIds });
+    const evidenceByPublication = new Map();
+    for (const unitId of unitIds) {
+      const unit = EVIDENCE_UNIT_BY_ID.get(unitId);
+      if (!unit || !unit.profile_ids.includes(profileId)) continue;
+      if (!evidenceByPublication.has(unit.publication_id)) evidenceByPublication.set(unit.publication_id, new Set());
+      evidenceByPublication.get(unit.publication_id).add(unit.expertise_id);
     }
 
-    if (!validEvidence.length) continue;
-    seen.add(profileId);
+    const evidence = [...evidenceByPublication.entries()].map(([publication_id, ids]) => ({
+      publication_id,
+      expertise_ids: [...ids]
+    }));
+    if (!evidence.length) continue;
+
+    seenProfiles.add(profileId);
     out.push({
       profile_id: profileId,
       reason: clean(item?.reason),
-      evidence: validEvidence
+      evidence
     });
+    if (out.length >= MAX_FINAL_EXPERTS) break;
   }
 
   return out;
@@ -377,22 +497,48 @@ function applyOptionalFilters(experts, body) {
   });
 }
 
-function stats() {
-  const uniqueExpertiseIds = new Set();
-  let publicationContexts = 0;
-  for (const profile of EXPERT_PROFILES) {
-    publicationContexts += profile.publications.length;
-    for (const pub of profile.publications) {
-      for (const expertise of pub.expertises) uniqueExpertiseIds.add(expertise.id);
-    }
-  }
+function stats(extra = {}) {
+  const uniqueExpertiseIds = new Set(EVIDENCE_UNITS.map(x => x.expertise_id));
   return {
     directory_experts: DIRECTORY_EXPERTS,
     searchable_expertises: uniqueExpertiseIds.size,
-    expert_publication_contexts: publicationContexts,
+    evidence_units: EVIDENCE_UNITS.length,
     total_expertises: Array.isArray(expertiseNodes) ? expertiseNodes.length : 0,
-    publications_available: Array.isArray(publications) ? publications.length : 0
+    publications_available: Array.isArray(publications) ? publications.length : 0,
+    ...extra
   };
+}
+
+function buildSelectedExpertises(selected) {
+  const selectedExpertises = [];
+  const seen = new Set();
+
+  for (const item of selected) {
+    const profile = PROFILE_BY_ID.get(item.profile_id);
+    if (!profile) continue;
+    for (const evidence of item.evidence) {
+      const pub = profile.publications.find(p => p.publication_id === evidence.publication_id);
+      if (!pub) continue;
+      const expertiseById = new Map(pub.expertises.map(x => [x.id, x]));
+      for (const id of evidence.expertise_ids) {
+        const expertise = expertiseById.get(id);
+        if (!expertise) continue;
+        const key = `${item.profile_id}:${evidence.publication_id}:${id}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        selectedExpertises.push({
+          id,
+          label: expertise.label,
+          family: expertise.family,
+          publication_id: evidence.publication_id,
+          expert: profile.name,
+          reason: item.reason
+        });
+      }
+    }
+  }
+
+  return selectedExpertises;
 }
 
 async function searchExperts({ apiKey, body = {} }) {
@@ -406,29 +552,44 @@ async function searchExperts({ apiKey, body = {} }) {
   if (queryIsUnderspecified(query)) {
     return {
       ok: true,
-      engine: "expert-search-v1.2-expert-profile",
+      engine: "expert-search-v1.3-two-stage",
       query,
       status: "insufficient_query",
       message: "Précisez le sujet ou la compétence recherchée avant de lancer la recherche.",
       selected_expertises: [],
       experts: [],
-      stats: stats()
+      stats: stats({ retrieved_units: 0, candidate_experts: 0 })
     };
   }
 
-  const rawSelection = await callSelector({ apiKey, query });
-  const selected = validateSelection(rawSelection);
+  const retrievedUnits = await retrieveRelevantEvidence({ apiKey, query });
+  if (!retrievedUnits.length) {
+    return {
+      ok: true,
+      engine: "expert-search-v1.3-two-stage",
+      query,
+      status: "no_relevant_evidence",
+      message: "Le référentiel ne contient pas de micro-expertise rattachée à une publication ministérielle suffisamment pertinente pour cette demande.",
+      selected_expertises: [],
+      experts: [],
+      stats: stats({ retrieved_units: 0, candidate_experts: 0 })
+    };
+  }
+
+  const candidates = buildCandidateProfiles(retrievedUnits);
+  const rawFinal = await validateCandidateExperts({ apiKey, query, candidates });
+  const selected = validateFinalSelection(rawFinal, candidates);
 
   if (!selected.length) {
     return {
       ok: true,
-      engine: "expert-search-v1.2-expert-profile",
+      engine: "expert-search-v1.3-two-stage",
       query,
       status: "no_matching_expert",
-      message: "Aucun des 27 profils documentaires ne fournit une preuve suffisamment précise de l'expertise demandée.",
+      message: "Des éléments du référentiel sont liés au sujet, mais aucun des profils ministériels associés ne fournit une preuve suffisamment précise de l'expertise demandée.",
       selected_expertises: [],
       experts: [],
-      stats: stats()
+      stats: stats({ retrieved_units: retrievedUnits.length, candidate_experts: candidates.length })
     };
   }
 
@@ -438,52 +599,28 @@ async function searchExperts({ apiKey, body = {} }) {
 
   const status = experts.length ? "ok" : "no_expert_after_filters";
   const message = status === "ok"
-    ? `${experts.length} expert${experts.length > 1 ? "s" : ""} documenté${experts.length > 1 ? "s" : ""} par une preuve directement rattachée à leur propre profil.`
+    ? `${experts.length} expert${experts.length > 1 ? "s" : ""} documenté${experts.length > 1 ? "s" : ""} par des preuves rattachées à leurs propres publications.`
     : "Des experts correspondent à la demande, mais aucun ne répond aux filtres Organisme/Domaine sélectionnés.";
-
-  const selectedExpertises = [];
-  const seenExpertiseKey = new Set();
-  for (const item of selected) {
-    const profile = PROFILE_BY_ID.get(item.profile_id);
-    for (const evidence of item.evidence) {
-      const pub = profile.publications.find(p => p.publication_id === evidence.publication_id);
-      if (!pub) continue;
-      const expertiseById = new Map(pub.expertises.map(x => [x.id, x]));
-      for (const id of evidence.expertise_ids) {
-        const expertise = expertiseById.get(id);
-        if (!expertise) continue;
-        const key = `${item.profile_id}:${evidence.publication_id}:${id}`;
-        if (seenExpertiseKey.has(key)) continue;
-        seenExpertiseKey.add(key);
-        selectedExpertises.push({
-          id,
-          label: expertise.label,
-          family: expertise.family,
-          publication_id: evidence.publication_id,
-          expert: profile.name,
-          reason: item.reason
-        });
-      }
-    }
-  }
 
   return {
     ok: true,
-    engine: "expert-search-v1.2-expert-profile",
+    engine: "expert-search-v1.3-two-stage",
     query,
     status,
     message,
-    selected_expertises: selectedExpertises,
+    selected_expertises: buildSelectedExpertises(selected),
     experts,
-    stats: stats(),
+    stats: stats({ retrieved_units: retrievedUnits.length, candidate_experts: candidates.length }),
     guardrails: {
       corpus_only: true,
-      expert_profile_first: true,
+      two_stage_retrieval_and_validation: true,
       publication_scoped_expertise: true,
       no_cross_publication_expertise_transfer: true,
       authorship_alone_is_not_expertise: true,
       generic_method_alone_is_not_thematic_expertise: true,
       lexical_match_alone_is_not_enough: true,
+      broad_topic_recall_preserved: true,
+      strict_final_validation: true,
       underspecified_query_guard: true
     }
   };
@@ -492,6 +629,7 @@ async function searchExperts({ apiKey, body = {} }) {
 module.exports = {
   searchExperts,
   EXPERT_PROFILES,
+  EVIDENCE_UNITS,
   queryIsUnderspecified,
   DIRECTORY_EXPERTS
 };

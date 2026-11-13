@@ -9403,5 +9403,3794 @@
     "libelle_normalise": "clarifier le principe d exclusivite pour les activites connexes par des doctrines evolutives",
     "page_source": "53",
     "chunk_id_source": "C0908"
+  },
+  {
+    "node_id": "N1215",
+    "publication_id": "PUB111",
+    "type_noeud": "probleme",
+    "libelle": "Délinquance enregistrée dans les transports en commun",
+    "libelle_normalise": "delinquance enregistree dans les transports en commun",
+    "page_source": "1;2;3;4;5;6;7",
+    "chunk_id_source": "C0910;C0911;C0912;C0913"
+  },
+  {
+    "node_id": "N1216",
+    "publication_id": "PUB111",
+    "type_noeud": "tendance",
+    "libelle": "Baisse du nombre de victimes enregistrées dans les transports en commun en 2025, au plus bas niveau depuis 2016",
+    "libelle_normalise": "baisse du nombre de victimes enregistrees dans les transports en commun en 2025 au plus bas niveau depuis 2016",
+    "page_source": "1;3",
+    "chunk_id_source": "C0909;C0916"
+  },
+  {
+    "node_id": "N1217",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Vols sans violence, atteinte la plus caractéristique de la délinquance dans les transports en commun",
+    "libelle_normalise": "vols sans violence atteinte la plus caracteristique de la delinquance dans les transports en commun",
+    "page_source": "1;3",
+    "chunk_id_source": "C0909;C0910"
+  },
+  {
+    "node_id": "N1218",
+    "publication_id": "PUB111",
+    "type_noeud": "tendance",
+    "libelle": "Baisse en 2025 des victimes de vols et d’escroqueries et fraudes aux moyens de paiement",
+    "libelle_normalise": "baisse en 2025 des victimes de vols et d escroqueries et fraudes aux moyens de paiement",
+    "page_source": "1;3;4",
+    "chunk_id_source": "C0909;C0917"
+  },
+  {
+    "node_id": "N1219",
+    "publication_id": "PUB111",
+    "type_noeud": "tendance",
+    "libelle": "Hausse en 2025 des victimes enregistrées de violences physiques ou sexuelles",
+    "libelle_normalise": "hausse en 2025 des victimes enregistrees de violences physiques ou sexuelles",
+    "page_source": "1;4",
+    "chunk_id_source": "C0909;C0919"
+  },
+  {
+    "node_id": "N1220",
+    "publication_id": "PUB111",
+    "type_noeud": "tendance",
+    "libelle": "Hausse en 2025 des mis en cause pour infractions liées aux stupéfiants dans les transports en commun",
+    "libelle_normalise": "hausse en 2025 des mis en cause pour infractions liees aux stupefiants dans les transports en commun",
+    "page_source": "1;4",
+    "chunk_id_source": "C0909;C0919"
+  },
+  {
+    "node_id": "N1221",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Forte concentration francilienne de la délinquance enregistrée dans les transports en commun",
+    "libelle_normalise": "forte concentration francilienne de la delinquance enregistree dans les transports en commun",
+    "page_source": "1;4",
+    "chunk_id_source": "C0911"
+  },
+  {
+    "node_id": "N1222",
+    "publication_id": "PUB111",
+    "type_noeud": "localisation",
+    "libelle": "Île-de-France",
+    "libelle_normalise": "ile de france",
+    "page_source": "1;4;5",
+    "chunk_id_source": "C0911"
+  },
+  {
+    "node_id": "N1223",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Concentration de plus de 80 % des victimes dans les 22 métropoles françaises",
+    "libelle_normalise": "concentration de plus de 80 des victimes dans les 22 metropoles francaises",
+    "page_source": "2;6",
+    "chunk_id_source": "C0923"
+  },
+  {
+    "node_id": "N1224",
+    "publication_id": "PUB111",
+    "type_noeud": "localisation",
+    "libelle": "Métropole du Grand Paris",
+    "libelle_normalise": "metropole du grand paris",
+    "page_source": "2;6",
+    "chunk_id_source": "C0923"
+  },
+  {
+    "node_id": "N1225",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Métropole du Grand Paris, environ la moitié des victimes enregistrées dans les transports en commun",
+    "libelle_normalise": "metropole du grand paris environ la moitie des victimes enregistrees dans les transports en commun",
+    "page_source": "2;6",
+    "chunk_id_source": "C0923"
+  },
+  {
+    "node_id": "N1226",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Différenciation des lieux de commission selon les réseaux de transport et les territoires",
+    "libelle_normalise": "differenciation des lieux de commission selon les reseaux de transport et les territoires",
+    "page_source": "1;5",
+    "chunk_id_source": "C0911"
+  },
+  {
+    "node_id": "N1227",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des victimes étrangères dans les transports en commun, particulièrement pour les vols sans violence",
+    "libelle_normalise": "surrepresentation des victimes etrangeres dans les transports en commun particulierement pour les vols sans violence",
+    "page_source": "2",
+    "chunk_id_source": "C0912"
+  },
+  {
+    "node_id": "N1228",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des étrangers parmi les mis en cause dans les transports en commun",
+    "libelle_normalise": "surrepresentation des etrangers parmi les mis en cause dans les transports en commun",
+    "page_source": "2",
+    "chunk_id_source": "C0913"
+  },
+  {
+    "node_id": "N1229",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des mineurs parmi les mis en cause pour vols avec violence dans les transports en commun",
+    "libelle_normalise": "surrepresentation des mineurs parmi les mis en cause pour vols avec violence dans les transports en commun",
+    "page_source": "2",
+    "chunk_id_source": "C0913"
+  },
+  {
+    "node_id": "N1230",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Filières de criminalité organisée exploitant notamment des mineurs isolés",
+    "libelle_normalise": "filieres de criminalite organisee exploitant notamment des mineurs isoles",
+    "page_source": "2",
+    "chunk_id_source": "C0913"
+  },
+  {
+    "node_id": "N1231",
+    "publication_id": "PUB111",
+    "type_noeud": "notion_idee",
+    "libelle": "Diminution du nombre de victimes rapporté au nombre de voyages en Île-de-France en 2025",
+    "libelle_normalise": "diminution du nombre de victimes rapporte au nombre de voyages en ile de france en 2025",
+    "page_source": "1;5",
+    "chunk_id_source": "C0921"
+  },
+  {
+    "node_id": "N1232",
+    "publication_id": "PUB111",
+    "type_noeud": "acteur",
+    "libelle": "Service statistique ministériel de la sécurité intérieure",
+    "libelle_normalise": "service statistique ministeriel de la securite interieure",
+    "page_source": "1;2;3;4;5;6;7;8",
+    "chunk_id_source": "C0925"
+  },
+  {
+    "node_id": "N1233",
+    "publication_id": "PUB111",
+    "type_noeud": "acteur",
+    "libelle": "Police nationale",
+    "libelle_normalise": "police nationale",
+    "page_source": "1;2;5;7",
+    "chunk_id_source": "C0914"
+  },
+  {
+    "node_id": "N1234",
+    "publication_id": "PUB111",
+    "type_noeud": "acteur",
+    "libelle": "Gendarmerie nationale",
+    "libelle_normalise": "gendarmerie nationale",
+    "page_source": "1;2",
+    "chunk_id_source": "C0914"
+  },
+  {
+    "node_id": "N1235",
+    "publication_id": "PUB111",
+    "type_noeud": "expert_public",
+    "libelle": "Fanny Simões",
+    "libelle_normalise": "fanny simoes",
+    "page_source": "8",
+    "chunk_id_source": "C0925"
+  },
+  {
+    "node_id": "N1236",
+    "publication_id": "PUB112",
+    "type_noeud": "probleme",
+    "libelle": "Disparités territoriales des victimations déclarées et des craintes d’être victime",
+    "libelle_normalise": "disparites territoriales des victimations declarees et des craintes d etre victime",
+    "page_source": "1",
+    "chunk_id_source": "C0926;C0927;C0928"
+  },
+  {
+    "node_id": "N1237",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des victimations déclarées dans les départements les plus densément peuplés",
+    "libelle_normalise": "surrepresentation des victimations declarees dans les departements les plus densement peuples",
+    "page_source": "1",
+    "chunk_id_source": "C0926;C0927;C0928"
+  },
+  {
+    "node_id": "N1238",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "Île-de-France",
+    "libelle_normalise": "ile de france",
+    "page_source": "1;2;5;8;10;12;13",
+    "chunk_id_source": "C0926;C0927"
+  },
+  {
+    "node_id": "N1239",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "Paris",
+    "libelle_normalise": "paris",
+    "page_source": "1;5;6;8;10;12",
+    "chunk_id_source": "C0927;C0935;C0939;C0941;C0942"
+  },
+  {
+    "node_id": "N1240",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Décalage territorial entre victimation déclarée et peur d’être victime pour les atteintes aux biens",
+    "libelle_normalise": "decalage territorial entre victimation declaree et peur d etre victime pour les atteintes aux biens",
+    "page_source": "1;3;4;5;6;7",
+    "chunk_id_source": "C0927;C0935;C0939;C0941;C0942"
+  },
+  {
+    "node_id": "N1241",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Cambriolages davantage déclarés dans les départements densément peuplés",
+    "libelle_normalise": "cambriolages davantage declares dans les departements densement peuples",
+    "page_source": "1;2;3;4;5",
+    "chunk_id_source": "C0926;C0928;C0933;C0934;C0936"
+  },
+  {
+    "node_id": "N1242",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Peur du cambriolage relativement homogène sur le territoire et parfois plus forte dans des départements moins touchés",
+    "libelle_normalise": "peur du cambriolage relativement homogene sur le territoire et parfois plus forte dans des departements moins touches",
+    "page_source": "1;3;4;5",
+    "chunk_id_source": "C0933"
+  },
+  {
+    "node_id": "N1243",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "Cher",
+    "libelle_normalise": "cher",
+    "page_source": "1;3;4",
+    "chunk_id_source": "C0933;C0934"
+  },
+  {
+    "node_id": "N1244",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Cher : forte peur du cambriolage malgré une victimation inférieure à la moyenne nationale",
+    "libelle_normalise": "cher forte peur du cambriolage malgre une victimation inferieure a la moyenne nationale",
+    "page_source": "1;3;4",
+    "chunk_id_source": "C0928;C0933"
+  },
+  {
+    "node_id": "N1245",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "Aube",
+    "libelle_normalise": "aube",
+    "page_source": "3;4",
+    "chunk_id_source": "C0928;C0933"
+  },
+  {
+    "node_id": "N1246",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Aube : forte peur du cambriolage malgré une faible victimation déclarée",
+    "libelle_normalise": "aube forte peur du cambriolage malgre une faible victimation declaree",
+    "page_source": "3;4",
+    "chunk_id_source": "C0933"
+  },
+  {
+    "node_id": "N1247",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "Corse",
+    "libelle_normalise": "corse",
+    "page_source": "1;3;4;6;10",
+    "chunk_id_source": "C0928;C0934;C0936"
+  },
+  {
+    "node_id": "N1248",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Corse : faibles niveaux de victimation et d’inquiétude par rapport à la moyenne nationale",
+    "libelle_normalise": "corse faibles niveaux de victimation et d inquietude par rapport a la moyenne nationale",
+    "page_source": "1;3;4;6;10",
+    "chunk_id_source": "C0928;C0934;C0936;C0941"
+  },
+  {
+    "node_id": "N1249",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Vols sans violence concentrés dans les territoires urbains alors que la peur du vol ou du racket est beaucoup plus diffuse",
+    "libelle_normalise": "vols sans violence concentres dans les territoires urbains alors que la peur du vol ou du racket est beaucoup plus diffuse",
+    "page_source": "5;6;7",
+    "chunk_id_source": "C0935;C0936"
+  },
+  {
+    "node_id": "N1250",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Faible peur du vol ou du racket dans plusieurs départements ruraux, notamment le Cantal, l’Aveyron et la Lozère",
+    "libelle_normalise": "faible peur du vol ou du racket dans plusieurs departements ruraux notamment le cantal l aveyron et la lozere",
+    "page_source": "6;7",
+    "chunk_id_source": "C0935;C0936"
+  },
+  {
+    "node_id": "N1251",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Pour les atteintes aux personnes, correspondance territoriale plus forte entre victimation et peur d’être victime",
+    "libelle_normalise": "pour les atteintes aux personnes correspondance territoriale plus forte entre victimation et peur d etre victime",
+    "page_source": "1;10;11",
+    "chunk_id_source": "C0926;C0928;C0941"
+  },
+  {
+    "node_id": "N1252",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Injures et menaces : victimation et peur d’être victime associées à la densité du département",
+    "libelle_normalise": "injures et menaces victimation et peur d etre victime associees a la densite du departement",
+    "page_source": "10;11",
+    "chunk_id_source": "C0926;C0928;C0941"
+  },
+  {
+    "node_id": "N1253",
+    "publication_id": "PUB112",
+    "type_noeud": "localisation",
+    "libelle": "La Réunion",
+    "libelle_normalise": "la reunion",
+    "page_source": "1;9",
+    "chunk_id_source": "C0928;C0940"
+  },
+  {
+    "node_id": "N1254",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "La Réunion : forte peur du harcèlement sexuel malgré une victimation déclarée inférieure à la moyenne nationale",
+    "libelle_normalise": "la reunion forte peur du harcelement sexuel malgre une victimation declaree inferieure a la moyenne nationale",
+    "page_source": "9",
+    "chunk_id_source": "C0928;C0940"
+  },
+  {
+    "node_id": "N1255",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Concentration des vols d’objets dans ou sur les véhicules dans les départements les plus urbains",
+    "libelle_normalise": "concentration des vols d objets dans ou sur les vehicules dans les departements les plus urbains",
+    "page_source": "5",
+    "chunk_id_source": "C0935"
+  },
+  {
+    "node_id": "N1256",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des vols sans violence en dehors du logement à Paris et dans le Rhône",
+    "libelle_normalise": "surrepresentation des vols sans violence en dehors du logement a paris et dans le rhone",
+    "page_source": "5;6",
+    "chunk_id_source": "C0935"
+  },
+  {
+    "node_id": "N1257",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Faibles différences territoriales pour les débits frauduleux, escroqueries, arnaques et destructions par virus",
+    "libelle_normalise": "faibles differences territoriales pour les debits frauduleux escroqueries arnaques et destructions par virus",
+    "page_source": "6;7",
+    "chunk_id_source": "C0937"
+  },
+  {
+    "node_id": "N1258",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation du harcèlement sexuel déclaré à Paris",
+    "libelle_normalise": "surrepresentation du harcelement sexuel declare a paris",
+    "page_source": "8",
+    "chunk_id_source": "C0939"
+  },
+  {
+    "node_id": "N1259",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Harcèlement moral réparti de manière relativement uniforme sur le territoire",
+    "libelle_normalise": "harcelement moral reparti de maniere relativement uniforme sur le territoire",
+    "page_source": "10",
+    "chunk_id_source": "C0941"
+  },
+  {
+    "node_id": "N1260",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Surreprésentation des discriminations déclarées en Île-de-France",
+    "libelle_normalise": "surrepresentation des discriminations declarees en ile de france",
+    "page_source": "10;12;13",
+    "chunk_id_source": "C0941"
+  },
+  {
+    "node_id": "N1261",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Lien entre surreprésentation territoriale des discriminations et composition migratoire de la population",
+    "libelle_normalise": "lien entre surrepresentation territoriale des discriminations et composition migratoire de la population",
+    "page_source": "12;13",
+    "chunk_id_source": "C0942"
+  },
+  {
+    "node_id": "N1262",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Cumul des éditions 2022 à 2024 de l’enquête VRS pour permettre l’analyse départementale des victimations",
+    "libelle_normalise": "cumul des editions 2022 a 2024 de l enquete vrs pour permettre l analyse departementale des victimations",
+    "page_source": "2",
+    "chunk_id_source": "C0930"
+  },
+  {
+    "node_id": "N1263",
+    "publication_id": "PUB112",
+    "type_noeud": "notion_idee",
+    "libelle": "Représentation cartographique fondée sur l’écart à la moyenne nationale, avec seuils de robustesse et de diffusion",
+    "libelle_normalise": "representation cartographique fondee sur l ecart a la moyenne nationale avec seuils de robustesse et de diffusion",
+    "page_source": "3",
+    "chunk_id_source": "C0932"
+  },
+  {
+    "node_id": "N1264",
+    "publication_id": "PUB112",
+    "type_noeud": "acteur",
+    "libelle": "Service statistique ministériel de la sécurité intérieure",
+    "libelle_normalise": "service statistique ministeriel de la securite interieure",
+    "page_source": "1;2;3;4;5;6;7;8;9;10;11;12;13",
+    "chunk_id_source": "C0943"
+  },
+  {
+    "node_id": "N1265",
+    "publication_id": "PUB112",
+    "type_noeud": "expert_public",
+    "libelle": "Inès Karmous",
+    "libelle_normalise": "ines karmous",
+    "page_source": "13",
+    "chunk_id_source": "C0943"
+  },
+  {
+    "node_id": "N1266",
+    "publication_id": "PUB113",
+    "type_noeud": "probleme",
+    "libelle": "Feux de forêt et missions de la gendarmerie",
+    "libelle_normalise": "feux de foret et missions de la gendarmerie",
+    "page_source": "1;2;3;4",
+    "chunk_id_source": "C0944;C0947;C0949;C0952;C0957"
+  },
+  {
+    "node_id": "N1267",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Évolution de la gendarmerie d’un rôle de maintien de l’ordre vers un rôle de partenaire de la gestion de crise",
+    "libelle_normalise": "evolution de la gendarmerie d un role de maintien de l ordre vers un role de partenaire de la gestion de crise",
+    "page_source": "1;4",
+    "chunk_id_source": "C0944;C0957"
+  },
+  {
+    "node_id": "N1268",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Participation ancienne de la maréchaussée à la lutte contre les incendies dès le XVIe siècle",
+    "libelle_normalise": "participation ancienne de la marechaussee a la lutte contre les incendies des le xvie siecle",
+    "page_source": "1",
+    "chunk_id_source": "C0945"
+  },
+  {
+    "node_id": "N1269",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Le grand feu des Landes de 1949 comme moment de formalisation des missions de la gendarmerie face aux incendies",
+    "libelle_normalise": "le grand feu des landes de 1949 comme moment de formalisation des missions de la gendarmerie face aux incendies",
+    "page_source": "2",
+    "chunk_id_source": "C0947"
+  },
+  {
+    "node_id": "N1270",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Formalisation de trois missions : prévenir les incendies, lutter contre les feux et conduire l’enquête judiciaire",
+    "libelle_normalise": "formalisation de trois missions prevenir les incendies lutter contre les feux et conduire l enquete judiciaire",
+    "page_source": "2",
+    "chunk_id_source": "C0947"
+  },
+  {
+    "node_id": "N1271",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "À partir de 1973, alimentation de la base Prométhée par les groupements méditerranéens de gendarmerie",
+    "libelle_normalise": "a partir de 1973 alimentation de la base promethee par les groupements mediterraneens de gendarmerie",
+    "page_source": "3",
+    "chunk_id_source": "C0949"
+  },
+  {
+    "node_id": "N1272",
+    "publication_id": "PUB113",
+    "type_noeud": "acteur",
+    "libelle": "Base de données Prométhée",
+    "libelle_normalise": "base de donnees promethee",
+    "page_source": "3",
+    "chunk_id_source": "C0949"
+  },
+  {
+    "node_id": "N1273",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Développement de l’investigation sur les causes des incendies dans les années 1990",
+    "libelle_normalise": "developpement de l investigation sur les causes des incendies dans les annees 1990",
+    "page_source": "3",
+    "chunk_id_source": "C0950"
+  },
+  {
+    "node_id": "N1274",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Mobilisation d’équipes pluridisciplinaires associant pompiers, policiers et forestiers pour rechercher les causes des incendies",
+    "libelle_normalise": "mobilisation d equipes pluridisciplinaires associant pompiers policiers et forestiers pour rechercher les causes des incendies",
+    "page_source": "3",
+    "chunk_id_source": "C0950"
+  },
+  {
+    "node_id": "N1275",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Mobilisation des compétences cynophiles de la gendarmerie dans la recherche des causes d’incendie",
+    "libelle_normalise": "mobilisation des competences cynophiles de la gendarmerie dans la recherche des causes d incendie",
+    "page_source": "3",
+    "chunk_id_source": "C0951"
+  },
+  {
+    "node_id": "N1276",
+    "publication_id": "PUB113",
+    "type_noeud": "tendance",
+    "libelle": "Forte mobilisation opérationnelle de la gendarmerie lors des feux de l’été 2026",
+    "libelle_normalise": "forte mobilisation operationnelle de la gendarmerie lors des feux de l ete 2026",
+    "page_source": "3;4",
+    "chunk_id_source": "C0952"
+  },
+  {
+    "node_id": "N1277",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Environ 90 % des feux de végétation sont d’origine humaine",
+    "libelle_normalise": "environ 90 des feux de vegetation sont d origine humaine",
+    "page_source": "4",
+    "chunk_id_source": "C0953"
+  },
+  {
+    "node_id": "N1278",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Renforcement de la surveillance des massifs et des contrôles aux accès forestiers pour prévenir les comportements dangereux",
+    "libelle_normalise": "renforcement de la surveillance des massifs et des controles aux acces forestiers pour prevenir les comportements dangereux",
+    "page_source": "4",
+    "chunk_id_source": "C0953"
+  },
+  {
+    "node_id": "N1281",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Usage des véhicules blindés polyvalents de la gendarmerie dans les zones enfumées",
+    "libelle_normalise": "usage des vehicules blindes polyvalents de la gendarmerie dans les zones enfumees",
+    "page_source": "4",
+    "chunk_id_source": "C0955"
+  },
+  {
+    "node_id": "N1282",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Usage des drones pour détecter les départs de feu et conduire des reconnaissances",
+    "libelle_normalise": "usage des drones pour detecter les departs de feu et conduire des reconnaissances",
+    "page_source": "4",
+    "chunk_id_source": "C0956"
+  },
+  {
+    "node_id": "N1283",
+    "publication_id": "PUB113",
+    "type_noeud": "expert_public",
+    "libelle": "Benoît Haberbusch",
+    "libelle_normalise": "benoit haberbusch",
+    "page_source": "4",
+    "chunk_id_source": "C0957"
+  },
+  {
+    "node_id": "N1284",
+    "publication_id": "PUB113",
+    "type_noeud": "notion_idee",
+    "libelle": "Chien comme auxiliaire de détection dans l’investigation",
+    "libelle_normalise": "chien comme auxiliaire de detection dans l investigation",
+    "page_source": "3",
+    "chunk_id_source": "C0951"
+  },
+  {
+    "node_id": "N1285",
+    "publication_id": "PUB114",
+    "type_noeud": "probleme",
+    "libelle": "Intégration précoce des demandeurs de protection internationale",
+    "libelle_normalise": "integration precoce demandeurs protection internationale",
+    "page_source": "4;5",
+    "chunk_id_source": "C0959;C0960;C0965;C0968;C0972;C0973"
+  },
+  {
+    "node_id": "N1286",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Intégration pendant la procédure d’asile et la phase d’accueil",
+    "libelle_normalise": "integration pendant procedure asile phase accueil",
+    "page_source": "4",
+    "chunk_id_source": "C0959"
+  },
+  {
+    "node_id": "N1287",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Variabilité de l’accès et de la couverture des mesures d’intégration précoce selon les pays",
+    "libelle_normalise": "variabilite acces couverture mesures integration precoce selon pays",
+    "page_source": "4;5",
+    "chunk_id_source": "C0959;C0960"
+  },
+  {
+    "node_id": "N1288",
+    "publication_id": "PUB114",
+    "type_noeud": "action",
+    "libelle": "Apprentissage linguistique",
+    "libelle_normalise": "apprentissage linguistique",
+    "page_source": "4;6;7;16",
+    "chunk_id_source": "C0959;C0961;C0970"
+  },
+  {
+    "node_id": "N1289",
+    "publication_id": "PUB114",
+    "type_noeud": "action",
+    "libelle": "Formation civique et culturelle",
+    "libelle_normalise": "formation civique culturelle",
+    "page_source": "4;7;8;15",
+    "chunk_id_source": "C0959;C0962;C0970"
+  },
+  {
+    "node_id": "N1290",
+    "publication_id": "PUB114",
+    "type_noeud": "action",
+    "libelle": "Formation et orientation professionnelle",
+    "libelle_normalise": "formation orientation professionnelle",
+    "page_source": "4;8;9;16",
+    "chunk_id_source": "C0959;C0963;C0971"
+  },
+  {
+    "node_id": "N1291",
+    "publication_id": "PUB114",
+    "type_noeud": "action",
+    "libelle": "Mesures éducatives destinées aux enfants demandeurs de protection internationale",
+    "libelle_normalise": "mesures educatives destinees enfants demandeurs protection internationale",
+    "page_source": "6;12",
+    "chunk_id_source": "C0966"
+  },
+  {
+    "node_id": "N1292",
+    "publication_id": "PUB114",
+    "type_noeud": "action",
+    "libelle": "Soutien psychosocial et en santé mentale",
+    "libelle_normalise": "soutien psychosocial sante mentale",
+    "page_source": "6;9;12",
+    "chunk_id_source": "C0964;C0966"
+  },
+  {
+    "node_id": "N1293",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Participation majoritairement volontaire aux mesures d’intégration précoce",
+    "libelle_normalise": "participation majoritairement volontaire mesures integration precoce",
+    "page_source": "4;6;7",
+    "chunk_id_source": "C0959;C0961;C0962"
+  },
+  {
+    "node_id": "N1294",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Continuité limitée entre intégration précoce et dispositifs généraux d’intégration",
+    "libelle_normalise": "continuite limitee integration precoce dispositifs generaux integration",
+    "page_source": "9",
+    "chunk_id_source": "C0964"
+  },
+  {
+    "node_id": "N1295",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle central des autorités nationales dans la coordination des mesures d’intégration précoce",
+    "libelle_normalise": "role central autorites nationales coordination mesures integration precoce",
+    "page_source": "4;5;10",
+    "chunk_id_source": "C0959;C0960;C0965"
+  },
+  {
+    "node_id": "N1296",
+    "publication_id": "PUB114",
+    "type_noeud": "acteur",
+    "libelle": "Autorités locales et régionales",
+    "libelle_normalise": "autorites locales regionales",
+    "page_source": "4;5;10",
+    "chunk_id_source": "C0959;C0960;C0965"
+  },
+  {
+    "node_id": "N1297",
+    "publication_id": "PUB114",
+    "type_noeud": "acteur",
+    "libelle": "Organisations non gouvernementales et partenaires locaux",
+    "libelle_normalise": "organisations non gouvernementales partenaires locaux",
+    "page_source": "4;5;7;10;16",
+    "chunk_id_source": "C0959;C0960;C0961;C0965;C0971"
+  },
+  {
+    "node_id": "N1298",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Combinaison de financements nationaux et européens pour l’intégration précoce",
+    "libelle_normalise": "combinaison financements nationaux europeens integration precoce",
+    "page_source": "10;11",
+    "chunk_id_source": "C0965"
+  },
+  {
+    "node_id": "N1299",
+    "publication_id": "PUB114",
+    "type_noeud": "acteur",
+    "libelle": "Fonds Asile, Migration et Intégration (FAMI)",
+    "libelle_normalise": "fonds asile migration integration fami",
+    "page_source": "5;10;11",
+    "chunk_id_source": "C0960;C0965"
+  },
+  {
+    "node_id": "N1300",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Adaptation des mesures au genre, à l’âge, à la vulnérabilité et au niveau d’éducation",
+    "libelle_normalise": "adaptation mesures genre age vulnerabilite niveau education",
+    "page_source": "4;11;12;13",
+    "chunk_id_source": "C0959;C0966"
+  },
+  {
+    "node_id": "N1301",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Information des demandeurs sur les mesures d’intégration précoce disponibles",
+    "libelle_normalise": "information demandeurs mesures integration precoce disponibles",
+    "page_source": "4;13;14",
+    "chunk_id_source": "C0959;C0967"
+  },
+  {
+    "node_id": "N1302",
+    "publication_id": "PUB114",
+    "type_noeud": "tendance_forte",
+    "libelle": "Réformes annoncées des dispositifs d’intégration précoce",
+    "libelle_normalise": "reformes annoncees dispositifs integration precoce",
+    "page_source": "18",
+    "chunk_id_source": "C0973"
+  },
+  {
+    "node_id": "N1303",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Développement encore limité du suivi et de l’évaluation des mesures d’intégration précoce",
+    "libelle_normalise": "developpement encore limite suivi evaluation mesures integration precoce",
+    "page_source": "4;14;15",
+    "chunk_id_source": "C0959;C0968;C0969"
+  },
+  {
+    "node_id": "N1304",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation systématique de l’impact des mesures d’intégration précoce en Lettonie et en Allemagne",
+    "libelle_normalise": "evaluation systematique impact mesures integration precoce lettonie allemagne",
+    "page_source": "14;15",
+    "chunk_id_source": "C0968;C0969"
+  },
+  {
+    "node_id": "N1305",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Italie",
+    "libelle_normalise": "italie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1306",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Lettonie",
+    "libelle_normalise": "lettonie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1307",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Pays-Bas",
+    "libelle_normalise": "pays bas",
+    "page_source": "14;15",
+    "chunk_id_source": "C0968;C0969"
+  },
+  {
+    "node_id": "N1308",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Pologne",
+    "libelle_normalise": "pologne",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1309",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Suède",
+    "libelle_normalise": "suede",
+    "page_source": "14;15",
+    "chunk_id_source": "C0968;C0969"
+  },
+  {
+    "node_id": "N1310",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Serbie",
+    "libelle_normalise": "serbie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1311",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Allemagne",
+    "libelle_normalise": "allemagne",
+    "page_source": "14;15",
+    "chunk_id_source": "C0968;C0969"
+  },
+  {
+    "node_id": "N1312",
+    "publication_id": "PUB114",
+    "type_noeud": "localisation",
+    "libelle": "Chypre",
+    "libelle_normalise": "chypre",
+    "page_source": "15",
+    "chunk_id_source": "C0969"
+  },
+  {
+    "node_id": "N1313",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation des mesures d’intégration par le système d’accueil et d’intégration italien",
+    "libelle_normalise": "evaluation mesures integration systeme accueil integration italien",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1314",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation à la fois individuelle et systémique des mesures d’intégration précoce en Lettonie",
+    "libelle_normalise": "evaluation individuelle systemique mesures integration precoce lettonie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1315",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Suivi continu des plans d’inclusion personnalisés en Lettonie",
+    "libelle_normalise": "suivi continu plans inclusion personnalises lettonie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1316",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation systémique par indicateurs, coordination intersectorielle et évaluations interinstitutionnelles en Lettonie",
+    "libelle_normalise": "evaluation systemique indicateurs coordination intersectorielle evaluations interinstitutionnelles lettonie",
+    "page_source": "14",
+    "chunk_id_source": "C0968"
+  },
+  {
+    "node_id": "N1317",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation longitudinale des effets à long terme de l’intégration précoce en Allemagne",
+    "libelle_normalise": "evaluation longitudinale effets long terme integration precoce allemagne",
+    "page_source": "15",
+    "chunk_id_source": "C0969"
+  },
+  {
+    "node_id": "N1318",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Suivi empirique répété d’un large panel de migrants en Allemagne",
+    "libelle_normalise": "suivi empirique repete large panel migrants allemagne",
+    "page_source": "15",
+    "chunk_id_source": "C0969"
+  },
+  {
+    "node_id": "N1319",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Évaluation non spécifique des seules mesures d’intégration précoce aux Pays-Bas et en Suède",
+    "libelle_normalise": "evaluation non specifique seules mesures integration precoce pays bas suede",
+    "page_source": "15",
+    "chunk_id_source": "C0969"
+  },
+  {
+    "node_id": "N1320",
+    "publication_id": "PUB114",
+    "type_noeud": "notion_idee",
+    "libelle": "Suivi par indicateurs de performance de la stratégie d’intégration à Chypre",
+    "libelle_normalise": "suivi indicateurs performance strategie integration chypre",
+    "page_source": "15",
+    "chunk_id_source": "C0969"
+  },
+  {
+    "node_id": "N1321",
+    "publication_id": "PUB115",
+    "type_noeud": "probleme",
+    "libelle": "Commerce illicite des produits du tabac",
+    "libelle_normalise": "commerce illicite produits tabac",
+    "page_source": "4;5;6",
+    "chunk_id_source": "C0976;C0977"
+  },
+  {
+    "node_id": "N1322",
+    "publication_id": "PUB115",
+    "type_noeud": "tendance_forte",
+    "libelle": "Progression du marché illicite du tabac malgré le recul de la consommation globale",
+    "libelle_normalise": "progression marche illicite tabac malgre recul consommation globale",
+    "page_source": "45",
+    "chunk_id_source": "C0991"
+  },
+  {
+    "node_id": "N1323",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Forte rentabilité et faible risque de détection du commerce illicite pour les groupes criminels organisés",
+    "libelle_normalise": "forte rentabilite faible risque detection commerce illicite groupes criminels organises",
+    "page_source": "4;45",
+    "chunk_id_source": "C0976;C0991"
+  },
+  {
+    "node_id": "N1324",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Écarts de prix et de fiscalité comme facteurs des flux illicites transfrontaliers",
+    "libelle_normalise": "ecarts prix fiscalite facteurs flux illicites transfrontaliers",
+    "page_source": "46",
+    "chunk_id_source": "C0991"
+  },
+  {
+    "node_id": "N1325",
+    "publication_id": "PUB115",
+    "type_noeud": "tendance_forte",
+    "libelle": "Montée de la production clandestine de tabac au sein de l’Union européenne",
+    "libelle_normalise": "montee production clandestine tabac union europeenne",
+    "page_source": "4;49",
+    "chunk_id_source": "C0976;C0992"
+  },
+  {
+    "node_id": "N1326",
+    "publication_id": "PUB115",
+    "type_noeud": "tendance_forte",
+    "libelle": "Rapprochement de la production clandestine des marchés de consommation",
+    "libelle_normalise": "rapprochement production clandestine marches consommation",
+    "page_source": "49",
+    "chunk_id_source": "C0992"
+  },
+  {
+    "node_id": "N1327",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Fragmentation géographique de la production clandestine pour réduire les risques opérationnels",
+    "libelle_normalise": "fragmentation geographique production clandestine reduire risques operationnels",
+    "page_source": "50",
+    "chunk_id_source": "C0992"
+  },
+  {
+    "node_id": "N1328",
+    "publication_id": "PUB115",
+    "type_noeud": "tendance_forte",
+    "libelle": "Diversification du commerce illicite vers de nouveaux produits du tabac et produits connexes",
+    "libelle_normalise": "diversification commerce illicite nouveaux produits tabac produits connexes",
+    "page_source": "4;46;50",
+    "chunk_id_source": "C0976;C0991;C0992"
+  },
+  {
+    "node_id": "N1329",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Fragmentation des données et du renseignement sur les activités illicites",
+    "libelle_normalise": "fragmentation donnees renseignement activites illicites",
+    "page_source": "6;11;12;13",
+    "chunk_id_source": "C0977;C0978"
+  },
+  {
+    "node_id": "N1330",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Absence d’estimation fiable de la taille, de la structure et de l’impact économique d’un marché illicite",
+    "libelle_normalise": "absence estimation fiable taille structure impact economique marche illicite",
+    "page_source": "6;13;14;15",
+    "chunk_id_source": "C0977;C0979"
+  },
+  {
+    "node_id": "N1331",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Limites des données de saisies pour mesurer l’ampleur réelle d’un marché criminel",
+    "libelle_normalise": "limites donnees saisies mesurer ampleur reelle marche criminel",
+    "page_source": "14",
+    "chunk_id_source": "C0979"
+  },
+  {
+    "node_id": "N1332",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Lacunes réglementaires créant des opportunités pour les organisations criminelles",
+    "libelle_normalise": "lacunes reglementaires opportunites organisations criminelles",
+    "page_source": "7;16;17;18",
+    "chunk_id_source": "C0977;C0980;C0981"
+  },
+  {
+    "node_id": "N1333",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Hétérogénéité des systèmes nationaux de contrôle et de répression",
+    "libelle_normalise": "heterogeneite systemes nationaux controle repression",
+    "page_source": "7;18;19;20;23",
+    "chunk_id_source": "C0977;C0981;C0982"
+  },
+  {
+    "node_id": "N1334",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Défaut d’harmonisation des infractions et des sanctions",
+    "libelle_normalise": "defaut harmonisation infractions sanctions",
+    "page_source": "7;24;25",
+    "chunk_id_source": "C0977;C0983"
+  },
+  {
+    "node_id": "N1335",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Faible contrôle des intrants et de la chaîne d’approvisionnement favorisant la production clandestine",
+    "libelle_normalise": "faible controle intrants chaine approvisionnement production clandestine",
+    "page_source": "16;17",
+    "chunk_id_source": "C0980"
+  },
+  {
+    "node_id": "N1336",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Coopération opérationnelle multi-acteurs contre les trafics transfrontaliers",
+    "libelle_normalise": "cooperation operationnelle multi acteurs trafics transfrontaliers",
+    "page_source": "25;26",
+    "chunk_id_source": "C0984"
+  },
+  {
+    "node_id": "N1337",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Lacunes dans l’échange d’informations entre autorités nationales et européennes",
+    "libelle_normalise": "lacunes echange informations autorites nationales europeennes",
+    "page_source": "8;25;26",
+    "chunk_id_source": "C0977;C0984"
+  },
+  {
+    "node_id": "N1338",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Manque d’interopérabilité des systèmes d’information entre services chargés de la lutte contre les trafics",
+    "libelle_normalise": "manque interoperabilite systemes information services lutte trafics",
+    "page_source": "25;26",
+    "chunk_id_source": "C0984"
+  },
+  {
+    "node_id": "N1339",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Fragmentation des responsabilités dans une politique publique multi-acteurs",
+    "libelle_normalise": "fragmentation responsabilites politique publique multi acteurs",
+    "page_source": "9;33;34",
+    "chunk_id_source": "C0977;C0987"
+  },
+  {
+    "node_id": "N1340",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Absence de coordination globale d’une architecture de lutte contre la fraude",
+    "libelle_normalise": "absence coordination globale architecture lutte fraude",
+    "page_source": "9;33;34",
+    "chunk_id_source": "C0977;C0987"
+  },
+  {
+    "node_id": "N1341",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Insuffisance du suivi et de l’évaluation de l’incidence des mesures de lutte",
+    "libelle_normalise": "insuffisance suivi evaluation incidence mesures lutte",
+    "page_source": "6;9;33;34;35;36;37;38;39;40;41;42;43;44",
+    "chunk_id_source": "C0977;C0987;C0988;C0989;C0990"
+  },
+  {
+    "node_id": "N1342",
+    "publication_id": "PUB115",
+    "type_noeud": "notion_idee",
+    "libelle": "Manque de transparence dans la coopération entre autorités publiques et acteurs économiques régulés",
+    "libelle_normalise": "manque transparence cooperation autorites publiques acteurs economiques regules",
+    "page_source": "8;27;28;29;30;31;32",
+    "chunk_id_source": "C0986"
+  },
+  {
+    "node_id": "N1343",
+    "publication_id": "PUB115",
+    "type_noeud": "action",
+    "libelle": "Harmonisation de la collecte et du partage des données sur les marchés illicites",
+    "libelle_normalise": "harmonisation collecte partage donnees marches illicites",
+    "page_source": "7",
+    "chunk_id_source": "C0977"
+  },
+  {
+    "node_id": "N1344",
+    "publication_id": "PUB115",
+    "type_noeud": "action",
+    "libelle": "Développement d’une estimation harmonisée et régulière de l’ampleur et de l’impact économique d’un marché illicite",
+    "libelle_normalise": "developpement estimation harmonisee reguliere ampleur impact economique marche illicite",
+    "page_source": "7",
+    "chunk_id_source": "C0977"
+  },
+  {
+    "node_id": "N1345",
+    "publication_id": "PUB115",
+    "type_noeud": "action",
+    "libelle": "Renforcement de la coopération et de l’échange d’informations entre administrations compétentes",
+    "libelle_normalise": "renforcement cooperation echange informations administrations competentes",
+    "page_source": "8",
+    "chunk_id_source": "C0977"
+  },
+  {
+    "node_id": "N1346",
+    "publication_id": "PUB115",
+    "type_noeud": "action",
+    "libelle": "Évaluation régulière de l’incidence des mesures publiques et adaptation de l’action aux résultats",
+    "libelle_normalise": "evaluation reguliere incidence mesures publiques adaptation action resultats",
+    "page_source": "9",
+    "chunk_id_source": "C0977"
+  },
+  {
+    "node_id": "N1347",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Office européen de lutte antifraude (OLAF)",
+    "libelle_normalise": "office europeen lutte antifraude olaf",
+    "page_source": "5;6;11;12;13;33;34;50;51",
+    "chunk_id_source": "C0977;C0978;C0987;C0993"
+  },
+  {
+    "node_id": "N1348",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Europol",
+    "libelle_normalise": "europol",
+    "page_source": "6;11;25;26;34;51",
+    "chunk_id_source": "C0977;C0978;C0984;C0987;C0993"
+  },
+  {
+    "node_id": "N1349",
+    "publication_id": "PUB115",
+    "type_noeud": "localisation",
+    "libelle": "Belgique",
+    "libelle_normalise": "belgique",
+    "page_source": "5;19;20;21;23;24",
+    "chunk_id_source": "C0977;C0981;C0982;C0983"
+  },
+  {
+    "node_id": "N1350",
+    "publication_id": "PUB115",
+    "type_noeud": "localisation",
+    "libelle": "Espagne",
+    "libelle_normalise": "espagne",
+    "page_source": "5;19;20;23;24",
+    "chunk_id_source": "C0977;C0981;C0982;C0983"
+  },
+  {
+    "node_id": "N1351",
+    "publication_id": "PUB115",
+    "type_noeud": "localisation",
+    "libelle": "Pologne",
+    "libelle_normalise": "pologne",
+    "page_source": "5;17;19;20;22;23",
+    "chunk_id_source": "C0977;C0980;C0981;C0982"
+  },
+  {
+    "node_id": "N1352",
+    "publication_id": "PUB115",
+    "type_noeud": "localisation",
+    "libelle": "Roumanie",
+    "libelle_normalise": "roumanie",
+    "page_source": "5;17;19;20;22;23;24",
+    "chunk_id_source": "C0977;C0980;C0981;C0982;C0983"
+  },
+  {
+    "node_id": "N1353",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Commission européenne",
+    "libelle_normalise": "commission europeenne",
+    "page_source": "5;6;7;8;9;13;14;15;33;34",
+    "chunk_id_source": "C0977;C0978;C0979;C0987"
+  },
+  {
+    "node_id": "N1354",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Direction générale de la fiscalité et de l’union douanière (DG TAXUD)",
+    "libelle_normalise": "direction generale fiscalite union douaniere dg taxud",
+    "page_source": "5;6;11;13;50",
+    "chunk_id_source": "C0977;C0978;C0993"
+  },
+  {
+    "node_id": "N1355",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Autorités douanières nationales",
+    "libelle_normalise": "autorites douanieres nationales",
+    "page_source": "16;17;18;19;20;23;24;25;26;51",
+    "chunk_id_source": "C0980;C0981;C0982;C0983;C0984;C0993"
+  },
+  {
+    "node_id": "N1356",
+    "publication_id": "PUB115",
+    "type_noeud": "acteur",
+    "libelle": "Architecture antifraude de l’Union européenne",
+    "libelle_normalise": "architecture antifraude union europeenne",
+    "page_source": "9;51;52",
+    "chunk_id_source": "C0977;C0993"
+  },
+  {
+    "node_id": "N1357",
+    "publication_id": "PUB116",
+    "type_noeud": "probleme",
+    "libelle": "Relations entre police et population",
+    "libelle_normalise": "relations police population",
+    "page_source": "08:25;19:18;38:49",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1358",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Formation des policiers par les sciences sociales",
+    "libelle_normalise": "formation policiers sciences sociales",
+    "page_source": "02:34-04:06;20:12-20:48",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1359",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Distinction entre problème social et problème sociologique",
+    "libelle_normalise": "distinction probleme social probleme sociologique",
+    "page_source": "02:49-03:21",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1360",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Mise à distance des catégories ordinaires de perception du métier",
+    "libelle_normalise": "mise distance categories ordinaires perception metier",
+    "page_source": "03:10-04:06;08:25-08:43",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1361",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Objectivation de sa propre pratique professionnelle",
+    "libelle_normalise": "objectivation propre pratique professionnelle",
+    "page_source": "06:34-07:39;17:45-18:43",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1362",
+    "publication_id": "PUB116",
+    "type_noeud": "action",
+    "libelle": "Écriture d’un mémoire comme instrument de réflexivité professionnelle",
+    "libelle_normalise": "ecriture memoire instrument reflexivite professionnelle",
+    "page_source": "03:44-04:06;46:32-53:09",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1363",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Socialisation professionnelle policière",
+    "libelle_normalise": "socialisation professionnelle policiere",
+    "page_source": "20:12-21:17;42:32-43:29",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1364",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Autonomie de pensée au sein de l’institution policière",
+    "libelle_normalise": "autonomie pensee institution policiere",
+    "page_source": "20:23-20:59",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1365",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Préjugés professionnels dans la relation aux usagers",
+    "libelle_normalise": "prejuges professionnels relation usagers",
+    "page_source": "21:17-22:02",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1366",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Décalage entre image institutionnelle de la police et réalité du métier",
+    "libelle_normalise": "decalage image institutionnelle police realite metier",
+    "page_source": "09:12-10:35",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1367",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Effets de la communication institutionnelle sur la représentation du métier policier",
+    "libelle_normalise": "effets communication institutionnelle representation metier policier",
+    "page_source": "09:12-10:35;37:00-37:31",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1368",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Sélectivité sociale des contrôles et de la répression",
+    "libelle_normalise": "selectivite sociale controles repression",
+    "page_source": "12:40-13:19",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1369",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Tension entre priorités politico-médiatiques et temporalité de l’enquête policière",
+    "libelle_normalise": "tension priorites politico mediatiques temporalite enquete policiere",
+    "page_source": "13:19-14:24",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1370",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Mise en chiffres de l’activité policière et recherche de résultats visibles",
+    "libelle_normalise": "mise chiffres activite policiere recherche resultats visibles",
+    "page_source": "13:59-14:24",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1371",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Rapports de genre et normes de virilité dans la police",
+    "libelle_normalise": "rapports genre normes virilite police",
+    "page_source": "15:17-16:13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1372",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Incorporation des normes professionnelles par les femmes policières",
+    "libelle_normalise": "incorporation normes professionnelles femmes policieres",
+    "page_source": "24:33-26:16",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1373",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Articulation du genre et de l’origine sociale dans les trajectoires policières",
+    "libelle_normalise": "articulation genre origine sociale trajectoires policieres",
+    "page_source": "26:22-27:39;50:30-50:49",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1374",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Usage légitime de la force et limites de la violence policière",
+    "libelle_normalise": "usage legitime force limites violence policiere",
+    "page_source": "16:13-18:03",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1375",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Autocontrainte dans l’exercice de la force policière",
+    "libelle_normalise": "autocontrainte exercice force policiere",
+    "page_source": "39:12-42:06",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1376",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Dissimulation et régulation des émotions dans le travail policier",
+    "libelle_normalise": "dissimulation regulation emotions travail policier",
+    "page_source": "30:43-34:28",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1377",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Débriefing entre pairs après des situations professionnelles éprouvantes",
+    "libelle_normalise": "debriefing entre pairs situations professionnelles eprouvantes",
+    "page_source": "33:40-34:28",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1378",
+    "publication_id": "PUB116",
+    "type_noeud": "probleme",
+    "libelle": "Mal-être professionnel et désengagement dans la police",
+    "libelle_normalise": "mal etre professionnel desengagement police",
+    "page_source": "44:59-46:07;51:06-53:09",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1379",
+    "publication_id": "PUB116",
+    "type_noeud": "probleme",
+    "libelle": "Suicide dans la police nationale",
+    "libelle_normalise": "suicide police nationale",
+    "page_source": "34:33-35:14;51:06-51:53",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1380",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Motivation de service public dans l’engagement policier",
+    "libelle_normalise": "motivation service public engagement policier",
+    "page_source": "35:58-38:01",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1381",
+    "publication_id": "PUB116",
+    "type_noeud": "notion_idee",
+    "libelle": "Diversité des rapports au métier selon les trajectoires personnelles",
+    "libelle_normalise": "diversite rapports metier trajectoires personnelles",
+    "page_source": "36:15-38:44;49:22-50:49",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1382",
+    "publication_id": "PUB116",
+    "type_noeud": "expert_public",
+    "libelle": "Élodie Lemaire",
+    "libelle_normalise": "elodie lemaire",
+    "page_source": "02:34-04:06;46:32-46:53",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1383",
+    "publication_id": "PUB116",
+    "type_noeud": "expert_public",
+    "libelle": "Marwan Mohammed",
+    "libelle_normalise": "marwan mohammed",
+    "page_source": "12:40-14:56;39:12-43:29;47:14-47:40",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1384",
+    "publication_id": "PUB117",
+    "type_noeud": "probleme",
+    "libelle": "Désinformation",
+    "libelle_normalise": "desinformation",
+    "page_source": "13;14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1385",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Distinction entre désinformation et mésinformation",
+    "libelle_normalise": "distinction desinformation mesinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1386",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Intention de nuire comme critère de la désinformation",
+    "libelle_normalise": "intention nuire critere desinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1387",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Scepticisme envers le vrai plutôt que crédulité comme ressort de vulnérabilité",
+    "libelle_normalise": "scepticisme envers vrai plutot credulite ressort vulnerabilite",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1388",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Limites d’une réponse à la désinformation fondée sur la seule éducation des individus",
+    "libelle_normalise": "limites reponse desinformation fondee seule education individus",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1389",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Modèle implicite de l’action publique fondé sur la correction des croyances individuelles",
+    "libelle_normalise": "modele implicite action publique correction croyances individuelles",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1390",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Articulation entre mécanismes cognitifs, appartenances collectives et loyautés partisanes",
+    "libelle_normalise": "articulation mecanismes cognitifs appartenances collectives loyautes partisanes",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1391",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Polarisation comme contexte de diffusion de la désinformation",
+    "libelle_normalise": "polarisation contexte diffusion desinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1392",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Fonctions identitaires et de coalition des récits de désinformation",
+    "libelle_normalise": "fonctions identitaires coalition recits desinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1393",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Précarité et isolement social comme facteurs de vulnérabilité à la désinformation",
+    "libelle_normalise": "precarite isolement social facteurs vulnerabilite desinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1394",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Solitude comme prédicteur de vulnérabilité à la désinformation",
+    "libelle_normalise": "solitude predicteur vulnerabilite desinformation",
+    "page_source": "13",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1395",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Défiance envers les institutions et diffusion des récits de manipulation",
+    "libelle_normalise": "defiance institutions diffusion recits manipulation",
+    "page_source": "13;14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1396",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Transformation de l’espace informationnel",
+    "libelle_normalise": "transformation espace informationnel",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1397",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Maintien du rôle central des médias traditionnels dans l’accès à l’information",
+    "libelle_normalise": "maintien role central medias traditionnels acces information",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1398",
+    "publication_id": "PUB117",
+    "type_noeud": "localisation",
+    "libelle": "France",
+    "libelle_normalise": "france",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1399",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Dégradation du modèle économique de l’information",
+    "libelle_normalise": "degradation modele economique information",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1400",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Réduction des capacités de production d’une information vérifiée",
+    "libelle_normalise": "reduction capacites production information verifiee",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1401",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Coexistence de sources fiables et de contenus fragiles dans les répertoires informationnels",
+    "libelle_normalise": "coexistence sources fiables contenus fragiles repertoires informationnels",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1402",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Simplifications et raccourcis dans le traitement public de la désinformation",
+    "libelle_normalise": "simplifications raccourcis traitement public desinformation",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1403",
+    "publication_id": "PUB117",
+    "type_noeud": "notion_idee",
+    "libelle": "Re-problématisation de la désinformation par les résultats de la recherche",
+    "libelle_normalise": "re problematisation desinformation resultats recherche",
+    "page_source": "14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1404",
+    "publication_id": "PUB117",
+    "type_noeud": "expert_public",
+    "libelle": "Grégoire Darcy",
+    "libelle_normalise": "gregoire darcy",
+    "page_source": "13;14",
+    "chunk_id_source": ""
+  },
+  {
+    "node_id": "N1405",
+    "publication_id": "PUB118",
+    "type_noeud": "probleme",
+    "libelle": "Préservation de la santé et des capacités opérationnelles sous contrainte",
+    "libelle_normalise": "preservation sante capacites operationnelles sous contrainte",
+    "page_source": "Introduction",
+    "chunk_id_source": "C0999;C1000;C1030"
+  },
+  {
+    "node_id": "N1406",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Robustesse humaine et collective plutôt que recherche de performance brute",
+    "libelle_normalise": "robustesse humaine collective plutot recherche performance brute",
+    "page_source": "Introduction",
+    "chunk_id_source": "C0999;C1030"
+  },
+  {
+    "node_id": "N1407",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Approche intégrée cerveau-corps-collectif",
+    "libelle_normalise": "approche integree cerveau corps collectif",
+    "page_source": "Introduction;Parties III-IV",
+    "chunk_id_source": "C1000;C1010;C1011;C1026"
+  },
+  {
+    "node_id": "N1408",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Lucidité de la décision sous stress, fatigue et incertitude",
+    "libelle_normalise": "lucidite decision sous stress fatigue incertitude",
+    "page_source": "Introduction;Partie I",
+    "chunk_id_source": "C0999;C1003;C1024"
+  },
+  {
+    "node_id": "N1409",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Biais cognitifs et collectifs susceptibles d’altérer le jugement opérationnel",
+    "libelle_normalise": "biais cognitifs collectifs alterer jugement operationnel",
+    "page_source": "Introduction;Partie IV",
+    "chunk_id_source": "C1014;C1015;C1024"
+  },
+  {
+    "node_id": "N1410",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Calibration des charges cognitives et émotionnelles à l’entraînement",
+    "libelle_normalise": "calibration charges cognitives emotionnelles entrainement",
+    "page_source": "Introduction;Partie III",
+    "chunk_id_source": "C1008"
+  },
+  {
+    "node_id": "N1411",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Entraînement à l’inoculation de stress",
+    "libelle_normalise": "entrainement inoculation stress",
+    "page_source": "Partie III",
+    "chunk_id_source": "C1008"
+  },
+  {
+    "node_id": "N1412",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Neuroplasticité (capacité du cerveau à se modifier et se remodeler en réponse à l’expérience, à l’apprentissage ou à une lésion)",
+    "libelle_normalise": "neuroplasticite capacite cerveau modifier remodeler experience apprentissage lesion",
+    "page_source": "Partie I",
+    "chunk_id_source": "C1001;C1009"
+  },
+  {
+    "node_id": "N1413",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Charge allostatique et coût biologique de l’adaptation",
+    "libelle_normalise": "charge allostatique cout biologique adaptation",
+    "page_source": "Partie I",
+    "chunk_id_source": "C1001;C1007"
+  },
+  {
+    "node_id": "N1414",
+    "publication_id": "PUB118",
+    "type_noeud": "probleme",
+    "libelle": "Blessures psychiques et troubles liés au stress traumatique",
+    "libelle_normalise": "blessures psychiques troubles stress traumatique",
+    "page_source": "Introduction",
+    "chunk_id_source": "C0999;C1009"
+  },
+  {
+    "node_id": "N1415",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Détection précoce, soutien et réintégration après l’engagement",
+    "libelle_normalise": "detection precoce soutien reintegration apres engagement",
+    "page_source": "Introduction",
+    "chunk_id_source": "C0999;C1009"
+  },
+  {
+    "node_id": "N1416",
+    "publication_id": "PUB118",
+    "type_noeud": "probleme",
+    "libelle": "Commotion cérébrale et blessures neurologiques peu visibles",
+    "libelle_normalise": "commotion cerebrale blessures neurologiques peu visibles",
+    "page_source": "Partie III",
+    "chunk_id_source": "C1009"
+  },
+  {
+    "node_id": "N1417",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Interactions corps-cerveau, intéroception et proprioception",
+    "libelle_normalise": "interactions corps cerveau interoception proprioception",
+    "page_source": "Partie III",
+    "chunk_id_source": "C1010;C1011"
+  },
+  {
+    "node_id": "N1418",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Groupe comme régulateur du stress et support de l’adaptation",
+    "libelle_normalise": "groupe regulateur stress support adaptation",
+    "page_source": "Parties II-IV",
+    "chunk_id_source": "C1006;C1007;C1017;C1018"
+  },
+  {
+    "node_id": "N1419",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Cohésion, leadership et coordination collective",
+    "libelle_normalise": "cohesion leadership coordination collective",
+    "page_source": "Parties II-IV",
+    "chunk_id_source": "C1004;C1005;C1007;C1017"
+  },
+  {
+    "node_id": "N1420",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Biais de groupe dans la planification et la décision collective",
+    "libelle_normalise": "biais groupe planification decision collective",
+    "page_source": "Partie IV",
+    "chunk_id_source": "C1014"
+  },
+  {
+    "node_id": "N1421",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Tension entre obéissance, coopération et maintien du jugement critique",
+    "libelle_normalise": "tension obeissance cooperation maintien jugement critique",
+    "page_source": "Partie IV",
+    "chunk_id_source": "C1015"
+  },
+  {
+    "node_id": "N1422",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Contagion émotionnelle et contagion du stress au sein d’un collectif",
+    "libelle_normalise": "contagion emotionnelle contagion stress collectif",
+    "page_source": "Partie IV",
+    "chunk_id_source": "C1017"
+  },
+  {
+    "node_id": "N1423",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Gestion collective de la peur",
+    "libelle_normalise": "gestion collective peur",
+    "page_source": "Partie IV",
+    "chunk_id_source": "C1018"
+  },
+  {
+    "node_id": "N1424",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Modélisation des mouvements de personnes pour anticiper évacuations et dynamiques de foule",
+    "libelle_normalise": "modelisation mouvements personnes anticiper evacuations dynamiques foule",
+    "page_source": "Partie IV",
+    "chunk_id_source": "C1019;C1020"
+  },
+  {
+    "node_id": "N1425",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Débriefing et retour d’expérience pour adapter les procédures opérationnelles",
+    "libelle_normalise": "debriefing retour experience adapter procedures operationnelles",
+    "page_source": "RETEX",
+    "chunk_id_source": "C1004"
+  },
+  {
+    "node_id": "N1426",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Compétences émotionnelles en situation d’urgence",
+    "libelle_normalise": "competences emotionnelles situation urgence",
+    "page_source": "Partie V",
+    "chunk_id_source": "C1022"
+  },
+  {
+    "node_id": "N1427",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Dispositif collectif de régulation du stress par biofeedback",
+    "libelle_normalise": "dispositif collectif regulation stress biofeedback",
+    "page_source": "Partie V",
+    "chunk_id_source": "C1023"
+  },
+  {
+    "node_id": "N1428",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Agrégation de données physiologiques pour apprécier l’état d’un collectif",
+    "libelle_normalise": "agregation donnees physiologiques apprecier etat collectif",
+    "page_source": "Parties V-VII",
+    "chunk_id_source": "C1023;C1026"
+  },
+  {
+    "node_id": "N1429",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Pleine conscience et cohérence cardiaque comme outils non invasifs de régulation",
+    "libelle_normalise": "pleine conscience coherence cardiaque outils non invasifs regulation",
+    "page_source": "Partie V",
+    "chunk_id_source": "C1024"
+  },
+  {
+    "node_id": "N1430",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Care, attention à autrui et cohésion dans l’action",
+    "libelle_normalise": "care attention autrui cohesion action",
+    "page_source": "Partie VI",
+    "chunk_id_source": "C1025"
+  },
+  {
+    "node_id": "N1431",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Données neurophysiologiques de groupe pour éclairer la performance collective",
+    "libelle_normalise": "donnees neurophysiologiques groupe eclairer performance collective",
+    "page_source": "Partie VII",
+    "chunk_id_source": "C1026"
+  },
+  {
+    "node_id": "N1432",
+    "publication_id": "PUB118",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de captation et d’interprétation des signaux neurophysiologiques en environnement opérationnel",
+    "libelle_normalise": "difficultes captation interpretation signaux neurophysiologiques environnement operationnel",
+    "page_source": "Partie VII",
+    "chunk_id_source": "C1027;C1028"
+  },
+  {
+    "node_id": "N1433",
+    "publication_id": "PUB118",
+    "type_noeud": "action",
+    "libelle": "Intelligence artificielle pour détecter des états mentaux à partir de données neurophysiologiques",
+    "libelle_normalise": "intelligence artificielle detecter etats mentaux donnees neurophysiologiques",
+    "page_source": "Partie VII",
+    "chunk_id_source": "C1028"
+  },
+  {
+    "node_id": "N1434",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Nécessité de contextualiser les données neurophysiologiques et les états mentaux",
+    "libelle_normalise": "necessite contextualiser donnees neurophysiologiques etats mentaux",
+    "page_source": "Partie VII",
+    "chunk_id_source": "C1028"
+  },
+  {
+    "node_id": "N1435",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Technologie comme aide au discernement et non comme dispositif autonome de jugement de l’humain",
+    "libelle_normalise": "technologie aide discernement non dispositif autonome jugement humain",
+    "page_source": "Introduction;Partie VII",
+    "chunk_id_source": "C1028;C1030"
+  },
+  {
+    "node_id": "N1436",
+    "publication_id": "PUB118",
+    "type_noeud": "probleme",
+    "libelle": "Enjeux éthiques et juridiques des neurotechnologies militaires",
+    "libelle_normalise": "enjeux ethiques juridiques neurotechnologies militaires",
+    "page_source": "Partie VIII",
+    "chunk_id_source": "C1029"
+  },
+  {
+    "node_id": "N1437",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Usage des neurotechnologies pour augmenter ou altérer des capacités cognitives",
+    "libelle_normalise": "usage neurotechnologies augmenter alterer capacites cognitives",
+    "page_source": "Partie VIII",
+    "chunk_id_source": "C1029"
+  },
+  {
+    "node_id": "N1438",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Transposabilité des neurosciences aux métiers de la sécurité et de la gestion de crise",
+    "libelle_normalise": "transposabilite neurosciences metiers securite gestion crise",
+    "page_source": "Synthèse Quiritès",
+    "chunk_id_source": "C1020;C1023;C1024;C1030"
+  },
+  {
+    "node_id": "N1439",
+    "publication_id": "PUB118",
+    "type_noeud": "acteur",
+    "libelle": "Institut de recherche biomédicale des armées (IRBA)",
+    "libelle_normalise": "institut recherche biomedicale armees irba",
+    "page_source": "Ensemble",
+    "chunk_id_source": "C0998"
+  },
+  {
+    "node_id": "N1440",
+    "publication_id": "PUB118",
+    "type_noeud": "acteur",
+    "libelle": "Centre de recherche de Saint-Cyr (CReC Saint-Cyr)",
+    "libelle_normalise": "centre recherche saint cyr crec saint cyr",
+    "page_source": "Ensemble",
+    "chunk_id_source": "C0998"
+  },
+  {
+    "node_id": "N1441",
+    "publication_id": "PUB118",
+    "type_noeud": "acteur",
+    "libelle": "Service de santé des armées",
+    "libelle_normalise": "service sante armees",
+    "page_source": "Introduction",
+    "chunk_id_source": "C0999"
+  },
+  {
+    "node_id": "N1442",
+    "publication_id": "PUB118",
+    "type_noeud": "expert_public",
+    "libelle": "Gaylord Guérin",
+    "libelle_normalise": "gaylord guerin",
+    "page_source": "RETEX",
+    "chunk_id_source": "C1004"
+  },
+  {
+    "node_id": "N1443",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Gestion de crise",
+    "libelle_normalise": "gestion crise",
+    "page_source": "242;270;285",
+    "chunk_id_source": "C1020;C1023;C1024"
+  },
+  {
+    "node_id": "N1444",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Prise de décision en situation de crise",
+    "libelle_normalise": "prise decision situation crise",
+    "page_source": "242;285",
+    "chunk_id_source": "C1003;C1020;C1024"
+  },
+  {
+    "node_id": "N1445",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Coordination collective en situation de crise",
+    "libelle_normalise": "coordination collective situation crise",
+    "page_source": "205;214;270",
+    "chunk_id_source": "C1007;C1017;C1020;C1023"
+  },
+  {
+    "node_id": "N1446",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Gestion du stress en situation de crise",
+    "libelle_normalise": "gestion stress situation crise",
+    "page_source": "117-120;270-276;285",
+    "chunk_id_source": "C1008;C1023;C1024"
+  },
+  {
+    "node_id": "N1447",
+    "publication_id": "PUB118",
+    "type_noeud": "notion_idee",
+    "libelle": "Anticipation des comportements collectifs en situation de crise",
+    "libelle_normalise": "anticipation comportements collectifs situation crise",
+    "page_source": "231-236;242",
+    "chunk_id_source": "C1019;C1020"
+  },
+  {
+    "node_id": "N1448",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Fait religieux en entreprise",
+    "libelle_normalise": "fait religieux entreprise",
+    "page_source": "16-17",
+    "chunk_id_source": "C1032"
+  },
+  {
+    "node_id": "N1449",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Progression continue de la présence du fait religieux au travail",
+    "libelle_normalise": "progression continue presence fait religieux travail",
+    "page_source": "16-19",
+    "chunk_id_source": "C1032"
+  },
+  {
+    "node_id": "N1450",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Fait religieux comme comportement ou événement à dimension religieuse dans les interactions professionnelles",
+    "libelle_normalise": "fait religieux comportement evenement dimension religieuse interactions professionnelles",
+    "page_source": "17",
+    "chunk_id_source": "C1032"
+  },
+  {
+    "node_id": "N1451",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Visibilité croissante du fait religieux au travail",
+    "libelle_normalise": "visibilite croissante fait religieux travail",
+    "page_source": "18-32",
+    "chunk_id_source": "C1032;C1034"
+  },
+  {
+    "node_id": "N1452",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Port visible de signes religieux comme première manifestation du fait religieux au travail",
+    "libelle_normalise": "port visible signes religieux premiere manifestation fait religieux travail",
+    "page_source": "26-31",
+    "chunk_id_source": "C1034"
+  },
+  {
+    "node_id": "N1453",
+    "publication_id": "PUB119",
+    "type_noeud": "signal_faible",
+    "libelle": "Émergence du fait religieux dans les interactions professionnelles en ligne",
+    "libelle_normalise": "emergence fait religieux interactions professionnelles ligne",
+    "page_source": "32",
+    "chunk_id_source": "C1034"
+  },
+  {
+    "node_id": "N1455",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Majorité de faits religieux peu perturbateurs pour le fonctionnement du travail",
+    "libelle_normalise": "majorite faits religieux peu perturbateurs fonctionnement travail",
+    "page_source": "19-20",
+    "chunk_id_source": "C1032"
+  },
+  {
+    "node_id": "N1456",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Progression des comportements rigoristes au travail",
+    "libelle_normalise": "progression comportements rigoristes travail",
+    "page_source": "24-25",
+    "chunk_id_source": "C1033"
+  },
+  {
+    "node_id": "N1457",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Stigmatisation et discrimination liées à l’appartenance ou à l’expression religieuse",
+    "libelle_normalise": "stigmatisation discrimination appartenance expression religieuse",
+    "page_source": "21-23;75-80",
+    "chunk_id_source": "C1033;C1042"
+  },
+  {
+    "node_id": "N1459",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Présence majoritaire de faits attribués à l’islam dans les situations observées",
+    "libelle_normalise": "presence majoritaire faits attribues islam situations observees",
+    "page_source": "38-40",
+    "chunk_id_source": "C1035"
+  },
+  {
+    "node_id": "N1460",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Féminisation du fait religieux au travail",
+    "libelle_normalise": "feminisation fait religieux travail",
+    "page_source": "48-49",
+    "chunk_id_source": "C1037"
+  },
+  {
+    "node_id": "N1461",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Rajeunissement du fait religieux au travail",
+    "libelle_normalise": "rajeunissement fait religieux travail",
+    "page_source": "50-51",
+    "chunk_id_source": "C1037"
+  },
+  {
+    "node_id": "N1462",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Concentration du fait religieux parmi les ouvriers et les employés",
+    "libelle_normalise": "concentration fait religieux ouvriers employes",
+    "page_source": "52",
+    "chunk_id_source": "C1037"
+  },
+  {
+    "node_id": "N1463",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Concentration du fait religieux dans les grandes entreprises et les secteurs intensifs en main-d’œuvre",
+    "libelle_normalise": "concentration fait religieux grandes entreprises secteurs intensifs main oeuvre",
+    "page_source": "53-54",
+    "chunk_id_source": "C1037"
+  },
+  {
+    "node_id": "N1464",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Compatibilité majoritairement positive entre pratique religieuse et travail selon les salariés pratiquants",
+    "libelle_normalise": "compatibilite majoritairement positive pratique religieuse travail salaries pratiquants",
+    "page_source": "60-63",
+    "chunk_id_source": "C1039"
+  },
+  {
+    "node_id": "N1465",
+    "publication_id": "PUB119",
+    "type_noeud": "tendance",
+    "libelle": "Dégradation de la perception du fait religieux dans l’entreprise",
+    "libelle_normalise": "degradation perception fait religieux entreprise",
+    "page_source": "64-67",
+    "chunk_id_source": "C1040"
+  },
+  {
+    "node_id": "N1466",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Acceptabilité différenciée des pratiques religieuses selon leurs effets sur le travail",
+    "libelle_normalise": "acceptabilite differenciee pratiques religieuses effets travail",
+    "page_source": "68-74",
+    "chunk_id_source": "C1041"
+  },
+  {
+    "node_id": "N1467",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Tolérance majoritaire des pratiques religieuses peu perturbatrices",
+    "libelle_normalise": "tolerance majoritaire pratiques religieuses peu perturbatrices",
+    "page_source": "68-71",
+    "chunk_id_source": "C1041"
+  },
+  {
+    "node_id": "N1468",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Rejet des refus de tâches, du prosélytisme et des comportements discriminatoires",
+    "libelle_normalise": "rejet refus taches proselytisme comportements discriminatoires",
+    "page_source": "72-74",
+    "chunk_id_source": "C1041"
+  },
+  {
+    "node_id": "N1469",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Progression des tensions et conflits lors des interventions managériales liées au fait religieux",
+    "libelle_normalise": "progression tensions conflits interventions manageriales fait religieux",
+    "page_source": "75-80",
+    "chunk_id_source": "C1042"
+  },
+  {
+    "node_id": "N1470",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Tension entre liberté religieuse dans l’entreprise privée et demande de neutralité",
+    "libelle_normalise": "tension liberte religieuse entreprise privee demande neutralite",
+    "page_source": "83-87",
+    "chunk_id_source": "C1043"
+  },
+  {
+    "node_id": "N1471",
+    "publication_id": "PUB119",
+    "type_noeud": "action",
+    "libelle": "Intervention managériale face au fait religieux",
+    "libelle_normalise": "intervention manageriale face fait religieux",
+    "page_source": "88-90",
+    "chunk_id_source": "C1044"
+  },
+  {
+    "node_id": "N1472",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Encadrants de proximité insuffisamment sécurisés dans la gestion du fait religieux",
+    "libelle_normalise": "encadrants proximite insuffisamment securises gestion fait religieux",
+    "page_source": "91-97",
+    "chunk_id_source": "C1045;C1046"
+  },
+  {
+    "node_id": "N1473",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisance des dispositifs internes et de la formation à la gestion du fait religieux",
+    "libelle_normalise": "insuffisance dispositifs internes formation gestion fait religieux",
+    "page_source": "91-94",
+    "chunk_id_source": "C1045"
+  },
+  {
+    "node_id": "N1474",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Isolement des salariés pratiquants confrontés à une difficulté liée au fait religieux",
+    "libelle_normalise": "isolement salaries pratiquants difficulte liee fait religieux",
+    "page_source": "91",
+    "chunk_id_source": "C1045"
+  },
+  {
+    "node_id": "N1475",
+    "publication_id": "PUB119",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés spécifiques des PME à cadrer et gérer le fait religieux",
+    "libelle_normalise": "difficultes specifiques pme cadrer gerer fait religieux",
+    "page_source": "98",
+    "chunk_id_source": "C1046"
+  },
+  {
+    "node_id": "N1476",
+    "publication_id": "PUB119",
+    "type_noeud": "notion_idee",
+    "libelle": "Diversité des cadres juridiques et managériaux européens du fait religieux au travail",
+    "libelle_normalise": "diversite cadres juridiques manageriaux europeens fait religieux travail",
+    "page_source": "102-105",
+    "chunk_id_source": "C1047"
+  },
+  {
+    "node_id": "N1477",
+    "publication_id": "PUB119",
+    "type_noeud": "expert_public",
+    "libelle": "Lionel Honoré",
+    "libelle_normalise": "lionel honore",
+    "page_source": "5",
+    "chunk_id_source": "C1031"
+  },
+  {
+    "node_id": "N1478",
+    "publication_id": "PUB119",
+    "type_noeud": "acteur",
+    "libelle": "Institut Montaigne",
+    "libelle_normalise": "institut montaigne",
+    "page_source": "3-5",
+    "chunk_id_source": "C1031"
+  },
+  {
+    "node_id": "N1479",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Doctrine française du maintien de l'ordre fondée sur la mise à distance",
+    "libelle_normalise": "Doctrine française du maintien de l'ordre fondée sur la mise à distance",
+    "page_source": "05:49–08:53",
+    "chunk_id_source": "C1049"
+  },
+  {
+    "node_id": "N1480",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Distinction entre maintien de l'ordre et action militaire",
+    "libelle_normalise": "Distinction entre maintien de l'ordre et action militaire",
+    "page_source": "23:45–25:30",
+    "chunk_id_source": "C1051"
+  },
+  {
+    "node_id": "N1481",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Articulation entre autorité civile et commandement de la force publique",
+    "libelle_normalise": "Articulation entre autorité civile et commandement de la force publique",
+    "page_source": "17:00–18:30",
+    "chunk_id_source": "C1050"
+  },
+  {
+    "node_id": "N1482",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Transparence et anticipation des réactions des manifestants",
+    "libelle_normalise": "Transparence et anticipation des réactions des manifestants",
+    "page_source": "24:45–30:54",
+    "chunk_id_source": "C1052;C1053"
+  },
+  {
+    "node_id": "N1483",
+    "publication_id": "PUB120",
+    "type_noeud": "action",
+    "libelle": "Communication des sommations et maintien de voies de dégagement",
+    "libelle_normalise": "Communication des sommations et maintien de voies de dégagement",
+    "page_source": "27:35–30:00",
+    "chunk_id_source": "C1052;C1053"
+  },
+  {
+    "node_id": "N1484",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Réduction de l'emploi de la force par la maîtrise de la nécessité et de l'urgence",
+    "libelle_normalise": "Réduction de l'emploi de la force par la maîtrise de la nécessité et de l'urgence",
+    "page_source": "52:01–52:44",
+    "chunk_id_source": "C1054"
+  },
+  {
+    "node_id": "N1485",
+    "publication_id": "PUB120",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Équipements et armements spécialisés du maintien de l'ordre",
+    "libelle_normalise": "Équipements et armements spécialisés du maintien de l'ordre",
+    "page_source": "1:00:08–1:25:00",
+    "chunk_id_source": "C1055;C1056"
+  },
+  {
+    "node_id": "N1486",
+    "publication_id": "PUB120",
+    "type_noeud": "tendance",
+    "libelle": "Remise en cause du principe de mise à distance par les nouvelles formes de manifestation",
+    "libelle_normalise": "Remise en cause du principe de mise à distance par les nouvelles formes de manifestation",
+    "page_source": "07:35–08:53;1:50:45",
+    "chunk_id_source": "C1049;C1061"
+  },
+  {
+    "node_id": "N1487",
+    "publication_id": "PUB120",
+    "type_noeud": "notion_idee",
+    "libelle": "Enseignements opérationnels du mouvement des Gilets jaunes",
+    "libelle_normalise": "Enseignements opérationnels du mouvement des Gilets jaunes",
+    "page_source": "1:42:04–1:49:00",
+    "chunk_id_source": "C1057;C1058"
+  },
+  {
+    "node_id": "N1488",
+    "publication_id": "PUB120",
+    "type_noeud": "methode",
+    "libelle": "Anticipation des mobilisations par le renseignement et l'information opérationnelle",
+    "libelle_normalise": "Anticipation des mobilisations par le renseignement et l'information opérationnelle",
+    "page_source": "1:49:17–1:50:21",
+    "chunk_id_source": "C1059"
+  },
+  {
+    "node_id": "N1489",
+    "publication_id": "PUB120",
+    "type_noeud": "tendance",
+    "libelle": "Transformation du commandement du maintien de l'ordre par les images et les réseaux sociaux",
+    "libelle_normalise": "Transformation du commandement du maintien de l'ordre par les images et les réseaux sociaux",
+    "page_source": "1:49:49–1:54:44",
+    "chunk_id_source": "C1060;C1062"
+  },
+  {
+    "node_id": "N1490",
+    "publication_id": "PUB120",
+    "type_noeud": "expert_public",
+    "libelle": "Christophe Maresca",
+    "libelle_normalise": "Christophe Maresca",
+    "page_source": "00:34–00:57",
+    "chunk_id_source": "C1048"
+  },
+  {
+    "node_id": "N1491",
+    "publication_id": "PUB121",
+    "type_noeud": "notion_idee",
+    "libelle": "Définition et critères de la criminalité organisée",
+    "libelle_normalise": "Définition et critères de la criminalité organisée",
+    "page_source": "21–24",
+    "chunk_id_source": "C1063"
+  },
+  {
+    "node_id": "N1492",
+    "publication_id": "PUB121",
+    "type_noeud": "notion_idee",
+    "libelle": "Quête de pouvoir des organisations criminelles",
+    "libelle_normalise": "Quête de pouvoir des organisations criminelles",
+    "page_source": "21–24",
+    "chunk_id_source": "C1064"
+  },
+  {
+    "node_id": "N1493",
+    "publication_id": "PUB121",
+    "type_noeud": "notion_idee",
+    "libelle": "Corruption systémique des organisations criminelles",
+    "libelle_normalise": "Corruption systémique des organisations criminelles",
+    "page_source": "21–24",
+    "chunk_id_source": "C1065"
+  },
+  {
+    "node_id": "N1494",
+    "publication_id": "PUB121",
+    "type_noeud": "tendance",
+    "libelle": "Extension territoriale de la criminalité organisée",
+    "libelle_normalise": "Extension territoriale de la criminalité organisée",
+    "page_source": "10–11",
+    "chunk_id_source": "C1067"
+  },
+  {
+    "node_id": "N1495",
+    "publication_id": "PUB121",
+    "type_noeud": "tendance",
+    "libelle": "Imbrication de la criminalité organisée et de la délinquance quotidienne",
+    "libelle_normalise": "Imbrication de la criminalité organisée et de la délinquance quotidienne",
+    "page_source": "11–13",
+    "chunk_id_source": "C1068"
+  },
+  {
+    "node_id": "N1496",
+    "publication_id": "PUB121",
+    "type_noeud": "notion_idee",
+    "libelle": "Criminalité organisée et souveraineté de l'État",
+    "libelle_normalise": "Criminalité organisée et souveraineté de l'État",
+    "page_source": "10–11",
+    "chunk_id_source": "C1067"
+  },
+  {
+    "node_id": "N1497",
+    "publication_id": "PUB121",
+    "type_noeud": "methode",
+    "libelle": "Détection territoriale des réseaux criminels",
+    "libelle_normalise": "Détection territoriale des réseaux criminels",
+    "page_source": "13;17",
+    "chunk_id_source": "C1070;C1072"
+  },
+  {
+    "node_id": "N1498",
+    "publication_id": "PUB121",
+    "type_noeud": "methode",
+    "libelle": "Articulation du renseignement criminel et des enquêtes judiciaires",
+    "libelle_normalise": "Articulation du renseignement criminel et des enquêtes judiciaires",
+    "page_source": "16–17",
+    "chunk_id_source": "C1071;C1072"
+  },
+  {
+    "node_id": "N1499",
+    "publication_id": "PUB121",
+    "type_noeud": "methode",
+    "libelle": "Ciblage des dirigeants des organisations criminelles",
+    "libelle_normalise": "Ciblage des dirigeants des organisations criminelles",
+    "page_source": "52–55",
+    "chunk_id_source": "C1074;C1075"
+  },
+  {
+    "node_id": "N1500",
+    "publication_id": "PUB121",
+    "type_noeud": "tendance",
+    "libelle": "Diversification des activités criminelles",
+    "libelle_normalise": "Diversification des activités criminelles",
+    "page_source": "21–24;71–74",
+    "chunk_id_source": "C1066;C1077"
+  },
+  {
+    "node_id": "N1408",
+    "publication_id": "PUB122",
+    "type_noeud": "notion_idee",
+    "libelle": "Lucidité de la décision sous stress, fatigue et incertitude",
+    "libelle_normalise": "lucidite decision sous stress fatigue incertitude",
+    "page_source": "67;68;69",
+    "chunk_id_source": "C1080;C1091"
+  },
+  {
+    "node_id": "N1414",
+    "publication_id": "PUB122",
+    "type_noeud": "probleme",
+    "libelle": "Blessures psychiques et troubles liés au stress traumatique",
+    "libelle_normalise": "blessures psychiques troubles stress traumatique",
+    "page_source": "39;40;41;42;67;68",
+    "chunk_id_source": "C1085"
+  },
+  {
+    "node_id": "N1418",
+    "publication_id": "PUB122",
+    "type_noeud": "notion_idee",
+    "libelle": "Groupe comme régulateur du stress et support de l'adaptation",
+    "libelle_normalise": "groupe regulateur stress support adaptation",
+    "page_source": "67",
+    "chunk_id_source": "C1081"
+  },
+  {
+    "node_id": "N1425",
+    "publication_id": "PUB122",
+    "type_noeud": "action",
+    "libelle": "Débriefing et retour d'expérience pour adapter les procédures opérationnelles",
+    "libelle_normalise": "debriefing retour experience adapter procedures operationnelles",
+    "page_source": "67;74",
+    "chunk_id_source": "C1082;C1088"
+  },
+  {
+    "node_id": "N1445",
+    "publication_id": "PUB122",
+    "type_noeud": "notion_idee",
+    "libelle": "Coordination collective en situation de crise",
+    "libelle_normalise": "coordination collective situation crise",
+    "page_source": "67;68;74",
+    "chunk_id_source": "C1079;C1089"
+  },
+  {
+    "node_id": "N1501",
+    "publication_id": "PUB122",
+    "type_noeud": "tendance",
+    "libelle": "Intensification des feux extrêmes et extension du risque incendie",
+    "libelle_normalise": "intensification feux extremes extension risque incendie",
+    "page_source": "9;10;78",
+    "chunk_id_source": "C1078"
+  },
+  {
+    "node_id": "N1502",
+    "publication_id": "PUB122",
+    "type_noeud": "probleme",
+    "libelle": "Dépassement des capacités opérationnelles face aux feux extrêmes",
+    "libelle_normalise": "depassement capacites operationnelles feux extremes",
+    "page_source": "67;68",
+    "chunk_id_source": "C1084"
+  },
+  {
+    "node_id": "N1503",
+    "publication_id": "PUB122",
+    "type_noeud": "probleme",
+    "libelle": "Surcharge logistique et épuisement des primo-intervenants",
+    "libelle_normalise": "surcharge logistique epuisement primo intervenants",
+    "page_source": "68",
+    "chunk_id_source": "C1084;C1085"
+  },
+  {
+    "node_id": "N1504",
+    "publication_id": "PUB122",
+    "type_noeud": "probleme",
+    "libelle": "Défaillances des communications en situation de crise extrême",
+    "libelle_normalise": "defaillances communications crise extreme",
+    "page_source": "68",
+    "chunk_id_source": "C1086"
+  },
+  {
+    "node_id": "N1505",
+    "publication_id": "PUB122",
+    "type_noeud": "notion_idee",
+    "libelle": "Résilience psychosociale des primo-intervenants",
+    "libelle_normalise": "resilience psychosociale primo intervenants",
+    "page_source": "67;68;69",
+    "chunk_id_source": "C1081;C1082;C1088"
+  },
+  {
+    "node_id": "N1506",
+    "publication_id": "PUB122",
+    "type_noeud": "action",
+    "libelle": "Anticipation opérationnelle des feux extrêmes",
+    "libelle_normalise": "anticipation operationnelle feux extremes",
+    "page_source": "67;75",
+    "chunk_id_source": "C1079;C1090"
+  },
+  {
+    "node_id": "N1507",
+    "publication_id": "PUB122",
+    "type_noeud": "notion_idee",
+    "libelle": "Adaptation tactique face à l'impossible opérationnel",
+    "libelle_normalise": "adaptation tactique impossible operationnel",
+    "page_source": "67;76",
+    "chunk_id_source": "C1083;C1091"
+  },
+  {
+    "node_id": "N1508",
+    "publication_id": "PUB122",
+    "type_noeud": "probleme",
+    "libelle": "Écart entre recommandations et mise en œuvre opérationnelle",
+    "libelle_normalise": "ecart recommandations mise en oeuvre operationnelle",
+    "page_source": "68;74",
+    "chunk_id_source": "C1087"
+  },
+  {
+    "node_id": "N1408",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Lucidité de la décision sous stress, fatigue et incertitude",
+    "libelle_normalise": "lucidite decision sous stress fatigue incertitude",
+    "page_source": "296;297;298",
+    "chunk_id_source": "C1092;C1093"
+  },
+  {
+    "node_id": "N1409",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Biais cognitifs et collectifs susceptibles d’altérer le jugement opérationnel",
+    "libelle_normalise": "biais cognitifs collectifs alterer jugement operationnel",
+    "page_source": "11;12;13;14;15;296;297;298",
+    "chunk_id_source": "C1092"
+  },
+  {
+    "node_id": "N1426",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Compétences émotionnelles en situation d’urgence",
+    "libelle_normalise": "competences emotionnelles situation urgence",
+    "page_source": "296;297;298;299",
+    "chunk_id_source": "C1093;C1099"
+  },
+  {
+    "node_id": "N1509",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Les émotions ne perturbent pas toujours les décisions",
+    "libelle_normalise": "emotions ne perturbent pas toujours decisions",
+    "page_source": "296;297;298;311;312",
+    "chunk_id_source": "C1097;C1100"
+  },
+  {
+    "node_id": "N1510",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle des émotions dans les décisions difficiles",
+    "libelle_normalise": "role emotions decisions difficiles",
+    "page_source": "296;297;298;312",
+    "chunk_id_source": "C1098;C1100"
+  },
+  {
+    "node_id": "N1511",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Différences émotionnelles entre pompiers et civils",
+    "libelle_normalise": "differences emotionnelles pompiers civils",
+    "page_source": "295;311;312",
+    "chunk_id_source": "C1095;C1100"
+  },
+  {
+    "node_id": "N1512",
+    "publication_id": "PUB123",
+    "type_noeud": "methode",
+    "libelle": "Simulation immersive pour étudier les émotions",
+    "libelle_normalise": "simulation immersive etudier emotions",
+    "page_source": "294;295;311",
+    "chunk_id_source": "C1094;C1101"
+  },
+  {
+    "node_id": "N1513",
+    "publication_id": "PUB123",
+    "type_noeud": "notion_idee",
+    "libelle": "Retour au calme après une situation critique",
+    "libelle_normalise": "retour calme apres situation critique",
+    "page_source": "292;293;296;297",
+    "chunk_id_source": "C1096"
+  },
+  {
+    "node_id": "N1514",
+    "publication_id": "PUB124",
+    "type_noeud": "tendance",
+    "libelle": "Baisse des homicides au sein du couple depuis 2006",
+    "libelle_normalise": "Baisse des homicides au sein du couple depuis 2006",
+    "page_source": "8",
+    "chunk_id_source": "C1102"
+  },
+  {
+    "node_id": "N1515",
+    "publication_id": "PUB124",
+    "type_noeud": "tendance",
+    "libelle": "Hausse des tentatives d'homicide conjugal en 2025",
+    "libelle_normalise": "Hausse des tentatives d'homicide conjugal en 2025",
+    "page_source": "9",
+    "chunk_id_source": "C1103"
+  },
+  {
+    "node_id": "N1516",
+    "publication_id": "PUB124",
+    "type_noeud": "notion_idee",
+    "libelle": "Femmes majoritaires parmi les victimes d'homicides conjugaux",
+    "libelle_normalise": "Femmes majoritaires parmi les victimes d'homicides conjugaux",
+    "page_source": "5;7;17",
+    "chunk_id_source": "C1104"
+  },
+  {
+    "node_id": "N1517",
+    "publication_id": "PUB124",
+    "type_noeud": "notion_idee",
+    "libelle": "Séparations et disputes dans les homicides conjugaux",
+    "libelle_normalise": "Séparations et disputes dans les homicides conjugaux",
+    "page_source": "16",
+    "chunk_id_source": "C1105"
+  },
+  {
+    "node_id": "N1518",
+    "publication_id": "PUB124",
+    "type_noeud": "probleme",
+    "libelle": "Violences antérieures chez les victimes d'homicides conjugaux",
+    "libelle_normalise": "Violences antérieures chez les victimes d'homicides conjugaux",
+    "page_source": "22;23;24",
+    "chunk_id_source": "C1106"
+  },
+  {
+    "node_id": "N1519",
+    "publication_id": "PUB124",
+    "type_noeud": "probleme",
+    "libelle": "Violences signalées avant les homicides conjugaux",
+    "libelle_normalise": "Violences signalées avant les homicides conjugaux",
+    "page_source": "23",
+    "chunk_id_source": "C1107"
+  },
+  {
+    "node_id": "N1520",
+    "publication_id": "PUB124",
+    "type_noeud": "notion_idee",
+    "libelle": "Enfants victimes des violences mortelles au sein du couple",
+    "libelle_normalise": "Enfants victimes des violences mortelles au sein du couple",
+    "page_source": "26",
+    "chunk_id_source": "C1108"
+  },
+  {
+    "node_id": "N1521",
+    "publication_id": "PUB124",
+    "type_noeud": "action",
+    "libelle": "Dispositifs de protection des victimes de violences conjugales",
+    "libelle_normalise": "Dispositifs de protection des victimes de violences conjugales",
+    "page_source": "30;31",
+    "chunk_id_source": "C1109"
+  },
+  {
+    "node_id": "N1001",
+    "publication_id": "PUB125",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Loi du 24 juillet 2015, encadrement légal des techniques de renseignement",
+    "libelle_normalise": "Loi du 24 juillet 2015, encadrement légal des techniques de renseignement",
+    "page_source": "1;3;4",
+    "chunk_id_source": "C1111"
+  },
+  {
+    "node_id": "N1116",
+    "publication_id": "PUB125",
+    "type_noeud": "notion_idee",
+    "libelle": "Intelligence artificielle, transformation du geste métier, du métier et de l’environnement métier",
+    "libelle_normalise": "Intelligence artificielle, transformation du geste métier, du métier et de l’environnement métier",
+    "page_source": "2;3",
+    "chunk_id_source": "C1112"
+  },
+  {
+    "node_id": "N1522",
+    "publication_id": "PUB125",
+    "type_noeud": "notion_idee",
+    "libelle": "Trois formes d'infiltration des services de renseignement étrangers",
+    "libelle_normalise": "Trois formes d'infiltration des services de renseignement étrangers",
+    "page_source": "1",
+    "chunk_id_source": "C1110"
+  },
+  {
+    "node_id": "N1523",
+    "publication_id": "PUB125",
+    "type_noeud": "notion_idee",
+    "libelle": "Détection de signaux suspects par l'intelligence artificielle",
+    "libelle_normalise": "Détection de signaux suspects par l'intelligence artificielle",
+    "page_source": "2;3",
+    "chunk_id_source": "C1113"
+  },
+  {
+    "node_id": "N1524",
+    "publication_id": "PUB125",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle humain dans l'interprétation du renseignement",
+    "libelle_normalise": "Rôle humain dans l'interprétation du renseignement",
+    "page_source": "2;3",
+    "chunk_id_source": "C1114"
+  },
+  {
+    "node_id": "N1525",
+    "publication_id": "PUB125",
+    "type_noeud": "notion_idee",
+    "libelle": "Transformation du renseignement en preuve judiciaire",
+    "libelle_normalise": "transformation du renseignement en preuve judiciaire",
+    "page_source": "3;4",
+    "chunk_id_source": "C1115"
+  },
+  {
+    "node_id": "N0544",
+    "publication_id": "PUB126",
+    "type_noeud": "acteur",
+    "libelle": "Office français de la biodiversité",
+    "libelle_normalise": "office français de la biodiversité",
+    "page_source": "115;116;117;118;119",
+    "chunk_id_source": "C1118;C1122"
+  },
+  {
+    "node_id": "N0558",
+    "publication_id": "PUB126",
+    "type_noeud": "action",
+    "libelle": "Enquête judiciaire sur les infractions environnementales",
+    "libelle_normalise": "enquête judiciaire sur les infractions environnementales",
+    "page_source": "125;126;127",
+    "chunk_id_source": "C1121;C1122"
+  },
+  {
+    "node_id": "N0698",
+    "publication_id": "PUB126",
+    "type_noeud": "acteur",
+    "libelle": "Commandement pour l’environnement et la santé (CESAN)",
+    "libelle_normalise": "commandement pour l’environnement et la santé (cesan)",
+    "page_source": "112;113;114;124;125;126;127;128;129;130",
+    "chunk_id_source": "C1120;C1122;C1124"
+  },
+  {
+    "node_id": "N1527",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Quatre modèles européens de police environnementale",
+    "libelle_normalise": "quatre modèles européens de police environnementale",
+    "page_source": "13;14;15;16;133;134;135;136",
+    "chunk_id_source": "C1116"
+  },
+  {
+    "node_id": "N1528",
+    "publication_id": "PUB126",
+    "type_noeud": "probleme",
+    "libelle": "Fragmentation de la lutte contre la criminalité environnementale",
+    "libelle_normalise": "fragmentation de la lutte contre la criminalité environnementale",
+    "page_source": "111;112;133;134;137;138",
+    "chunk_id_source": "C1117;C1116"
+  },
+  {
+    "node_id": "N1529",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Complémentarité entre gendarmerie et OFB dans les enquêtes",
+    "libelle_normalise": "complémentarité entre gendarmerie et ofb dans les enquêtes",
+    "page_source": "125;126;127",
+    "chunk_id_source": "C1122"
+  },
+  {
+    "node_id": "N1530",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Renseignement criminel au service des enquêtes environnementales",
+    "libelle_normalise": "renseignement criminel au service des enquêtes environnementales",
+    "page_source": "134;135;136",
+    "chunk_id_source": "C1123"
+  },
+  {
+    "node_id": "N1531",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Spécialisation des enquêteurs en criminalité environnementale",
+    "libelle_normalise": "spécialisation des enquêteurs en criminalité environnementale",
+    "page_source": "75;76;102;103;124;125",
+    "chunk_id_source": "C1124"
+  },
+  {
+    "node_id": "N1532",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Coopération entre forces de sécurité et société civile",
+    "libelle_normalise": "coopération entre forces de sécurité et société civile",
+    "page_source": "127;128;135;136",
+    "chunk_id_source": "C1125"
+  },
+  {
+    "node_id": "N1533",
+    "publication_id": "PUB126",
+    "type_noeud": "recommandation",
+    "libelle": "Renforcer les capacités policières de lutte contre la criminalité environnementale",
+    "libelle_normalise": "renforcer les capacités policières de lutte contre la criminalité environnementale",
+    "page_source": "143;144;145;146;147;148",
+    "chunk_id_source": "C1126;C1127"
+  },
+  {
+    "node_id": "N1534",
+    "publication_id": "PUB126",
+    "type_noeud": "acteur",
+    "libelle": "Office central de lutte contre les atteintes à l'environnement et à la santé publique (OCLAESP)",
+    "libelle_normalise": "office central de lutte contre les atteintes à l'environnement et à la santé publique (oclaesp)",
+    "page_source": "112;113;114",
+    "chunk_id_source": "C1119;C1121"
+  },
+  {
+    "node_id": "N0552",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Connaissance des milieux, des espèces et de la biodiversité",
+    "libelle_normalise": "connaissance des milieux, des espèces et de la biodiversité",
+    "page_source": "125;126",
+    "chunk_id_source": "C1122"
+  },
+  {
+    "node_id": "N1535",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Diversité des atteintes criminelles à l'environnement",
+    "libelle_normalise": "diversité des atteintes criminelles à l'environnement",
+    "page_source": "24;26",
+    "chunk_id_source": "C1128"
+  },
+  {
+    "node_id": "N1536",
+    "publication_id": "PUB126",
+    "type_noeud": "notion_idee",
+    "libelle": "Géographie des atteintes à l'environnement",
+    "libelle_normalise": "géographie des atteintes à l'environnement",
+    "page_source": "24;25",
+    "chunk_id_source": "C1129"
+  },
+  {
+    "node_id": "N1537",
+    "publication_id": "PUB127",
+    "type_noeud": "tendance",
+    "libelle": "Militarisation des images produites par les civils",
+    "libelle_normalise": "militarisation des images produites par les civils",
+    "page_source": "4",
+    "chunk_id_source": "C1130"
+  },
+  {
+    "node_id": "N1538",
+    "publication_id": "PUB127",
+    "type_noeud": "notion_idee",
+    "libelle": "Utilisation des données visuelles pour le ciblage automatisé",
+    "libelle_normalise": "utilisation des données visuelles pour le ciblage automatisé",
+    "page_source": "4",
+    "chunk_id_source": "C1131"
+  },
+  {
+    "node_id": "N1539",
+    "publication_id": "PUB127",
+    "type_noeud": "notion_idee",
+    "libelle": "Des images qui ne servent plus seulement à montrer, mais aussi à agir",
+    "libelle_normalise": "des images qui ne servent plus seulement à montrer, mais aussi à agir",
+    "page_source": "4",
+    "chunk_id_source": "C1132"
+  },
+  {
+    "node_id": "N1540",
+    "publication_id": "PUB127",
+    "type_noeud": "notion_idee",
+    "libelle": "Détecter, identifier, suivre et guider grâce aux images",
+    "libelle_normalise": "détecter, identifier, suivre et guider grâce aux images",
+    "page_source": "4",
+    "chunk_id_source": "C1133"
+  },
+  {
+    "node_id": "N1541",
+    "publication_id": "PUB128",
+    "type_noeud": "tendance",
+    "libelle": "Montée en puissance du renseignement allemand depuis 2022",
+    "libelle_normalise": "montée en puissance du renseignement allemand depuis 2022",
+    "page_source": "12:20-14:30;28:15-29:25",
+    "chunk_id_source": "C1134"
+  },
+  {
+    "node_id": "N1542",
+    "publication_id": "PUB128",
+    "type_noeud": "probleme",
+    "libelle": "Contraintes juridiques et parlementaires pesant sur le renseignement extérieur allemand",
+    "libelle_normalise": "contraintes juridiques et parlementaires pesant sur le renseignement extérieur allemand",
+    "page_source": "01:50-03:45;10:15-11:15",
+    "chunk_id_source": "C1135"
+  },
+  {
+    "node_id": "N1543",
+    "publication_id": "PUB128",
+    "type_noeud": "methode",
+    "libelle": "Réforme des capacités opérationnelles du renseignement extérieur allemand",
+    "libelle_normalise": "réforme des capacités opérationnelles du renseignement extérieur allemand",
+    "page_source": "20:30-22:10;31:40-32:00",
+    "chunk_id_source": "C1136"
+  },
+  {
+    "node_id": "N1544",
+    "publication_id": "PUB128",
+    "type_noeud": "tendance",
+    "libelle": "Développement des capacités allemandes de renseignement spatial",
+    "libelle_normalise": "développement des capacités allemandes de renseignement spatial",
+    "page_source": "22:15-25:25",
+    "chunk_id_source": "C1137"
+  },
+  {
+    "node_id": "N1545",
+    "publication_id": "PUB128",
+    "type_noeud": "notion_idee",
+    "libelle": "Surveillance plus fréquente des territoires par satellite",
+    "libelle_normalise": "surveillance plus fréquente des territoires par satellite",
+    "page_source": "24:20-25:25",
+    "chunk_id_source": "C1138"
+  },
+  {
+    "node_id": "N1546",
+    "publication_id": "PUB128",
+    "type_noeud": "tendance",
+    "libelle": "Renforcement du contre-espionnage allemand",
+    "libelle_normalise": "renforcement du contre-espionnage allemand",
+    "page_source": "29:30-30:50;32:15-34:15",
+    "chunk_id_source": "C1139"
+  },
+  {
+    "node_id": "N1547",
+    "publication_id": "PUB128",
+    "type_noeud": "probleme",
+    "libelle": "Cloisonnement entre renseignement, police et justice en Allemagne",
+    "libelle_normalise": "cloisonnement entre renseignement, police et justice en Allemagne",
+    "page_source": "29:35-31:35",
+    "chunk_id_source": "C1140"
+  },
+  {
+    "node_id": "N1525",
+    "publication_id": "PUB128",
+    "type_noeud": "notion_idee",
+    "libelle": "Transformation du renseignement en preuve judiciaire",
+    "libelle_normalise": "transformation du renseignement en preuve judiciaire",
+    "page_source": "29:35-30:00",
+    "chunk_id_source": "C1141"
+  },
+  {
+    "node_id": "N1548",
+    "publication_id": "PUB128",
+    "type_noeud": "tendance",
+    "libelle": "Recomposition des coopérations européennes de renseignement",
+    "libelle_normalise": "recomposition des coopérations européennes de renseignement",
+    "page_source": "36:20-40:15",
+    "chunk_id_source": "C1142"
+  },
+  {
+    "node_id": "N1549",
+    "publication_id": "PUB128",
+    "type_noeud": "probleme",
+    "libelle": "Concurrence industrielle liée aux investissements allemands dans le renseignement",
+    "libelle_normalise": "concurrence industrielle liée aux investissements allemands dans le renseignement",
+    "page_source": "25:30-27:10;37:40-39:15",
+    "chunk_id_source": "C1143"
+  },
+  {
+    "node_id": "N1550",
+    "publication_id": "PUB128",
+    "type_noeud": "notion_idee",
+    "libelle": "Tournant stratégique allemand après l'invasion de l'Ukraine",
+    "libelle_normalise": "tournant stratégique allemand après l'invasion de l'Ukraine",
+    "page_source": "12:20-13:35",
+    "chunk_id_source": "C1144"
+  },
+  {
+    "node_id": "N1551",
+    "publication_id": "PUB128",
+    "type_noeud": "probleme",
+    "libelle": "Méfiance historique envers le renseignement allemand",
+    "libelle_normalise": "méfiance historique envers le renseignement allemand",
+    "page_source": "11:50-12:25",
+    "chunk_id_source": "C1145"
+  },
+  {
+    "node_id": "N1552",
+    "publication_id": "PUB128",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés d'anticipation des menaces par le renseignement allemand",
+    "libelle_normalise": "difficultés d'anticipation des menaces par le renseignement allemand",
+    "page_source": "12:30-13:20;16:20-17:30",
+    "chunk_id_source": "C1146;C1147"
+  },
+  {
+    "node_id": "N1553",
+    "publication_id": "PUB129",
+    "type_noeud": "tendance",
+    "libelle": "Industrialisation du narcotrafic",
+    "libelle_normalise": "industrialisation du narcotrafic",
+    "page_source": "53",
+    "chunk_id_source": "C1148"
+  },
+  {
+    "node_id": "N1554",
+    "publication_id": "PUB129",
+    "type_noeud": "tendance",
+    "libelle": "Extension des violences liées au narcotrafic à de nouveaux territoires",
+    "libelle_normalise": "extension des violences liées au narcotrafic à de nouveaux territoires",
+    "page_source": "54",
+    "chunk_id_source": "C1149"
+  },
+  {
+    "node_id": "N1629",
+    "publication_id": "PUB129",
+    "type_noeud": "notion_idee",
+    "libelle": "Corruption des services chargés de lutter contre le narcotrafic",
+    "libelle_normalise": "corruption des services chargés de lutter contre le narcotrafic",
+    "page_source": "54;57",
+    "chunk_id_source": "C1150"
+  },
+  {
+    "node_id": "N1555",
+    "publication_id": "PUB129",
+    "type_noeud": "probleme",
+    "libelle": "Corruption des institutions publiques et menace sur l'État de droit",
+    "libelle_normalise": "corruption des institutions publiques et menace sur l'état de droit",
+    "page_source": "57",
+    "chunk_id_source": "C1151"
+  },
+  {
+    "node_id": "N1556",
+    "publication_id": "PUB129",
+    "type_noeud": "methode",
+    "libelle": "Renforcement de la coordination nationale contre la criminalité organisée",
+    "libelle_normalise": "renforcement de la coordination nationale contre la criminalité organisée",
+    "page_source": "55;56",
+    "chunk_id_source": "C1152"
+  },
+  {
+    "node_id": "N1557",
+    "publication_id": "PUB129",
+    "type_noeud": "methode",
+    "libelle": "Recours aux repentis et aux informateurs pour démanteler les réseaux criminels",
+    "libelle_normalise": "recours aux repentis et aux informateurs pour démanteler les réseaux criminels",
+    "page_source": "55",
+    "chunk_id_source": "C1153"
+  },
+  {
+    "node_id": "N1558",
+    "publication_id": "PUB129",
+    "type_noeud": "probleme",
+    "libelle": "Tensions entre efficacité des enquêtes et protection des libertés",
+    "libelle_normalise": "tensions entre efficacité des enquêtes et protection des libertés",
+    "page_source": "55;57",
+    "chunk_id_source": "C1154;C1155"
+  },
+  {
+    "node_id": "N1559",
+    "publication_id": "PUB129",
+    "type_noeud": "notion_idee",
+    "libelle": "Adaptation du droit face à la criminalité organisée",
+    "libelle_normalise": "adaptation du droit face à la criminalité organisée",
+    "page_source": "56;57",
+    "chunk_id_source": "C1156"
+  },
+  {
+    "node_id": "N1560",
+    "publication_id": "PUB129",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisance de la prévention et de l'accompagnement des consommateurs de drogues",
+    "libelle_normalise": "insuffisance de la prévention et de l'accompagnement des consommateurs de drogues",
+    "page_source": "58;59",
+    "chunk_id_source": "C1157;C1158"
+  },
+  {
+    "node_id": "N1561",
+    "publication_id": "PUB130",
+    "type_noeud": "tendance",
+    "libelle": "Diffusion des usages de drogues dans de nouveaux territoires et milieux sociaux",
+    "libelle_normalise": "diffusion des usages de drogues dans de nouveaux territoires et milieux sociaux",
+    "page_source": "35;36",
+    "chunk_id_source": "C1159"
+  },
+  {
+    "node_id": "N1562",
+    "publication_id": "PUB130",
+    "type_noeud": "tendance",
+    "libelle": "Place croissante du narcotrafic dans le débat public",
+    "libelle_normalise": "place croissante du narcotrafic dans le débat public",
+    "page_source": "35;36",
+    "chunk_id_source": "C1160"
+  },
+  {
+    "node_id": "N1563",
+    "publication_id": "PUB130",
+    "type_noeud": "probleme",
+    "libelle": "Effacement des enjeux sanitaires derrière la lutte contre les trafics",
+    "libelle_normalise": "effacement des enjeux sanitaires derrière la lutte contre les trafics",
+    "page_source": "35;36;37",
+    "chunk_id_source": "C1161"
+  },
+  {
+    "node_id": "N1564",
+    "publication_id": "PUB130",
+    "type_noeud": "probleme",
+    "libelle": "Limites des politiques de prohibition des drogues",
+    "libelle_normalise": "limites des politiques de prohibition des drogues",
+    "page_source": "36;38;39",
+    "chunk_id_source": "C1162"
+  },
+  {
+    "node_id": "N1565",
+    "publication_id": "PUB130",
+    "type_noeud": "notion_idee",
+    "libelle": "Effets de la prohibition sur les marchés et les violences liés aux drogues",
+    "libelle_normalise": "effets de la prohibition sur les marchés et les violences liés aux drogues",
+    "page_source": "38;39",
+    "chunk_id_source": "C1163"
+  },
+  {
+    "node_id": "N1566",
+    "publication_id": "PUB130",
+    "type_noeud": "methode",
+    "libelle": "Développement des politiques de réduction des risques liés aux drogues",
+    "libelle_normalise": "développement des politiques de réduction des risques liés aux drogues",
+    "page_source": "37;38;39",
+    "chunk_id_source": "C1164;C1165"
+  },
+  {
+    "node_id": "N1567",
+    "publication_id": "PUB130",
+    "type_noeud": "methode",
+    "libelle": "Articulation des réponses sanitaires, sociales et sécuritaires aux drogues",
+    "libelle_normalise": "articulation des réponses sanitaires, sociales et sécuritaires aux drogues",
+    "page_source": "38;39",
+    "chunk_id_source": "C1166"
+  },
+  {
+    "node_id": "N1568",
+    "publication_id": "PUB130",
+    "type_noeud": "methode",
+    "libelle": "Participation des habitants et des usagers aux politiques des drogues",
+    "libelle_normalise": "participation des habitants et des usagers aux politiques des drogues",
+    "page_source": "38;39;40",
+    "chunk_id_source": "C1167"
+  },
+  {
+    "node_id": "N1560",
+    "publication_id": "PUB130",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisance de la prévention et de l'accompagnement des consommateurs de drogues",
+    "libelle_normalise": "insuffisance de la prévention et de l'accompagnement des consommateurs de drogues",
+    "page_source": "35;36;39",
+    "chunk_id_source": "C1168"
+  },
+  {
+    "node_id": "N1569",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Diversité des parcours pénaux des jeunes suivis par la justice",
+    "libelle_normalise": "L'étude met en évidence l'hétérogénéité des parcours pénaux des jeunes suivis par la protection judiciaire de la jeunesse, tant dans leur intensité que dans leur évolution.",
+    "page_source": "1;2;7",
+    "chunk_id_source": "C1169;C1173"
+  },
+  {
+    "node_id": "N1570",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Association entre intensité du parcours pénal et type de suivi judiciaire",
+    "libelle_normalise": "Les parcours pénaux les plus denses sont associés à des modalités de suivi judiciaire différentes de celles observées pour les parcours moins denses, sans que cette association permette d'établir une causalité.",
+    "page_source": "2;3;5",
+    "chunk_id_source": "C1172"
+  },
+  {
+    "node_id": "N1571",
+    "publication_id": "PUB131",
+    "type_noeud": "tendance",
+    "libelle": "Pic des affaires pénales à 17 ans puis diminution après la majorité",
+    "libelle_normalise": "Le nombre d'affaires pénales atteint un maximum à 17 ans avant de diminuer après la majorité, y compris pour des jeunes présentant des parcours pénaux soutenus.",
+    "page_source": "10",
+    "chunk_id_source": "C1180"
+  },
+  {
+    "node_id": "N1572",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Poursuite des parcours pénaux après la majorité",
+    "libelle_normalise": "Les trajectoires pénales de certains jeunes suivis pendant leur minorité se prolongent au-delà de 18 ans, selon des rythmes et des intensités variables.",
+    "page_source": "3;6;7",
+    "chunk_id_source": "C1171"
+  },
+  {
+    "node_id": "N1573",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Typologie des quatre trajectoires pénales des jeunes suivis par la protection judiciaire de la jeunesse",
+    "libelle_normalise": "L'analyse statistique distingue quatre profils de parcours pénaux parmi les jeunes ayant bénéficié d'un suivi conséquent par la protection judiciaire de la jeunesse.",
+    "page_source": "7;8",
+    "chunk_id_source": "C1173"
+  },
+  {
+    "node_id": "N1574",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Association entre situations de danger durant l'enfance et parcours pénaux plus denses",
+    "libelle_normalise": "Les jeunes présentant des parcours pénaux plus denses sont davantage concernés par certaines situations de danger signalées durant leur enfance. Cette association ne démontre pas de lien causal.",
+    "page_source": "8;9",
+    "chunk_id_source": "C1178"
+  },
+  {
+    "node_id": "N1575",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Association entre fugues et intensité des parcours pénaux",
+    "libelle_normalise": "Les fugues apparaissent plus fréquemment dans certains parcours judiciaires particulièrement denses et constituent un élément de différenciation des trajectoires.",
+    "page_source": "8",
+    "chunk_id_source": "C1179"
+  },
+  {
+    "node_id": "N1576",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Bifurcations possibles dans les parcours pénaux après la majorité",
+    "libelle_normalise": "Les trajectoires pénales ne sont pas nécessairement linéaires : certains parcours connaissent une diminution ou une interruption des affaires pénales après la majorité.",
+    "page_source": "10;11",
+    "chunk_id_source": "C1182"
+  },
+  {
+    "node_id": "N1577",
+    "publication_id": "PUB131",
+    "type_noeud": "methode",
+    "libelle": "Analyse des parcours judiciaires par rapprochement de données administratives",
+    "libelle_normalise": "L'étude rapproche des données administratives relatives aux procédures pénales et aux suivis éducatifs afin de reconstituer et de comparer les parcours judiciaires des jeunes.",
+    "page_source": "1;5;9",
+    "chunk_id_source": "C1183;C1184"
+  },
+  {
+    "node_id": "N1578",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Les jeunes aux parcours pénaux peu denses et à l'entrée tardive dans la délinquance représentent 28 % des jeunes ayant bénéficié d'un suivi conséquent",
+    "libelle_normalise": "Ce profil rassemble 28 % des jeunes ayant bénéficié d'un suivi conséquent par la protection judiciaire de la jeunesse. Leurs parcours pénaux se caractérisent par une entrée relativement tardive et une faible densité d'affaires.",
+    "page_source": "7;8",
+    "chunk_id_source": "C1174"
+  },
+  {
+    "node_id": "N1579",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Les jeunes dont le parcours pénal se développe principalement après la majorité représentent 38 % des jeunes ayant bénéficié d'un suivi conséquent",
+    "libelle_normalise": "Ce profil représente 38 % des jeunes ayant bénéficié d'un suivi conséquent. Leur activité pénale enregistrée se développe principalement après le passage à la majorité.",
+    "page_source": "7;8",
+    "chunk_id_source": "C1175"
+  },
+  {
+    "node_id": "N1580",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Les jeunes entrés précocement dans la délinquance mais pris en charge tardivement représentent 18 % des jeunes ayant bénéficié d'un suivi conséquent",
+    "libelle_normalise": "Ce profil correspond à 18 % des jeunes ayant bénéficié d'un suivi conséquent. Il associe une entrée précoce dans les affaires pénales à une prise en charge judiciaire plus tardive.",
+    "page_source": "7;8",
+    "chunk_id_source": "C1176"
+  },
+  {
+    "node_id": "N1581",
+    "publication_id": "PUB131",
+    "type_noeud": "notion_idee",
+    "libelle": "Les jeunes aux parcours pénaux précoces, persistants et particulièrement intensifs représentent 16 % des jeunes ayant bénéficié d'un suivi conséquent",
+    "libelle_normalise": "Ce profil regroupe 16 % des jeunes ayant bénéficié d'un suivi conséquent. Leurs parcours pénaux se distinguent par leur précocité, leur persistance et leur forte intensité.",
+    "page_source": "7;8",
+    "chunk_id_source": "C1177"
+  },
+  {
+    "node_id": "N1582",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Performance analytique fondée sur l'articulation des compétences, de l'organisation et des technologies",
+    "libelle_normalise": "La performance de l'analyse repose sur l'interaction entre les compétences humaines, les dispositifs organisationnels et les outils technologiques. Aucun de ces leviers ne suffit isolément à garantir la fluidité, la cohérence et la valeur décisionnelle des analyses.",
+    "page_source": "491;494;499",
+    "chunk_id_source": "C1208;C1210"
+  },
+  {
+    "node_id": "N1583",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Centralité de l'analyse dans la transformation de l'information en connaissance utile à la décision",
+    "libelle_normalise": "L'analyse constitue une étape centrale du cycle de veille et de renseignement. Elle permet d'interpréter les informations collectées, d'établir des liens, de construire une compréhension des situations et de produire des connaissances susceptibles d'éclairer la décision.",
+    "page_source": "18;19;494",
+    "chunk_id_source": "C1185;C1210"
+  },
+  {
+    "node_id": "N1584",
+    "publication_id": "PUB132",
+    "type_noeud": "probleme",
+    "libelle": "Dégradation de la qualité de l'analyse par un mauvais cadrage des besoins ou une diffusion inadaptée",
+    "libelle_normalise": "La qualité du travail analytique dépend de l'ensemble du cycle de veille. Une définition insuffisante des besoins, une collecte mal ciblée ou une diffusion inadaptée aux destinataires peuvent compromettre la pertinence et l'utilisation des résultats.",
+    "page_source": "494;495",
+    "chunk_id_source": "C1210"
+  },
+  {
+    "node_id": "N1585",
+    "publication_id": "PUB132",
+    "type_noeud": "methode",
+    "libelle": "Articulation des dimensions humaines, organisationnelles et technologiques de l'analyse",
+    "libelle_normalise": "L'auteur propose de considérer conjointement les compétences des analystes, l'organisation du travail et les technologies mobilisées. Cette approche vise à mettre en cohérence les trois dimensions pour améliorer le fonctionnement du dispositif analytique et éviter les limites d'une intervention centrée sur un seul levier.",
+    "page_source": "470;498;499",
+    "chunk_id_source": "C1200;C1212"
+  },
+  {
+    "node_id": "N1586",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Contribution des compétences de l'analyste à la fluidité et à la cohérence du travail analytique",
+    "libelle_normalise": "L'enquête met en évidence une association robuste entre les compétences des analystes et la fluidité du processus de renseignement. Les capacités de cadrage, de sélection des sources, d'interprétation et de communication contribuent à limiter les incompréhensions et les reprises inutiles.",
+    "page_source": "433;434",
+    "chunk_id_source": "C1193"
+  },
+  {
+    "node_id": "N1587",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Contribution de la collaboration structurée à la fluidité de l'analyse",
+    "libelle_normalise": "L'enquête identifie une association robuste entre la collaboration et la fluidité du travail analytique. Les échanges entre analystes, experts et commanditaires facilitent la confrontation des interprétations, la circulation des connaissances et la cohérence des productions.",
+    "page_source": "433;434;491",
+    "chunk_id_source": "C1194;C1208"
+  },
+  {
+    "node_id": "N1588",
+    "publication_id": "PUB132",
+    "type_noeud": "probleme",
+    "libelle": "Obstacles organisationnels à la circulation et à l'exploitation des informations",
+    "libelle_normalise": "Les cloisonnements entre services, l'imprécision des responsabilités et les difficultés de coordination peuvent freiner le partage des informations et perturber le processus analytique. L'enquête identifie une association robuste entre les obstacles organisationnels et la dégradation de la fluidité du dispositif.",
+    "page_source": "429;433;456;457",
+    "chunk_id_source": "C1195;C1196"
+  },
+  {
+    "node_id": "N1589",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Contribution des technologies d'aide à l'analyse à la fluidité des processus",
+    "libelle_normalise": "L'enquête identifie une association robuste entre l'utilisation des technologies d'aide à l'analyse et la fluidité du travail analytique. Les outils peuvent faciliter certaines opérations de recherche, de traitement et de structuration de l'information, sous réserve d'être intégrés aux pratiques professionnelles.",
+    "page_source": "433;491",
+    "chunk_id_source": "C1198;C1208"
+  },
+  {
+    "node_id": "N1590",
+    "publication_id": "PUB132",
+    "type_noeud": "methode",
+    "libelle": "Évaluation des leviers de performance analytique par couverture et densité des témoignages",
+    "libelle_normalise": "L'auteur examine les associations entre leviers et effets de l'analyse à partir de deux indicateurs : la couverture, correspondant au nombre d'entretiens dans lesquels une association apparaît, et la densité, correspondant au nombre de citations concernées. Cette démarche permet de distinguer les associations robustes, modérées et faibles dans le corpus étudié.",
+    "page_source": "430;431;432",
+    "chunk_id_source": "C1191"
+  },
+  {
+    "node_id": "N1591",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Six associations robustes identifiées dans l'enquête, dont cinq reprises dans le tableau des recommandations",
+    "libelle_normalise": "Le tableau V-6 identifie six associations robustes parmi douze hypothèses examinées : compétences et fluidité, compétences et valeur décisionnelle, compétences et qualité mesurée, collaboration et fluidité, obstacles organisationnels et fluidité, technologies d'aide à l'analyse et fluidité. Le tableau récapitulatif des recommandations ne reprend toutefois que cinq de ces associations, sans celle relative aux obstacles organisationnels. Ces résultats reposent sur les cooccurrences observées dans les entretiens et ne démontrent pas des causalités.",
+    "page_source": "433;464;465",
+    "chunk_id_source": "C1192;C1199"
+  },
+  {
+    "node_id": "N1592",
+    "publication_id": "PUB132",
+    "type_noeud": "methode",
+    "libelle": "Capitalisation des analyses dans une mémoire documentaire réutilisable et traçable",
+    "libelle_normalise": "La capitalisation consiste à organiser et conserver les informations, les analyses et les connaissances produites afin de les retrouver et de les réutiliser. Elle peut faciliter la continuité des travaux, la transmission des connaissances et la contextualisation de nouvelles situations, notamment lors des changements d'interlocuteurs.",
+    "page_source": "458;459",
+    "chunk_id_source": "C1197"
+  },
+  {
+    "node_id": "N1593",
+    "publication_id": "PUB132",
+    "type_noeud": "recommandation",
+    "libelle": "Cinquante-huit recommandations pour renforcer les capacités humaines, organisationnelles et techniques de l'analyse",
+    "libelle_normalise": "À partir de l'interprétation des résultats de l'enquête, l'auteur formule 58 recommandations réparties entre les dimensions humaines (19), organisationnelles (22) et techniques (17). Il souligne l'importance d'une mise en œuvre coordonnée de ces dimensions. Ces recommandations n'ont pas fait l'objet d'une validation expérimentale de leurs effets.",
+    "page_source": "463;464;465",
+    "chunk_id_source": "C1199"
+  },
+  {
+    "node_id": "N1594",
+    "publication_id": "PUB132",
+    "type_noeud": "probleme",
+    "libelle": "Limites de généralisation d'une enquête qualitative fondée sur vingt analystes",
+    "libelle_normalise": "L'étude repose sur les témoignages de vingt analystes français et présente des limites liées à la taille et à la composition de l'échantillon, aux biais possibles des entretiens et aux choix méthodologiques de codage. L'auteur souligne la nécessité de reproduire les recherches dans d'autres contextes et d'évaluer les propositions sur le terrain.",
+    "page_source": "491;492",
+    "chunk_id_source": "C1209"
+  },
+  {
+    "node_id": "N1595",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Raisonnement par hypothèses pour analyser des situations incertaines",
+    "libelle_normalise": "Face à une situation incertaine, l'analyste peut partir d'indices pour élaborer plusieurs explications plausibles, puis rechercher les informations permettant de les confronter aux faits. Cette démarche mobilise notamment le raisonnement abductif et vise à produire des interprétations argumentées et révisables.",
+    "page_source": "470;471;483",
+    "chunk_id_source": "C1201;C1202"
+  },
+  {
+    "node_id": "N1596",
+    "publication_id": "PUB132",
+    "type_noeud": "methode",
+    "libelle": "Protocole d'analyse « Formuler – Tester – Tracer » : élaborer des hypothèses, les confronter aux faits et documenter le raisonnement",
+    "libelle_normalise": "Christophe Deschamps propose un protocole en trois étapes pour structurer l'analyse en situation d'incertitude. Formuler consiste à élaborer plusieurs hypothèses plausibles à partir des indices disponibles. Tester consiste à rechercher des preuves et des contre-preuves pour départager les hypothèses. Tracer consiste à conserver les sources, les critères et les arguments ayant conduit aux conclusions. Le protocole vise à rendre le raisonnement plus rigoureux, transparent et vérifiable, sans prétendre éliminer l'incertitude.",
+    "page_source": "484;485;486",
+    "chunk_id_source": "C1202;C1203"
+  },
+  {
+    "node_id": "N1602",
+    "publication_id": "PUB132",
+    "type_noeud": "tendance",
+    "libelle": "Usage des modèles de langage par dix-huit des vingt analystes interrogés",
+    "libelle_normalise": "Dans l'enquête qualitative menée auprès de vingt analystes, dix-huit déclarent utiliser des modèles de langage, dont la moitié quotidiennement. Cette observation illustre l'intégration de ces outils dans les pratiques des participants, sans permettre de généraliser ce taux à l'ensemble des professionnels de l'analyse.",
+    "page_source": "487",
+    "chunk_id_source": "C1204"
+  },
+  {
+    "node_id": "N1603",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Assistance de l'intelligence artificielle à la recherche, au traitement et à la synthèse des informations",
+    "libelle_normalise": "Les analystes interrogés décrivent différents usages de l'intelligence artificielle : exploration de sujets, identification de mots-clés, recherche de sources, traduction, résumé, comparaison de documents et structuration des informations. Des usages plus avancés d'extraction et de rapprochement des données sont également évoqués.",
+    "page_source": "488;489",
+    "chunk_id_source": "C1205"
+  },
+  {
+    "node_id": "N1604",
+    "publication_id": "PUB132",
+    "type_noeud": "probleme",
+    "libelle": "Nécessité de vérifier les productions et les sources fournies par l'intelligence artificielle",
+    "libelle_normalise": "Les témoignages soulignent les risques d'erreur des modèles de langage et la nécessité de vérifier leurs réponses. Les analystes insistent sur le contrôle des sources, le recoupement des informations et le maintien d'un jugement humain critique face aux productions automatisées.",
+    "page_source": "488;489",
+    "chunk_id_source": "C1206"
+  },
+  {
+    "node_id": "N1605",
+    "publication_id": "PUB132",
+    "type_noeud": "recommandation",
+    "libelle": "Conception d'outils d'intelligence artificielle adaptés aux connaissances métier et aux pratiques des analystes",
+    "libelle_normalise": "Plusieurs participants expriment le besoin d'outils d'intelligence artificielle capables de mobiliser les connaissances internes de leur organisation et de répondre aux exigences spécifiques du travail analytique. Les témoignages soulignent notamment l'intérêt d'associer les analystes à la conception des outils plutôt que de privilégier une approche uniquement technique.",
+    "page_source": "490",
+    "chunk_id_source": "C1207"
+  },
+  {
+    "node_id": "N1606",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Construction collective du sens à partir d'informations et d'expertises dispersées",
+    "libelle_normalise": "L'analyse de l'information repose sur la confrontation et la mise en relation de connaissances, d'expériences et d'interprétations issues de différents acteurs. La revue de littérature souligne notamment, à travers les travaux de Nicolas Lesca, que la construction collective du sens contribue à produire une compréhension partagée des situations.",
+    "page_source": "401;497",
+    "chunk_id_source": "C1190;C1211"
+  },
+  {
+    "node_id": "N1607",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle du jugement, de l'expérience et de la créativité dans l'analyse de l'information",
+    "libelle_normalise": "L'analyse ne se réduit pas au traitement technique des données ou à l'application de méthodes formalisées. Elle mobilise les capacités de jugement, l'expérience, l'intuition et la créativité de l'analyste pour établir des liens entre des informations dispersées, identifier des changements et élaborer des interprétations pertinentes.",
+    "page_source": "383;384",
+    "chunk_id_source": "C1186"
+  },
+  {
+    "node_id": "N1608",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Différence entre résumé documentaire et synthèse orientée vers la décision",
+    "libelle_normalise": "Contrairement au résumé, qui condense un contenu, la synthèse sélectionne, interprète et organise les informations essentielles en fonction des besoins d'un destinataire et d'un objectif de décision. Elle implique un jugement et une prise de responsabilité de son auteur dans la représentation de la situation.",
+    "page_source": "385;386",
+    "chunk_id_source": "C1188"
+  },
+  {
+    "node_id": "N1609",
+    "publication_id": "PUB132",
+    "type_noeud": "probleme",
+    "libelle": "Risque d'appauvrissement de l'analyse par l'utilisation mécanique des grilles et méthodes standardisées",
+    "libelle_normalise": "La revue de littérature souligne que les méthodes et grilles d'analyse standardisées, notamment SWOT, PESTEL ou les cinq forces de Porter, peuvent orienter excessivement l'interprétation lorsque leur application se limite à remplir des catégories prédéfinies. Leur utilisation doit rester au service du raisonnement critique et ne pas s'y substituer.",
+    "page_source": "384;401",
+    "chunk_id_source": "C1187"
+  },
+  {
+    "node_id": "N1610",
+    "publication_id": "PUB132",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle actif du décideur dans l'interprétation des informations produites par les analystes",
+    "libelle_normalise": "Le décideur n'est pas uniquement le destinataire des productions analytiques. Il les confronte à sa propre expérience, les interprète et les contextualise pour construire sa représentation de la situation et prendre une décision. Christophe Deschamps relève que seuls cinq des soixante-dix ouvrages examinés abordent explicitement cette fonction analytique du décideur.",
+    "page_source": "399;400;401",
+    "chunk_id_source": "C1189"
+  },
+  {
+    "node_id": "N1611",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Exposition des fichiers sensibles de l'État aux cyberattaques",
+    "libelle_normalise": "Le débat examine les conséquences de l'intrusion dans les systèmes du ministère de l'Intérieur et de l'accès à des informations issues de fichiers sensibles, notamment les antécédents judiciaires et les personnes recherchées. Les intervenants distinguent la gravité potentielle de l'exploitation de ces données de la profondeur technique de l'intrusion.",
+    "page_source": "",
+    "chunk_id_source": "C1213;C1214"
+  },
+  {
+    "node_id": "N1612",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Erreurs humaines à l'origine de compromissions informatiques",
+    "libelle_normalise": "Les intervenants présentent l'utilisation insuffisamment sécurisée d'identifiants professionnels comme une vulnérabilité ayant facilité l'intrusion au ministère de l'Intérieur. Sylvain Guillet souligne qu'une attaque peut exploiter des pratiques ordinaires de sécurité défaillantes sans recourir à des techniques sophistiquées.",
+    "page_source": "",
+    "chunk_id_source": "C1215"
+  },
+  {
+    "node_id": "N1613",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Protection numérique inégale des services de l'État",
+    "libelle_normalise": "Antoine Chauveau et Sylvain Guillet soulignent que les capacités de cybersécurité ne sont pas homogènes dans l'administration. Les services les mieux dotés peuvent disposer de protections avancées, tandis que d'autres structures ou agents présentent des vulnérabilités plus importantes.",
+    "page_source": "",
+    "chunk_id_source": "C1218;C1233"
+  },
+  {
+    "node_id": "N1614",
+    "publication_id": "PUB133",
+    "type_noeud": "methode",
+    "libelle": "Renforcement de la sécurité des accès informatiques",
+    "libelle_normalise": "Sylvain Guillet identifie l'authentification multifacteur comme une mesure permettant de réduire les risques d'accès frauduleux à partir d'identifiants volés. Il évoque son renforcement au ministère de l'Intérieur à la suite de la cyberattaque.",
+    "page_source": "",
+    "chunk_id_source": "C1216"
+  },
+  {
+    "node_id": "N1615",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Cybersécurité fondée sur la prévention et l'amélioration continue",
+    "libelle_normalise": "Sylvain Guillet considère qu'une sécurité excluant toute attaque est irréaliste. Il préconise d'évaluer les incidents à partir de leurs conséquences, des mesures de réaction et des améliorations apportées aux pratiques humaines et techniques.",
+    "page_source": "",
+    "chunk_id_source": "C1217"
+  },
+  {
+    "node_id": "N1616",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisante formation des agents et des responsables politiques aux risques cyber",
+    "libelle_normalise": "Antoine Chauveau souligne les difficultés d'acculturation à la cybersécurité chez certains agents publics et responsables politiques. Il évoque les risques liés à des comportements insuffisamment prudents et la difficulté pour des décideurs généralistes de maîtriser des enjeux techniques complexes.",
+    "page_source": "",
+    "chunk_id_source": "C1215;C1220"
+  },
+  {
+    "node_id": "N1617",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Rôle des normes dans la prévention des cyberattaques",
+    "libelle_normalise": "Sylvain Guillet présente les normes et les processus de conformité comme des éléments structurants de la cybersécurité. Il cite notamment la directive NIS2 et le règlement européen sur la cyberrésilience pour illustrer l'importance de la préparation et des bonnes pratiques.",
+    "page_source": "",
+    "chunk_id_source": "C1219"
+  },
+  {
+    "node_id": "N1618",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de détection rapide des intrusions informatiques",
+    "libelle_normalise": "Antoine Chauveau souligne que les attaquants auraient pu accéder à des fichiers du ministère de l'Intérieur pendant plusieurs jours avant leur détection. Il évoque une durée allant jusqu'à vingt-six jours selon une source de presse, tout en reconnaissant la capacité des autorités à réagir après la découverte de l'intrusion.",
+    "page_source": "",
+    "chunk_id_source": "C1221"
+  },
+  {
+    "node_id": "N1619",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Exploitation criminelle des données volées",
+    "libelle_normalise": "Les intervenants distinguent plusieurs usages possibles des données dérobées : revente, recherche d'avantages financiers, réutilisation d'identifiants, constitution de bases d'informations et pressions sur des personnes. Antoine Chauveau évoque notamment les risques que représenterait l'accès de groupes criminels à des informations judiciaires sensibles.",
+    "page_source": "",
+    "chunk_id_source": "C1214;C1223"
+  },
+  {
+    "node_id": "N1620",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Diversité des motivations des cyberattaquants",
+    "libelle_normalise": "Les intervenants distinguent les motivations financières, la recherche de notoriété, l'exploitation d'informations sensibles et les objectifs de perturbation ou de démonstration de puissance. Ils soulignent que des cyberattaques apparemment similaires peuvent relever de logiques différentes.",
+    "page_source": "",
+    "chunk_id_source": "C1222"
+  },
+  {
+    "node_id": "N1621",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Fragilisation de la confiance dans les institutions par les cyberattaques",
+    "libelle_normalise": "À propos de l'attaque contre La Poste, Antoine Chauveau considère que la perturbation de services essentiels peut aussi viser la confiance des citoyens dans les institutions. Les dysfonctionnements deviennent alors un moyen de mettre en évidence publiquement les vulnérabilités des services publics.",
+    "page_source": "",
+    "chunk_id_source": "C1225;C1226"
+  },
+  {
+    "node_id": "N1622",
+    "publication_id": "PUB133",
+    "type_noeud": "notion_idee",
+    "libelle": "Deux formes de cyberattaques : vol de données et interruption de services",
+    "libelle_normalise": "Le débat oppose l'intrusion au ministère de l'Intérieur, caractérisée par l'accès à des données sensibles, et l'attaque contre La Poste, présentée comme une attaque par déni de service visant à perturber son fonctionnement. Les conséquences, les objectifs possibles et les réponses de sécurité diffèrent selon la nature de l'attaque.",
+    "page_source": "",
+    "chunk_id_source": "C1224"
+  },
+  {
+    "node_id": "N1623",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Dépendance de l'État aux technologies étrangères",
+    "libelle_normalise": "Antoine Chauveau souligne le recours de services publics français à des solutions développées par de grandes entreprises étrangères, notamment américaines. Il présente cette dépendance comme un enjeu de souveraineté, de maîtrise des infrastructures, d'innovation et d'autonomie stratégique.",
+    "page_source": "",
+    "chunk_id_source": "C1227;C1230"
+  },
+  {
+    "node_id": "N1624",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Risques liés à l'extraterritorialité du droit américain",
+    "libelle_normalise": "Sylvain Guillet évoque les effets potentiels des législations américaines sur les informations hébergées ou traitées par des fournisseurs de services numériques américains. Il présente ce contexte juridique comme un risque pour la souveraineté numérique française.",
+    "page_source": "",
+    "chunk_id_source": "C1228"
+  },
+  {
+    "node_id": "N1625",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Faible adoption des solutions françaises de cybersécurité qualifiées",
+    "libelle_normalise": "Sylvain Guillet cite le référentiel SecNumCloud et l'existence d'entreprises françaises qualifiées pour souligner un décalage entre l'offre disponible et les choix effectivement réalisés par les organisations. Le débat présente l'adoption de solutions nationales comme un enjeu distinct de leur disponibilité technique.",
+    "page_source": "",
+    "chunk_id_source": "C1229"
+  },
+  {
+    "node_id": "N1626",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Pénurie européenne d'experts en cybersécurité",
+    "libelle_normalise": "Le débat évoque un manque important de spécialistes de cybersécurité en Europe, à partir notamment d'une intervention attribuée à une porte-parole de l'ENISA. Sylvain Guillet souligne également les capacités limitées de formation et le besoin d'enseignants, tout en relevant le dynamisme de certains pôles français.",
+    "page_source": "",
+    "chunk_id_source": "C1231"
+  },
+  {
+    "node_id": "N1627",
+    "publication_id": "PUB133",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de fidélisation des experts cyber dans le secteur public",
+    "libelle_normalise": "Antoine Chauveau décrit une concurrence entre administrations et entreprises privées pour attirer les spécialistes de cybersécurité. Il estime que les différences de rémunération et de perspectives professionnelles peuvent fragiliser la capacité des services publics à conserver leurs compétences.",
+    "page_source": "",
+    "chunk_id_source": "C1232"
+  },
+  {
+    "node_id": "N1628",
+    "publication_id": "PUB133",
+    "type_noeud": "methode",
+    "libelle": "Accompagnement des petites collectivités et entreprises face aux cyberattaques",
+    "libelle_normalise": "Antoine Chauveau distingue trois formes d'accompagnement des structures disposant de moyens limités : la prévention et la sensibilisation, l'audit des dispositifs de sécurité et l'assistance à la gestion de crise après une attaque. Il souligne les difficultés particulières rencontrées par les petites collectivités et les petites et moyennes entreprises.",
+    "page_source": "",
+    "chunk_id_source": "C1234"
   }
 ]

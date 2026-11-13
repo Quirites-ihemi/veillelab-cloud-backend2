@@ -1,0 +1,2509 @@
+const { searchCorpus, normalizeText, tokenize } = require("./globalSearch");
+const { getCorpusStore } = require("./corpusStore");
+
+const SUPPORTED_ACTIONS = Object.freeze({
+  DOC01: Object.freeze({
+    id: "DOC01",
+    label: "Documenter cet élément",
+    role: "documentaliste_augmentee",
+    mode: "retrieval_only"
+  }),
+  DOC02: Object.freeze({
+    id: "DOC02",
+    label: "Remonter à la preuve",
+    role: "documentaliste_augmentee",
+    mode: "exact_provenance_lookup"
+  }),
+  DOC03: Object.freeze({
+    id: "DOC03",
+    label: "Chercher des cas comparables",
+    role: "documentaliste_augmentee",
+    mode: "comparison_candidates_only"
+  }),
+  MIR01: Object.freeze({
+    id: "MIR01",
+    label: "Mettre une affirmation à l’épreuve",
+    role: "miroir_critique",
+    mode: "evidence_stress_test"
+  }),
+  MIR04: Object.freeze({
+    id: "MIR04",
+    label: "Faire apparaître les contradictions entre matériaux",
+    role: "miroir_critique",
+    mode: "documentary_tension_mapping"
+  }),
+  MIR08: Object.freeze({
+    id: "MIR08",
+    label: "Vérifier l’ancrage empirique",
+    role: "miroir_critique",
+    mode: "empirical_anchor_check"
+  }),
+  MET01: Object.freeze({
+    id: "MET01",
+    label: "Vérifier la comparabilité",
+    role: "aiguillon_methodologique",
+    mode: "comparability_check"
+  }),
+  MET02: Object.freeze({
+    id: "MET02",
+    label: "Vérifier la nature du lien",
+    role: "aiguillon_methodologique",
+    mode: "relation_nature_check"
+  }),
+  MET04: Object.freeze({
+    id: "MET04",
+    label: "Éprouver une recommandation",
+    role: "aiguillon_methodologique",
+    mode: "recommendation_stress_test"
+  })
+});
+
+function cleanString(value) {
+  return String(value == null ? "" : value).trim();
+}
+
+function buildProofStatus(result) {
+  const level = cleanString(result.provenance_level);
+  const locator = result.locator == null ? null : cleanString(result.locator) || null;
+  const proofMode = cleanString(result.proof_mode);
+
+  if (level === "A") {
+    return {
+      level,
+      status: "fine_proof_available",
+      fine_proof_available: true,
+      locator,
+      proof_mode: proofMode,
+      message: "Preuve fine disponible dans le corpus."
+    };
+  }
+
+  if (level === "B") {
+    return {
+      level,
+      status: "source_level_only",
+      fine_proof_available: false,
+      locator,
+      proof_mode: proofMode,
+      message: "Source identifiée, sans repérage fin disponible."
+    };
+  }
+
+  return {
+    level: level || "C",
+    status: "structured_without_fine_locator",
+    fine_proof_available: false,
+    locator: null,
+    proof_mode: proofMode || "graph_only",
+    message: "Connaissance structurée disponible, sans repérage fin dans la source."
+  };
+}
+
+function buildContent(result) {
+  if (result.kind === "chunk") {
+    return {
+      type: "excerpt",
+      text: cleanString(result.text),
+      section: cleanString(result.section) || null,
+      page_debut: cleanString(result.page_debut) || null,
+      page_fin: cleanString(result.page_fin) || null
+    };
+  }
+
+  if (result.kind === "node") {
+    return {
+      type: "graph_node",
+      text: cleanString(result.label),
+      node_id: cleanString(result.node_id),
+      node_type: cleanString(result.node_type) || null
+    };
+  }
+
+  return {
+    type: "graph_relation",
+    text: [
+      cleanString(result.source_label),
+      cleanString(result.relation_type),
+      cleanString(result.target_label)
+    ].filter(Boolean).join(" | "),
+    relation_id: cleanString(result.relation_id),
+    relation_type: cleanString(result.relation_type) || null,
+    source_id: cleanString(result.source_id) || null,
+    source_label: cleanString(result.source_label) || null,
+    target_id: cleanString(result.target_id) || null,
+    target_label: cleanString(result.target_label) || null
+  };
+}
+
+function buildMaterial(result) {
+  const chunkId = cleanString(result.chunk_id || result.chunk_id_source) || null;
+  return {
+    material_id: cleanString(result.result_id),
+    result_kind: cleanString(result.kind),
+    relevance_score: Number(result.score || 0),
+    publication: {
+      publication_id: cleanString(result.publication_id),
+      title: cleanString(result.publication_title),
+      organisme_producteur: cleanString(result.organisme_producteur),
+      annee_publication: cleanString(result.annee_publication),
+      type_document: cleanString(result.type_document),
+      domaine: cleanString(result.domaine),
+      url_source: cleanString(result.url_source),
+      url_contenu: cleanString(result.url_contenu)
+    },
+    content: buildContent(result),
+    provenance: {
+      ...buildProofStatus(result),
+      detail: cleanString(result.provenance_detail),
+      chunk_id: chunkId
+    }
+  };
+}
+
+function runDoc01(body) {
+  const action = SUPPORTED_ACTIONS.DOC01;
+  const element = cleanString(body.element || body.query);
+  if (!element) {
+    const error = new Error("Le champ element est obligatoire pour DOC01.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const searchRequest = {
+    query: element,
+    limit: Math.max(1, Math.min(20, Number(body.limit) || 12)),
+    max_per_publication: Math.max(1, Math.min(6, Number(body.max_per_publication) || 3)),
+    diversify_by_publication: body.diversify_by_publication !== false
+  };
+
+  for (const key of ["publication_ids", "kinds", "domaine", "organisme", "provenance_levels"]) {
+    if (body[key] !== undefined) searchRequest[key] = body[key];
+  }
+
+  const search = searchCorpus(searchRequest);
+  const materials = search.results.map(buildMaterial);
+  const publicationIds = [...new Set(materials.map(m => m.publication.publication_id).filter(Boolean))];
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
+    action,
+    element,
+    guardrails: {
+      generates_analysis: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      corpus_only: true,
+      note: "DOC01 restitue des matériaux du corpus ; il ne construit pas le raisonnement de l'utilisateur."
+    },
+    search: {
+      engine: search.engine,
+      query_concepts: search.query_concepts,
+      returned_materials: materials.length,
+      returned_publications: publicationIds.length,
+      publication_ids: publicationIds,
+      returned_by_kind: search.search.returned_by_kind
+    },
+    materials
+  };
+}
+
+function splitChunkRefs(value) {
+  return cleanString(value)
+    .split(/[;,]/)
+    .map(cleanString)
+    .filter(Boolean);
+}
+
+function parseMaterialSelector(body) {
+  const explicit = cleanString(body.material_id);
+  if (explicit) {
+    const match = explicit.match(/^(chunk|node|relation):(.+)$/i);
+    if (!match) {
+      const error = new Error("material_id doit être de la forme chunk:Cxxxx, node:Nxxxx ou relation:Rxxxx.");
+      error.statusCode = 400;
+      throw error;
+    }
+    return { kind: match[1].toLowerCase(), id: cleanString(match[2]) };
+  }
+
+  const candidates = [
+    ["chunk", cleanString(body.chunk_id)],
+    ["node", cleanString(body.node_id)],
+    ["relation", cleanString(body.relation_id)]
+  ].filter(([, id]) => Boolean(id));
+
+  if (candidates.length !== 1) {
+    const error = new Error("DOC02 exige un matériau précis : material_id, ou exactement un de chunk_id, node_id, relation_id.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return { kind: candidates[0][0], id: candidates[0][1] };
+}
+
+function publicationMeta(store, publicationId) {
+  const publication = store.publicationById.get(publicationId) || {};
+  const manifest = store.manifestByPublicationId.get(publicationId) || {};
+  return {
+    publication_id: publicationId,
+    title: cleanString(publication.titre || manifest.titre),
+    organisme_producteur: cleanString(publication.organisme_producteur || manifest.organisme_producteur),
+    annee_publication: cleanString(publication.année_publication || publication.annee_publication || manifest.annee_publication),
+    type_document: cleanString(publication.type_document || manifest.type_document),
+    domaine: cleanString(publication.domaine || manifest.domaine),
+    url_source: cleanString(publication.url_source || manifest.url_source),
+    url_contenu: cleanString(publication.url_contenu || manifest.url_contenu)
+  };
+}
+
+function nodeSummary(node) {
+  return {
+    type: "graph_node",
+    node_id: cleanString(node.node_id),
+    node_type: cleanString(node.type_noeud) || null,
+    text: cleanString(node.libelle),
+    page_source: cleanString(node.page_source) || null,
+    chunk_id_source: cleanString(node.chunk_id_source) || null
+  };
+}
+
+function relationSummary(relation, nodeById) {
+  const source = nodeById.get(cleanString(relation.source_id));
+  const target = nodeById.get(cleanString(relation.cible_id));
+  return {
+    type: "graph_relation",
+    relation_id: cleanString(relation.relation_id),
+    relation_type: cleanString(relation.type_relation) || null,
+    source_id: cleanString(relation.source_id) || null,
+    source_label: cleanString(source?.libelle) || null,
+    target_id: cleanString(relation.cible_id) || null,
+    target_label: cleanString(target?.libelle) || null,
+    text: [
+      cleanString(source?.libelle),
+      cleanString(relation.type_relation),
+      cleanString(target?.libelle)
+    ].filter(Boolean).join(" | "),
+    page_source: cleanString(relation.page_source) || null,
+    chunk_id_source: cleanString(relation.chunk_id_source) || null
+  };
+}
+
+function chunkProof(chunk) {
+  const pageStart = cleanString(chunk.page_debut) || null;
+  const pageEnd = cleanString(chunk.page_fin) || null;
+  const locator = pageStart && pageEnd
+    ? (pageStart === pageEnd ? pageStart : `${pageStart};${pageEnd}`)
+    : (pageStart || pageEnd || null);
+
+  return {
+    proof_id: `chunk:${cleanString(chunk.chunk_id)}`,
+    chunk_id: cleanString(chunk.chunk_id),
+    section: cleanString(chunk.section) || null,
+    locator,
+    page_debut: pageStart,
+    page_fin: pageEnd,
+    text: cleanString(chunk.texte)
+  };
+}
+
+function exactMaterial(store, selector, publicationId = "") {
+  if (selector.kind === "chunk") {
+    const item = store.contents.find(chunk => cleanString(chunk.chunk_id) === selector.id);
+    if (item) return { kind: "chunk", raw: item };
+  }
+  if (selector.kind === "node") {
+    const matching = store.nodes.filter(node => cleanString(node.node_id) === selector.id);
+    const pid = cleanString(publicationId);
+    const item = pid
+      ? matching.find(node => cleanString(node.publication_id) === pid)
+      : matching.length === 1 ? matching[0] : null;
+    if (item) return { kind: "node", raw: item };
+    if (!pid && matching.length > 1) {
+      const error = new Error(`Le nœud ${selector.id} appartient à plusieurs publications : publication_id est obligatoire pour une preuve exacte.`);
+      error.statusCode = 400;
+      throw error;
+    }
+  }
+  if (selector.kind === "relation") {
+    const item = store.relations.find(relation => cleanString(relation.relation_id) === selector.id);
+    if (item) return { kind: "relation", raw: item };
+  }
+
+  const error = new Error(`Matériau introuvable dans le corpus actif : ${selector.kind}:${selector.id}.`);
+  error.statusCode = 404;
+  throw error;
+}
+
+function runDoc02(body) {
+  const action = SUPPORTED_ACTIONS.DOC02;
+  const selector = parseMaterialSelector(body);
+  const store = getCorpusStore();
+  const selected = exactMaterial(store, selector, body.publication_id);
+  const publicationId = cleanString(selected.raw.publication_id);
+  const manifest = store.manifestByPublicationId.get(publicationId) || {};
+  const level = cleanString(manifest.provenance_level) || "C";
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const chunkById = new Map(store.contents.map(chunk => [cleanString(chunk.chunk_id), chunk]));
+
+  let selectedMaterial;
+  let sourceLocator = null;
+  let referencedChunkIds = [];
+
+  if (selected.kind === "chunk") {
+    selectedMaterial = {
+      type: "excerpt",
+      chunk_id: cleanString(selected.raw.chunk_id),
+      section: cleanString(selected.raw.section) || null,
+      text: cleanString(selected.raw.texte),
+      page_debut: cleanString(selected.raw.page_debut) || null,
+      page_fin: cleanString(selected.raw.page_fin) || null
+    };
+    referencedChunkIds = [cleanString(selected.raw.chunk_id)];
+  } else if (selected.kind === "node") {
+    selectedMaterial = nodeSummary(selected.raw);
+    sourceLocator = cleanString(selected.raw.page_source) || null;
+    referencedChunkIds = splitChunkRefs(selected.raw.chunk_id_source);
+  } else {
+    selectedMaterial = relationSummary(selected.raw, nodeById);
+    sourceLocator = cleanString(selected.raw.page_source) || null;
+    referencedChunkIds = splitChunkRefs(selected.raw.chunk_id_source);
+  }
+
+  const missingChunkRefs = referencedChunkIds.filter(id => !chunkById.has(id));
+  if (missingChunkRefs.length) {
+    const error = new Error(`Référence(s) de chunk absente(s) du corpus : ${missingChunkRefs.join(", ")}.`);
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const proofs = referencedChunkIds.map(id => chunkProof(chunkById.get(id)));
+  if (!sourceLocator && proofs.length === 1) sourceLocator = proofs[0].locator;
+
+  const exactExcerptAvailable = proofs.length > 0;
+  const locatorAvailable = Boolean(sourceLocator || proofs.some(proof => proof.locator));
+
+  let status;
+  let message;
+  let displayInstruction;
+
+  if (level === "A" && exactExcerptAvailable) {
+    status = "fine_proof_available";
+    message = locatorAvailable
+      ? "Extrait(s) source identifié(s) dans le corpus avec repérage disponible."
+      : "Extrait(s) source identifié(s) dans le corpus ; aucun numéro de page ou timecode n’est disponible pour ce passage.";
+    displayInstruction = "Afficher uniquement les extraits et repères réellement présents dans le corpus.";
+  } else if (level === "B") {
+    status = "source_level_only";
+    message = "La source est identifiée mais aucun extrait source fin n’est disponible dans le corpus.";
+    displayInstruction = "Afficher la publication et le repère de source disponible ; ne pas fabriquer d’extrait, de page ni de timecode.";
+  } else {
+    status = "structured_without_fine_locator";
+    message = "Le graphe contient une connaissance structurée issue de cette publication, mais aucun extrait ni repérage fin n’est disponible.";
+    displayInstruction = "Afficher la publication source et signaler explicitement que le repérage fin est indisponible.";
+  }
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
+    action,
+    selected_material_id: `${selector.kind}:${selector.id}`,
+    selected_material: selectedMaterial,
+    publication: publicationMeta(store, publicationId),
+    provenance: {
+      level,
+      detail: cleanString(manifest.provenance_detail),
+      status,
+      source_locator: sourceLocator,
+      exact_excerpt_available: exactExcerptAvailable,
+      locator_available: locatorAvailable,
+      message,
+      display_instruction: displayInstruction
+    },
+    proofs,
+    guardrails: {
+      corpus_only: true,
+      exact_material_lookup: true,
+      generates_analysis: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      invents_excerpt: false,
+      invents_locator: false,
+      note: "DOC02 remonte uniquement vers la provenance réellement disponible pour le matériau sélectionné."
+    }
+  };
+}
+
+
+const COMPARISON_CONTROLLED_FACETS = Object.freeze([
+  Object.freeze({
+    id: "narcotrafic",
+    label: "trafic de cocaïne / stupéfiants",
+    query_term: "narcotrafic",
+    matches(text) {
+      const normalized = normalizeText(text);
+      return /\bnarcotrafic\b/.test(normalized)
+        || /\bcocaine\b/.test(normalized)
+        || /\bstupefiant/.test(normalized)
+        || /\bdrug trafficking\b/.test(normalized)
+        || /\bcocaine smuggling\b/.test(normalized);
+    }
+  }),
+  Object.freeze({
+    id: "port",
+    label: "ports / infrastructures portuaires",
+    query_term: "ports",
+    matches(text) {
+      const normalized = normalizeText(text);
+      const tokens = new Set(tokenize(normalized));
+      return tokens.has("port")
+        || tokens.has("ports")
+        || tokens.has("portuaire")
+        || tokens.has("portuaires")
+        || normalized.includes("port infrastructure")
+        || normalized.includes("port infrastructures")
+        || normalized.includes("shipping port")
+        || normalized.includes("commercial port");
+    }
+  })
+]);
+
+const COMPARISON_NOISE = new Set([
+  "accrue", "accru", "notamment", "francais", "francaise", "francaises", "france",
+  "mentionne", "mentionnee", "mentionnes", "mentionnees", "selon", "entre", "contre",
+  "risque", "risques", "enjeu", "enjeux", "probleme", "problemes", "public", "publique",
+  "publics", "publiques", "politique", "politiques", "evolution", "evolutions", "situation",
+  "situations", "cadre", "part", "niveau", "niveaux", "effet", "effets", "role", "roles"
+]);
+
+let COMPARISON_TOKEN_STATS = null;
+
+function comparisonTokenStats(store) {
+  if (COMPARISON_TOKEN_STATS) return COMPARISON_TOKEN_STATS;
+
+  const byPublication = new Map();
+  for (const publication of store.publications) {
+    byPublication.set(cleanString(publication.publication_id), new Set());
+  }
+
+  const add = (publicationId, text) => {
+    const target = byPublication.get(cleanString(publicationId));
+    if (!target) return;
+    for (const token of tokenize(text)) target.add(token);
+  };
+
+  for (const chunk of store.contents) add(chunk.publication_id, `${chunk.section || ""} ${chunk.texte || ""}`);
+  for (const node of store.nodes) add(node.publication_id, `${node.type_noeud || ""} ${node.libelle || ""}`);
+
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  for (const relation of store.relations) {
+    const source = nodeById.get(cleanString(relation.source_id));
+    const target = nodeById.get(cleanString(relation.cible_id));
+    add(relation.publication_id, `${source?.libelle || ""} ${relation.type_relation || ""} ${target?.libelle || ""}`);
+  }
+
+  const df = new Map();
+  for (const tokens of byPublication.values()) {
+    for (const token of tokens) df.set(token, (df.get(token) || 0) + 1);
+  }
+
+  COMPARISON_TOKEN_STATS = {
+    publication_count: byPublication.size,
+    byPublication,
+    df
+  };
+  return COMPARISON_TOKEN_STATS;
+}
+
+function comparisonIdf(token, stats) {
+  const count = stats.df.get(token) || 0;
+  return Math.log((stats.publication_count + 1) / (count + 1)) + 1;
+}
+
+function tokenApproxMatch(anchor, candidate) {
+  if (anchor === candidate) return true;
+  const minLen = Math.min(anchor.length, candidate.length);
+  if (minLen >= 6 && anchor.slice(0, 6) === candidate.slice(0, 6)) return true;
+  if (minLen >= 5 && (anchor.startsWith(candidate) || candidate.startsWith(anchor))) return true;
+  return false;
+}
+
+function resultComparisonText(result) {
+  if (result.kind === "chunk") return `${result.section || ""} ${result.text || ""}`;
+  if (result.kind === "node") return `${result.node_type || ""} ${result.label || ""}`;
+  return `${result.source_label || ""} ${result.relation_type || ""} ${result.target_label || ""}`;
+}
+
+function selectedMaterialText(selected, store) {
+  if (selected.kind === "chunk") {
+    return `${selected.raw.section || ""} ${selected.raw.texte || ""}`.trim();
+  }
+  if (selected.kind === "node") return cleanString(selected.raw.libelle);
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  return relationSummary(selected.raw, nodeById).text;
+}
+
+function extractComparisonBasis(text, store) {
+  const raw = cleanString(text);
+  const normalized = normalizeText(raw);
+  const sourceTokens = [...new Set(tokenize(normalized))];
+  const anchors = [];
+  const consumed = new Set();
+
+  for (const facet of COMPARISON_CONTROLLED_FACETS) {
+    if (!facet.matches(raw)) continue;
+    anchors.push({
+      id: facet.id,
+      label: facet.label,
+      type: "controlled_concept",
+      query_term: facet.query_term
+    });
+    if (facet.id === "narcotrafic") {
+      ["narcotrafic", "cocaine", "stupefiants", "stupefiant", "trafic", "trafics", "drug", "trafficking", "smuggling"].forEach(t => consumed.add(t));
+    }
+    if (facet.id === "port") {
+      ["port", "ports", "portuaire", "portuaires", "infrastructure", "infrastructures", "shipping", "commercial"].forEach(t => consumed.add(t));
+    }
+  }
+
+  const stats = comparisonTokenStats(store);
+  const fallbackLimit = anchors.length >= 2 ? 0 : (anchors.length === 1 ? 2 : 3);
+  const fallbackCandidates = sourceTokens
+    .filter(token => token.length >= 4)
+    .filter(token => !consumed.has(token) && !COMPARISON_NOISE.has(token))
+    .map((token, index) => ({
+      token,
+      index,
+      df: stats.df.get(token) || 0,
+      idf: comparisonIdf(token, stats)
+    }))
+    .filter(item => item.df > 0 && item.df <= Math.max(10, Math.floor(stats.publication_count * 0.4)))
+    .sort((a, b) => b.idf - a.idf || a.index - b.index)
+    .slice(0, fallbackLimit);
+
+  for (const item of fallbackCandidates) {
+    anchors.push({
+      id: `lex:${item.token}`,
+      label: item.token,
+      type: "lexical_anchor",
+      query_term: item.token,
+      document_frequency: item.df
+    });
+  }
+
+  return {
+    source_text: raw,
+    anchors,
+    query: anchors.map(anchor => anchor.query_term).join(" ").trim()
+  };
+}
+
+function anchorMatchesResult(anchor, result) {
+  const text = resultComparisonText(result);
+  if (anchor.type === "controlled_concept") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === anchor.id);
+    return Boolean(facet && facet.matches(text));
+  }
+
+  const tokens = tokenize(text);
+  const wanted = cleanString(anchor.query_term);
+  return tokens.some(token => tokenApproxMatch(wanted, token));
+}
+
+function runDoc03(body) {
+  const action = SUPPORTED_ACTIONS.DOC03;
+  const store = getCorpusStore();
+
+  let selectedMaterialId = null;
+  let originPublicationId = cleanString(body.origin_publication_id) || null;
+  let basisText = cleanString(body.element || body.query);
+  let selectedMaterial = null;
+
+  if (cleanString(body.material_id) || cleanString(body.chunk_id) || cleanString(body.node_id) || cleanString(body.relation_id)) {
+    const selector = parseMaterialSelector(body);
+    const selected = exactMaterial(store, selector);
+    selectedMaterialId = `${selector.kind}:${selector.id}`;
+    originPublicationId = cleanString(selected.raw.publication_id) || originPublicationId;
+    basisText = selectedMaterialText(selected, store);
+
+    if (selected.kind === "chunk") {
+      selectedMaterial = {
+        type: "excerpt",
+        chunk_id: cleanString(selected.raw.chunk_id),
+        section: cleanString(selected.raw.section) || null,
+        text: cleanString(selected.raw.texte),
+        page_debut: cleanString(selected.raw.page_debut) || null,
+        page_fin: cleanString(selected.raw.page_fin) || null
+      };
+    } else if (selected.kind === "node") {
+      selectedMaterial = nodeSummary(selected.raw);
+    } else {
+      const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+      selectedMaterial = relationSummary(selected.raw, nodeById);
+    }
+  }
+
+  if (!basisText) {
+    const error = new Error("DOC03 exige un élément à comparer : element/query ou un material_id précis.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const basis = extractComparisonBasis(basisText, store);
+  if (!basis.anchors.length || !basis.query) {
+    return {
+      ok: true,
+      engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
+      action,
+      selected_material_id: selectedMaterialId,
+      selected_material: selectedMaterial,
+      origin_publication_id: originPublicationId,
+      comparison_basis: { source_text: basis.source_text, anchors: [], query: null },
+      search: { returned_cases: 0, returned_publications: 0 },
+      cases: [],
+      guardrails: {
+        corpus_only: true,
+        excludes_origin_publication: Boolean(originPublicationId),
+        comparability_verified: false,
+        generates_analysis: false,
+        generates_recommendation: false,
+        forces_candidate: false,
+        note: "DOC03 ne force aucun cas comparable lorsqu'aucun critère documentaire suffisamment précis n'est détecté."
+      }
+    };
+  }
+
+  const search = searchCorpus({
+    query: basis.query,
+    limit: 30,
+    max_per_publication: 4,
+    diversify_by_publication: true
+  });
+
+  const byPublication = new Map();
+  for (const result of search.results) {
+    if (originPublicationId && result.publication_id === originPublicationId) continue;
+    if (!byPublication.has(result.publication_id)) byPublication.set(result.publication_id, []);
+    byPublication.get(result.publication_id).push(result);
+  }
+
+  const minShared = basis.anchors.length >= 2 ? 2 : 1;
+  const candidates = [];
+
+  for (const [publicationId, results] of byPublication.entries()) {
+    const shared = basis.anchors.filter(anchor => results.some(result => anchorMatchesResult(anchor, result)));
+    if (shared.length < minShared) continue;
+
+    const coverage = shared.length / basis.anchors.length;
+    if (basis.anchors.length >= 2 && coverage < (2 / basis.anchors.length)) continue;
+
+    const bestScore = Math.max(...results.map(result => Number(result.score || 0)));
+    const score = bestScore + shared.length * 3 + coverage * 5;
+    const evidence = results
+      .slice()
+      .sort((a, b) => Number(b.score || 0) - Number(a.score || 0))
+      .slice(0, 2)
+      .map(buildMaterial);
+
+    const publication = evidence[0]?.publication || publicationMeta(store, publicationId);
+    candidates.push({
+      publication_id: publicationId,
+      score,
+      publication,
+      shared_features: shared.map(anchor => ({
+        id: anchor.id,
+        label: anchor.label,
+        type: anchor.type
+      })),
+      shared_feature_count: shared.length,
+      feature_coverage: Number(coverage.toFixed(3)),
+      rapprochement_nature: coverage === 1 && shared.length >= 2
+        ? "documented_shared_features"
+        : "thematic_proximity_only",
+      comparability_verified: false,
+      evidence_materials: evidence
+    });
+  }
+
+  candidates.sort((a, b) => b.score - a.score || a.publication_id.localeCompare(b.publication_id));
+  const maxCases = Math.max(1, Math.min(4, Number(body.limit_cases) || 4));
+  const cases = candidates.slice(0, maxCases).map((candidate, index) => ({
+    rank: index + 1,
+    publication: candidate.publication,
+    shared_features: candidate.shared_features,
+    rapprochement_nature: candidate.rapprochement_nature,
+    comparability_verified: false,
+    comparison_note: candidate.rapprochement_nature === "documented_shared_features"
+      ? "Plusieurs caractéristiques explicitement présentes dans le corpus sont communes. La comparabilité méthodologique reste à vérifier avec MET01."
+      : "Le rapprochement est seulement thématique à ce stade. La comparabilité méthodologique n'est pas établie.",
+    evidence_materials: candidate.evidence_materials
+  }));
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
+    action,
+    selected_material_id: selectedMaterialId,
+    selected_material: selectedMaterial,
+    origin_publication_id: originPublicationId,
+    comparison_basis: {
+      source_text: basis.source_text,
+      query: basis.query,
+      anchors: basis.anchors.map(anchor => ({
+        id: anchor.id,
+        label: anchor.label,
+        type: anchor.type
+      }))
+    },
+    search: {
+      engine: search.engine,
+      returned_candidates_before_filter: search.search.returned,
+      returned_cases: cases.length,
+      returned_publications: cases.length,
+      origin_excluded: Boolean(originPublicationId)
+    },
+    cases,
+    guardrails: {
+      corpus_only: true,
+      excludes_origin_publication: Boolean(originPublicationId),
+      comparability_verified: false,
+      generates_analysis: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      infers_transferability: false,
+      forces_candidate: false,
+      note: "DOC03 propose des cas candidats à examiner à partir de caractéristiques documentées ; il ne conclut ni à l'équivalence, ni à la comparabilité méthodologique, ni à la transposabilité."
+    }
+  };
+}
+
+
+const MIR01_NUANCE_RELATIONS = new Set(["NUANCE", "SE_DISTINGUE_DE", "FREINE", "CONTRIBUE_PARTIELLEMENT_A"]);
+// MIR01 v0.4.1: REMET_EN_CAUSE signale une tension documentaire par défaut.
+// Il ne suffit pas, à lui seul, à établir que la proposition testée est contredite.
+const MIR01_TENSION_RELATIONS = new Set(["REMET_EN_CAUSE"]);
+const MIR01_CONTRADICTION_RELATIONS = new Set(["CONTREDIT"]);
+const MIR01_SUPPORT_RELATIONS = new Set([
+  "CONFIRME", "MET_EN_EVIDENCE", "ILLUSTRE", "CARACTERISE", "QUANTIFIE", "DOCUMENTE",
+  "FAIT_SUITE_A", "CONTRIBUE_A", "FAVORISE", "ACCENTUE", "RENFORCE", "INFLUENCE",
+  "PERMET_DE", "SE_TRADUIT_PAR", "TAUX_ELEVE_DE", "TAUX_FAIBLE_DE"
+]);
+const MIR01_CAUSAL_RELATIONS = new Set([
+  "FAIT_SUITE_A", "CONTRIBUE_A", "FAVORISE", "ACCENTUE", "RENFORCE", "INFLUENCE",
+  "PERMET_DE", "SE_TRADUIT_PAR"
+]);
+
+const MIR01_NUANCE_MARKERS = [
+  "toutefois", "cependant", "neanmoins", "mais", "malgre", "en revanche",
+  "temporaire", "temporairement", "pas necessairement", "sans pour autant",
+  "however", "although", "despite", "temporary", "temporarily", "not necessarily", "yet"
+];
+
+const MIR01_STRONG_LIMIT_MARKERS = [
+  "temporaire", "temporairement", "pas necessairement", "sans pour autant",
+  "temporary", "temporarily", "not necessarily", "despite", "malgre"
+];
+
+const MIR01_CAUSAL_PATTERNS = [
+  /\bentraine\b/, /\bentrainent\b/, /\bprovoque\b/, /\bprovoquent\b/, /\bcause\b/,
+  /\bconduit a\b/, /\bconduisent a\b/, /\bdeplace\b/, /\bdeplacent\b/,
+  /\breoriente\b/, /\breorientent\b/, /\bfavorise\b/, /\bfavorisent\b/,
+  /\baccentue\b/, /\baccentuent\b/, /\bexplique\b/, /\bexpliquent\b/,
+  /\ba pour effet\b/, /\bont pour effet\b/, /\bproduit\b/, /\bproduisent\b/
+];
+
+const MIR01_TEXT_CAUSAL_MARKERS = [
+  "a entraine", "ont entraine", "contribue a", "fait suite a", "pour contourner",
+  "en reponse a", "sous l effet de", "a conduit a", "ont conduit a", "reorientation",
+  "responding to", "produces temporary shifts", "led to", "resulting in", "as a result"
+];
+
+function mir01ResultText(result) {
+  return resultComparisonText(result);
+}
+
+function mir01ConceptMatch(concept, result) {
+  const text = mir01ResultText(result);
+  if (concept.id === "narcotrafic") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === "narcotrafic");
+    return Boolean(facet && facet.matches(text));
+  }
+  if (concept.id === "port") {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === "port");
+    return Boolean(facet && facet.matches(text));
+  }
+
+  const wanted = cleanString(concept.id);
+  if (!wanted) return false;
+  return tokenize(text).some(token => tokenApproxMatch(wanted, token));
+}
+
+function mir01Coverage(search, result) {
+  const concepts = search.query_concepts || [];
+  if (!concepts.length) return { matched: 0, total: 0, ratio: 0, matched_ids: [] };
+  const matched = concepts.filter(concept => mir01ConceptMatch(concept, result));
+  return {
+    matched: matched.length,
+    total: concepts.length,
+    ratio: matched.length / concepts.length,
+    matched_ids: matched.map(concept => concept.id)
+  };
+}
+
+function mir01RequiredControlledFacets(assertion) {
+  return COMPARISON_CONTROLLED_FACETS
+    .filter(facet => facet.matches(assertion))
+    .map(facet => facet.id);
+}
+
+function mir01HasAllControlledFacets(result, requiredFacetIds) {
+  if (!requiredFacetIds.length) return true;
+  const text = mir01ResultText(result);
+  return requiredFacetIds.every(id => {
+    const facet = COMPARISON_CONTROLLED_FACETS.find(item => item.id === id);
+    return Boolean(facet && facet.matches(text));
+  });
+}
+
+function mir01DetectCausalClaim(assertion) {
+  const normalized = normalizeText(assertion);
+  const markers = MIR01_CAUSAL_PATTERNS
+    .filter(pattern => pattern.test(normalized))
+    .map(pattern => String(pattern).replace(/^\/\\b|\\b\/$/g, ""));
+  return {
+    causal_language_detected: markers.length > 0,
+    markers
+  };
+}
+
+function mir01TextHasMarker(text, markers) {
+  const normalized = normalizeText(text);
+  return markers.some(marker => normalized.includes(normalizeText(marker)));
+}
+
+function mir01Classify(result, coverage, causalClaim) {
+  const relationType = cleanString(result.relation_type).toUpperCase();
+  const text = mir01ResultText(result);
+
+  if (result.kind === "relation" && MIR01_CONTRADICTION_RELATIONS.has(relationType)) {
+    return { position: "contradiction", reason: `relation_explicit:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  if (result.kind === "relation" && MIR01_TENSION_RELATIONS.has(relationType)) {
+    return { position: "nuance", reason: `relation_tension:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  if (result.kind === "relation" && MIR01_NUANCE_RELATIONS.has(relationType)) {
+    return { position: "nuance", reason: `relation_explicit:${relationType}`, causal_scope: "not_inferred" };
+  }
+
+  let support = false;
+  let reason = "";
+  if (result.kind === "relation" && MIR01_SUPPORT_RELATIONS.has(relationType)) {
+    support = true;
+    reason = `relation_explicit:${relationType}`;
+  } else if (result.kind === "node" && coverage.ratio >= 0.6) {
+    support = true;
+    reason = "high_concept_overlap_node";
+  } else if (result.kind === "chunk" && coverage.ratio >= 0.5) {
+    support = true;
+    reason = "high_concept_overlap_excerpt";
+  }
+
+  const hasNuanceMarker = mir01TextHasMarker(text, MIR01_NUANCE_MARKERS);
+  const hasStrongLimitMarker = mir01TextHasMarker(text, MIR01_STRONG_LIMIT_MARKERS);
+
+  if (causalClaim.causal_language_detected) {
+    const causalRelation = result.kind === "relation" && MIR01_CAUSAL_RELATIONS.has(relationType);
+    const causalText = mir01TextHasMarker(text, MIR01_TEXT_CAUSAL_MARKERS);
+
+    if (support && (causalRelation || causalText) && !hasStrongLimitMarker) {
+      return {
+        position: "support",
+        reason,
+        causal_scope: "causal_sequence_documented_in_source"
+      };
+    }
+
+    if (hasStrongLimitMarker || hasNuanceMarker) {
+      return {
+        position: "nuance",
+        reason: hasStrongLimitMarker ? "limitation_marker_in_source" : "nuance_marker_in_source",
+        causal_scope: (causalRelation || causalText) ? "causal_sequence_documented_but_limited" : "not_inferred"
+      };
+    }
+
+    if (support) {
+      return {
+        position: "support",
+        reason,
+        causal_scope: "descriptive_or_associative_support_only"
+      };
+    }
+
+    return { position: "context", reason: "relevant_context_only", causal_scope: "not_inferred" };
+  }
+
+  if (hasNuanceMarker) {
+    return { position: "nuance", reason: "nuance_marker_in_source", causal_scope: "not_applicable" };
+  }
+
+  if (support) return { position: "support", reason, causal_scope: "not_applicable" };
+  return { position: "context", reason: "relevant_context_only", causal_scope: "not_applicable" };
+}
+
+function mir01Material(result, coverage, classification) {
+  return {
+    ...buildMaterial(result),
+    stress_test: {
+      position: classification.position,
+      classification_reason: classification.reason,
+      query_concept_coverage: Number(coverage.ratio.toFixed(3)),
+      matched_query_concepts: coverage.matched_ids,
+      causal_scope: classification.causal_scope
+    }
+  };
+}
+
+function runMir01(body) {
+  const action = SUPPORTED_ACTIONS.MIR01;
+  const assertion = cleanString(body.assertion || body.element || body.query);
+  if (!assertion) {
+    const error = new Error("Le champ assertion est obligatoire pour MIR01.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const causalClaim = mir01DetectCausalClaim(assertion);
+  const search = searchCorpus({
+    query: assertion,
+    limit: Math.max(12, Math.min(30, Number(body.search_limit) || 24)),
+    max_per_publication: Math.max(3, Math.min(8, Number(body.max_per_publication) || 6)),
+    diversify_by_publication: true
+  });
+
+  const requiredControlledFacets = mir01RequiredControlledFacets(assertion);
+  const topScore = Math.max(0, ...search.results.map(result => Number(result.score || 0)));
+  const scoreFloor = topScore > 0 ? Math.max(5, topScore * 0.5) : Infinity;
+  const queryConceptCount = (search.query_concepts || []).length;
+  const minMatchedConcepts = queryConceptCount <= 2 ? 1 : Math.max(2, Math.ceil(queryConceptCount * 0.5));
+
+  const relevant = [];
+  for (const result of search.results) {
+    const score = Number(result.score || 0);
+    if (score < scoreFloor) continue;
+    if (!mir01HasAllControlledFacets(result, requiredControlledFacets)) continue;
+    const coverage = mir01Coverage(search, result);
+    if (!requiredControlledFacets.length && coverage.matched < minMatchedConcepts) continue;
+    const classification = mir01Classify(result, coverage, causalClaim);
+    relevant.push({ result, coverage, classification });
+  }
+
+  const byPosition = { support: [], nuance: [], contradiction: [], context: [] };
+  for (const item of relevant) {
+    byPosition[item.classification.position].push(mir01Material(item.result, item.coverage, item.classification));
+  }
+
+  for (const values of Object.values(byPosition)) {
+    values.sort((a, b) => b.relevance_score - a.relevance_score || a.material_id.localeCompare(b.material_id));
+  }
+
+  const maxPerPosition = Math.max(1, Math.min(4, Number(body.max_per_position) || 3));
+  const support = byPosition.support.slice(0, maxPerPosition);
+  const nuance = byPosition.nuance.slice(0, maxPerPosition);
+  const contradiction = byPosition.contradiction.slice(0, maxPerPosition);
+  const context = byPosition.context.slice(0, Math.min(2, maxPerPosition));
+  const classifiedCount = support.length + nuance.length + contradiction.length;
+  const insufficient = classifiedCount === 0;
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.4.1-doc01-doc02-doc03-mir01",
+    action,
+    assertion,
+    claim_analysis: {
+      causal_language_detected: causalClaim.causal_language_detected,
+      causal_markers: causalClaim.markers,
+      required_controlled_concepts: requiredControlledFacets,
+      methodological_caution: causalClaim.causal_language_detected
+        ? "La présence d'éléments convergents ne suffit pas, à elle seule, à établir une causalité générale. MIR01 distingue ce que la source documente d'une inférence causale plus large."
+        : null
+    },
+    search: {
+      engine: search.engine,
+      query_concepts: search.query_concepts,
+      candidates_returned: search.search.returned,
+      relevance_score_floor: Number.isFinite(scoreFloor) ? Number(scoreFloor.toFixed(3)) : null,
+      relevant_after_guardrails: relevant.length,
+      classified_materials: classifiedCount,
+      supporting_materials: support.length,
+      nuance_materials: nuance.length,
+      contradiction_materials: contradiction.length
+    },
+    evidence: {
+      support,
+      nuance,
+      contradiction,
+      context
+    },
+    documentary_state: {
+      insufficient,
+      explicit_contradiction_found: contradiction.length > 0,
+      contradiction_note: contradiction.length
+        ? "Le corpus contient au moins un matériau explicitement structuré comme contradiction de l'affirmation ou d'un de ses éléments."
+        : "Aucune contradiction explicite n'a été repérée parmi les matériaux retenus. Une relation de remise en cause est traitée comme une tension ou une nuance, sauf contradiction explicitement structurée. Cette absence ne prouve pas qu'il n'existe pas de contradiction.",
+      conclusion: "MIR01 expose les matériaux disponibles et leurs tensions documentaires ; il ne rend pas de verdict sur l'affirmation."
+    },
+    guardrails: {
+      corpus_only: true,
+      rewrites_assertion: false,
+      decides_truth_or_falsity: false,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      infers_causality_from_association: false,
+      invents_counterargument: false,
+      classification_is_documentary_not_verdict: true,
+      note: "MIR01 classe uniquement des matériaux retrouvés dans le corpus en appui, nuance/tension ou contradiction explicite ; une relation REMET_EN_CAUSE n'est pas assimilée automatiquement à une contradiction de la proposition testée. L'interprétation finale reste à l'utilisateur."
+    }
+  };
+}
+
+
+
+const MIR04_EXPLICIT_CONTRADICTION_RELATIONS = new Set(["CONTREDIT"]);
+const MIR04_TENSION_RELATIONS = new Set([
+  "NUANCE", "REMET_EN_CAUSE", "SE_DISTINGUE_DE", "FREINE", "CONTRIBUE_PARTIELLEMENT_A"
+]);
+
+function mir04ParseSelector(value) {
+  const raw = cleanString(value);
+  const match = raw.match(/^(chunk|node|relation):(.+)$/i);
+  if (!match) {
+    const error = new Error(`Identifiant de matériau invalide pour MIR04 : ${raw || "(vide)"}.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return { kind: match[1].toLowerCase(), id: cleanString(match[2]), material_id: `${match[1].toLowerCase()}:${cleanString(match[2])}` };
+}
+
+function mir04SelectedMaterials(body, store) {
+  let ids = [];
+  if (Array.isArray(body.material_ids)) ids = body.material_ids;
+  else if (cleanString(body.material_id)) ids = [body.material_id];
+
+  ids = [...new Set(ids.map(cleanString).filter(Boolean))];
+  if (ids.length > 8) {
+    const error = new Error("MIR04 accepte au maximum 8 matériaux sélectionnés à la fois.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return ids.map(value => {
+    const selector = mir04ParseSelector(value);
+    const selected = exactMaterial(store, selector);
+    let summary;
+    if (selected.kind === "chunk") {
+      summary = {
+        type: "excerpt",
+        chunk_id: cleanString(selected.raw.chunk_id),
+        section: cleanString(selected.raw.section) || null,
+        text: cleanString(selected.raw.texte),
+        page_debut: cleanString(selected.raw.page_debut) || null,
+        page_fin: cleanString(selected.raw.page_fin) || null
+      };
+    } else if (selected.kind === "node") {
+      summary = nodeSummary(selected.raw);
+    } else {
+      const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+      summary = relationSummary(selected.raw, nodeById);
+    }
+    return {
+      selector,
+      selected,
+      material_id: selector.material_id,
+      publication_id: cleanString(selected.raw.publication_id),
+      summary
+    };
+  });
+}
+
+function mir04AnchorNodeIdsFromSelections(selections, store) {
+  const anchorNodeIds = new Set();
+  const chunkIds = new Set();
+  const selectedRelationIds = new Set();
+
+  for (const item of selections) {
+    if (item.selected.kind === "node") {
+      anchorNodeIds.add(cleanString(item.selected.raw.node_id));
+    } else if (item.selected.kind === "relation") {
+      anchorNodeIds.add(cleanString(item.selected.raw.source_id));
+      anchorNodeIds.add(cleanString(item.selected.raw.cible_id));
+      selectedRelationIds.add(cleanString(item.selected.raw.relation_id));
+    } else if (item.selected.kind === "chunk") {
+      chunkIds.add(cleanString(item.selected.raw.chunk_id));
+    }
+  }
+
+  if (chunkIds.size) {
+    for (const node of store.nodes) {
+      const refs = splitChunkRefs(node.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) anchorNodeIds.add(cleanString(node.node_id));
+    }
+    for (const relation of store.relations) {
+      const refs = splitChunkRefs(relation.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) {
+        anchorNodeIds.add(cleanString(relation.source_id));
+        anchorNodeIds.add(cleanString(relation.cible_id));
+      }
+    }
+  }
+
+  anchorNodeIds.delete("");
+  selectedRelationIds.delete("");
+  return { anchorNodeIds, selectedRelationIds };
+}
+
+function mir04AnchorNodeIdsFromSearch(search, store) {
+  const anchorNodeIds = new Set();
+  const chunkIds = new Set();
+  const selectedRelationIds = new Set();
+
+  for (const result of search.results || []) {
+    if (result.kind === "node") anchorNodeIds.add(cleanString(result.node_id));
+    if (result.kind === "relation") {
+      anchorNodeIds.add(cleanString(result.source_id));
+      anchorNodeIds.add(cleanString(result.target_id));
+      selectedRelationIds.add(cleanString(result.relation_id));
+    }
+    if (result.kind === "chunk") chunkIds.add(cleanString(result.chunk_id));
+  }
+
+  if (chunkIds.size) {
+    for (const node of store.nodes) {
+      const refs = splitChunkRefs(node.chunk_id_source);
+      if (refs.some(ref => chunkIds.has(ref))) anchorNodeIds.add(cleanString(node.node_id));
+    }
+  }
+
+  anchorNodeIds.delete("");
+  selectedRelationIds.delete("");
+  return { anchorNodeIds, selectedRelationIds };
+}
+
+function mir04Finding(relation, store, classification) {
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const source = nodeById.get(cleanString(relation.source_id)) || {};
+  const target = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: `relation:${cleanString(relation.relation_id)}` });
+
+  return {
+    finding_id: `relation:${cleanString(relation.relation_id)}`,
+    classification,
+    relation_type: cleanString(relation.type_relation),
+    source: {
+      node_id: cleanString(relation.source_id),
+      label: cleanString(source.libelle),
+      node_type: cleanString(source.type_noeud) || null
+    },
+    target: {
+      node_id: cleanString(relation.cible_id),
+      label: cleanString(target.libelle),
+      node_type: cleanString(target.type_noeud) || null
+    },
+    publication: publicationMeta(store, cleanString(relation.publication_id)),
+    provenance: proofLookup.provenance,
+    proofs: proofLookup.proofs,
+    interpretation_note: classification === "explicit_contradiction"
+      ? "Contradiction explicitement structurée dans le graphe. MIR04 ne généralise pas au-delà de cette relation documentée."
+      : "Tension, nuance ou distinction explicitement structurée dans le graphe. Elle n'est pas assimilée à une contradiction."
+  };
+}
+
+function runMir04(body) {
+  const action = SUPPORTED_ACTIONS.MIR04;
+  const store = getCorpusStore();
+  const selections = mir04SelectedMaterials(body, store);
+  const query = cleanString(body.query || body.element);
+
+  if (selections.length < 2 && !query) {
+    const error = new Error("MIR04 exige soit au moins deux material_ids, soit un champ query/element pour rechercher des tensions documentaires.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  let mode;
+  let search = null;
+  let anchors;
+  let basisMaterials = [];
+
+  if (selections.length >= 2) {
+    mode = "selected_materials";
+    anchors = mir04AnchorNodeIdsFromSelections(selections, store);
+    basisMaterials = selections.map(item => ({
+      material_id: item.material_id,
+      publication: publicationMeta(store, item.publication_id),
+      content: item.summary
+    }));
+  } else {
+    mode = "query";
+    search = searchCorpus({
+      query,
+      limit: Math.max(12, Math.min(30, Number(body.search_limit) || 24)),
+      max_per_publication: Math.max(3, Math.min(8, Number(body.max_per_publication) || 6)),
+      diversify_by_publication: true
+    });
+    anchors = mir04AnchorNodeIdsFromSearch(search, store);
+    basisMaterials = search.results.slice(0, 6).map(buildMaterial);
+  }
+
+  const explicitContradictions = [];
+  const documentedTensions = [];
+
+  for (const relation of store.relations) {
+    const relationType = cleanString(relation.type_relation).toUpperCase();
+    const isContradiction = MIR04_EXPLICIT_CONTRADICTION_RELATIONS.has(relationType);
+    const isTension = MIR04_TENSION_RELATIONS.has(relationType);
+    if (!isContradiction && !isTension) continue;
+
+    const relationId = cleanString(relation.relation_id);
+    const sourceId = cleanString(relation.source_id);
+    const targetId = cleanString(relation.cible_id);
+
+    // Règle conservatrice : la relation doit être elle-même sélectionnée/retournée,
+    // ou relier deux nœuds ancrés par les matériaux examinés.
+    const anchored = anchors.selectedRelationIds.has(relationId)
+      || (anchors.anchorNodeIds.has(sourceId) && anchors.anchorNodeIds.has(targetId));
+    if (!anchored) continue;
+
+    const finding = mir04Finding(relation, store, isContradiction ? "explicit_contradiction" : "documented_tension");
+    if (isContradiction) explicitContradictions.push(finding);
+    else documentedTensions.push(finding);
+  }
+
+  const sortFindings = values => values.sort((a, b) => {
+    const pub = a.publication.publication_id.localeCompare(b.publication.publication_id);
+    if (pub !== 0) return pub;
+    return a.finding_id.localeCompare(b.finding_id);
+  });
+  sortFindings(explicitContradictions);
+  sortFindings(documentedTensions);
+
+  const insufficient = explicitContradictions.length === 0 && documentedTensions.length === 0;
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.5-mir04",
+    action,
+    input_mode: mode,
+    query: mode === "query" ? query : null,
+    basis_materials: basisMaterials,
+    scope: {
+      anchor_node_count: anchors.anchorNodeIds.size,
+      selected_relation_count: anchors.selectedRelationIds.size,
+      search_engine: search ? search.engine : null,
+      search_results_considered: search ? search.search.returned : null
+    },
+    findings: {
+      explicit_contradictions: explicitContradictions,
+      documented_tensions: documentedTensions
+    },
+    documentary_state: {
+      insufficient,
+      explicit_contradiction_found: explicitContradictions.length > 0,
+      documented_tension_found: documentedTensions.length > 0,
+      note: insufficient
+        ? "Aucune contradiction ni tension explicitement structurée n'a été repérée entre les matériaux ancrés. Cette absence ne prouve pas que les matériaux sont compatibles."
+        : "MIR04 distingue les contradictions explicitement structurées des tensions, nuances et distinctions documentées."
+    },
+    guardrails: {
+      corpus_only: true,
+      infers_contradiction_from_difference: false,
+      treats_nuance_as_contradiction: false,
+      treats_remet_en_cause_as_contradiction: false,
+      compares_only_anchored_materials: true,
+      generates_problem_statement: false,
+      generates_recommendation: false,
+      decides_which_material_is_correct: false,
+      note: "MIR04 fait apparaître uniquement des oppositions explicitement structurées dans le corpus. Une nuance, une remise en cause ou une distinction reste une tension documentaire, pas une contradiction automatique."
+    }
+  };
+}
+
+
+const MIR08_EMPIRICAL_PATTERNS = Object.freeze({
+  quantitative_data: [
+    /\b\d{1,3}(?:[.,]\d+)?\s*%\b/,
+    /\b\d+(?:[.,]\d+)?\s*(?:tonnes?|kg|kilogrammes?|millions?|milliards?|euros?|personnes?|habitants?|cas|faits|saisies?|infractions?)\b/,
+    /\b(?:taux|part|proportion|nombre|volume|hausse|baisse|augmentation|diminution)\b[^.]{0,80}\b\d+(?:[.,]\d+)?\b/
+  ],
+  recorded_observation: [
+    /\b(?:observe|observes|observee|observees|recense|recenses|recensee|recensees|enregistre|enregistres|enregistree|enregistrees|mesure|mesures|mesuree|mesurees|saisi|saisie|saisies|intercepte|interceptes|interceptee|interceptees|declare|declares|declaree|declarees|mis en cause|enquete|donnees|statistiques?)\b/,
+    /\b(?:observed|recorded|measured|survey|data|statistics|seized|intercepted|reported)\b/
+  ],
+  concrete_case: [
+    /\b(?:en|au|depuis|entre)\s+(?:19|20)\d{2}\b/,
+    /\b(?:port du havre|dunkerque|rouen|nantes|saint-nazaire|martinique|guadeloupe|guyane|dominican republic|rotterdam|antwerp|anvers)\b/
+  ]
+});
+
+const MIR08_ILLUSTRATIVE_RELATIONS = new Set(["ILLUSTRE"]);
+const MIR08_NORMATIVE_MARKERS = [
+  "devrait", "devraient", "doit", "doivent", "souhaitable", "preferable", "meilleur", "meilleure",
+  "superieur", "superieure", "inferieur", "inferieure", "juste", "injuste", "acceptable", "inacceptable",
+  "necessaire", "indispensable", "prioritaire"
+];
+
+function mir08SplitSegments(text) {
+  const cleaned = cleanString(text).replace(/\r/g, "");
+  if (!cleaned) return [];
+  const raw = cleaned
+    .split(/\n+|(?<=[.!?])\s+/)
+    .map(cleanString)
+    .filter(Boolean);
+  const substantive = raw.filter(segment => segment.length >= 25);
+  return (substantive.length ? substantive : [cleaned]).slice(0, 8);
+}
+
+function mir08EmpiricalKinds(text) {
+  const normalized = normalizeText(text);
+  const kinds = [];
+  for (const [kind, patterns] of Object.entries(MIR08_EMPIRICAL_PATTERNS)) {
+    if (patterns.some(pattern => pattern.test(normalized))) kinds.push(kind);
+  }
+  return kinds;
+}
+
+function mir08NumberTokens(text) {
+  const matches = cleanString(text).match(/\b\d+(?:[.,]\d+)?\b/g) || [];
+  return [...new Set(matches.map(value => value.replace(",", ".")))];
+}
+
+function mir08PercentageTokens(text) {
+  const matches = cleanString(text).match(/\b\d+(?:[.,]\d+)?\s*%/g) || [];
+  return [...new Set(matches.map(value => value.replace(/\s*%/, "").replace(",", ".")))];
+}
+
+function mir08ClaimNature(segment) {
+  const normalized = normalizeText(segment);
+  const empiricalKinds = mir08EmpiricalKinds(segment);
+  const normative = MIR08_NORMATIVE_MARKERS.some(marker => normalized.includes(normalizeText(marker)));
+  const numberTokens = mir08NumberTokens(segment);
+  const percentageTokens = mir08PercentageTokens(segment);
+  const empiricalClaim = empiricalKinds.length > 0;
+
+  return {
+    empirical_claim_detected: empiricalClaim,
+    normative_or_evaluative_language_detected: normative,
+    empirical_markers: empiricalKinds,
+    required_number_tokens: numberTokens,
+    required_percentage_tokens: percentageTokens,
+    assessment_scope: empiricalClaim ? "empirical_claim" : "non_empirical_or_conceptual_claim"
+  };
+}
+
+function mir08ReferencedChunks(result, store) {
+  const chunkById = new Map(store.contents.map(chunk => [cleanString(chunk.chunk_id), chunk]));
+  const refs = splitChunkRefs(result.chunk_id || result.chunk_id_source);
+  return refs.map(id => chunkById.get(id)).filter(Boolean);
+}
+
+function mir08NumericRequirementsMet(texts, claimNature) {
+  const combined = texts.join(" ");
+  const evidenceNumbers = new Set(mir08NumberTokens(combined));
+  const evidencePercentages = new Set(mir08PercentageTokens(combined));
+  const missingNumbers = claimNature.required_number_tokens.filter(value => !evidenceNumbers.has(value));
+  const missingPercentages = claimNature.required_percentage_tokens.filter(value => !evidencePercentages.has(value));
+  return {
+    met: missingNumbers.length === 0 && missingPercentages.length === 0,
+    missing_numbers: missingNumbers,
+    missing_percentages: missingPercentages
+  };
+}
+
+function mir08EmpiricalAssessment(result, store, claimNature) {
+  const level = cleanString(result.provenance_level) || "C";
+  const relationType = cleanString(result.relation_type).toUpperCase();
+  const illustrativeOnly = result.kind === "relation" && MIR08_ILLUSTRATIVE_RELATIONS.has(relationType);
+
+  const evidenceTexts = [];
+  if (result.kind === "chunk") evidenceTexts.push(cleanString(result.text));
+  for (const chunk of mir08ReferencedChunks(result, store)) evidenceTexts.push(cleanString(chunk.texte));
+
+  const empiricalKinds = [...new Set(evidenceTexts.flatMap(mir08EmpiricalKinds))];
+  const hasFineSource = level === "A" && evidenceTexts.some(Boolean);
+  const numericCheck = mir08NumericRequirementsMet(evidenceTexts, claimNature);
+  const countsAsAnchor = claimNature.empirical_claim_detected
+    && hasFineSource
+    && empiricalKinds.length > 0
+    && numericCheck.met
+    && !illustrativeOnly;
+
+  let role = "documentary_material";
+  if (illustrativeOnly) role = "illustrative_material";
+  else if (countsAsAnchor) role = "empirical_anchor";
+  else if (level !== "A") role = "structured_material_without_fine_empirical_proof";
+  else if (!numericCheck.met) role = "related_empirical_material_with_mismatched_quantification";
+  else if (hasFineSource) role = "fine_source_without_empirical_signal";
+
+  return {
+    role,
+    empirical_kinds: empiricalKinds,
+    counts_as_empirical_anchor: countsAsAnchor,
+    fine_source_available: hasFineSource,
+    illustrative_only: illustrativeOnly,
+    quantitative_requirements_met: numericCheck.met,
+    missing_number_tokens: numericCheck.missing_numbers,
+    missing_percentage_tokens: numericCheck.missing_percentages,
+    note: illustrativeOnly
+      ? "Matériau explicitement illustratif : il n'est pas compté comme preuve empirique à lui seul."
+      : countsAsAnchor
+        ? "Matériau du corpus avec provenance fine, marqueur empirique explicite et quantification compatible avec le segment lorsque celui-ci en contient."
+        : level !== "A"
+          ? "Matériau documentaire disponible, mais sans preuve fine permettant de l'utiliser comme ancrage empirique."
+          : !numericCheck.met
+            ? "Matériau empirique proche, mais sa quantification ne correspond pas à celle du segment ; il n'est pas compté comme preuve de ce segment."
+            : "Source fine disponible, mais aucun marqueur empirique explicite n'est détecté par la règle V0.1."
+  };
+}
+
+function mir08RelevantResults(search) {
+  const topScore = Math.max(0, ...search.results.map(result => Number(result.score || 0)));
+  if (!topScore) return [];
+  const scoreFloor = Math.max(5, topScore * 0.55);
+  const conceptCount = (search.query_concepts || []).length;
+  const minMatched = conceptCount <= 2 ? 1 : Math.max(2, Math.ceil(conceptCount * 0.5));
+
+  return search.results.filter(result => {
+    const score = Number(result.score || 0);
+    if (score < scoreFloor) return false;
+    const coverage = mir01Coverage(search, result);
+    return coverage.matched >= minMatched;
+  });
+}
+
+function runMir08(body) {
+  const action = SUPPORTED_ACTIONS.MIR08;
+  const text = cleanString(body.text || body.assertion || body.element || body.query);
+  if (!text) {
+    const error = new Error("Le champ text (ou assertion/element/query) est obligatoire pour MIR08.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const store = getCorpusStore();
+  const segments = mir08SplitSegments(text);
+  const checks = [];
+
+  for (let index = 0; index < segments.length; index += 1) {
+    const segment = segments[index];
+    const claimNature = mir08ClaimNature(segment);
+
+    if (!claimNature.empirical_claim_detected) {
+      checks.push({
+        segment_id: `S${String(index + 1).padStart(2, "0")}`,
+        text: segment,
+        claim_nature: claimNature,
+        status: "outside_empirical_check_scope",
+        weak_empirical_anchor: null,
+        empirical_anchor_count: 0,
+        relevant_documentary_material_count: 0,
+        note: "Ce segment n'est pas identifié comme une affirmation empirique par MIR08 V0.1. Il n'est donc pas qualifié de faiblement étayé sur cette seule base.",
+        materials: []
+      });
+      continue;
+    }
+
+    const search = searchCorpus({
+      query: segment,
+      limit: Math.max(12, Math.min(24, Number(body.search_limit) || 18)),
+      max_per_publication: Math.max(3, Math.min(6, Number(body.max_per_publication) || 4)),
+      diversify_by_publication: true
+    });
+    const relevant = mir08RelevantResults(search);
+
+    const assessed = relevant.map(result => ({
+      result,
+      assessment: mir08EmpiricalAssessment(result, store, claimNature)
+    }));
+    assessed.sort((a, b) => {
+      const anchorDiff = Number(b.assessment.counts_as_empirical_anchor) - Number(a.assessment.counts_as_empirical_anchor);
+      if (anchorDiff !== 0) return anchorDiff;
+      return Number(b.result.score || 0) - Number(a.result.score || 0);
+    });
+
+    const anchors = assessed.filter(item => item.assessment.counts_as_empirical_anchor);
+    const state = anchors.length > 0
+      ? "empirical_anchor_found"
+      : assessed.length > 0
+        ? "documentary_support_without_matching_empirical_anchor"
+        : "no_sufficient_corpus_anchor";
+
+    const materials = assessed.slice(0, 3).map(item => ({
+      ...buildMaterial(item.result),
+      empirical_check: item.assessment
+    }));
+
+    checks.push({
+      segment_id: `S${String(index + 1).padStart(2, "0")}`,
+      text: segment,
+      claim_nature: claimNature,
+      status: state,
+      weak_empirical_anchor: state !== "empirical_anchor_found",
+      empirical_anchor_count: materials.filter(item => item.empirical_check && item.empirical_check.counts_as_empirical_anchor).length,
+      relevant_documentary_material_count: assessed.length,
+      note: state === "empirical_anchor_found"
+        ? "Le corpus actif contient au moins un matériau avec provenance fine et marqueur empirique explicitement compatible avec ce segment."
+        : state === "documentary_support_without_matching_empirical_anchor"
+          ? "Le corpus contient des matériaux proches, mais MIR08 V0.1 n'y identifie pas de preuve empirique fine correspondant suffisamment au segment."
+          : "Aucun ancrage empirique suffisamment pertinent n'a été retrouvé dans le corpus actif. Cela ne signifie pas que l'affirmation est fausse ni qu'aucune preuve n'existe hors corpus.",
+      materials
+    });
+  }
+
+  const empiricalChecks = checks.filter(check => check.weak_empirical_anchor !== null);
+  const weakSegments = empiricalChecks.filter(check => check.weak_empirical_anchor);
+  const anchoredSegments = empiricalChecks.filter(check => !check.weak_empirical_anchor);
+  const outOfScopeSegments = checks.filter(check => check.weak_empirical_anchor === null);
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.6.1-mir08",
+    action,
+    text,
+    segmentation: {
+      segment_count: checks.length,
+      truncated: mir08SplitSegments(text).length >= 8 && text.split(/\n+|(?<=[.!?])\s+/).filter(Boolean).length > 8
+    },
+    summary: {
+      empirical_segments_checked: empiricalChecks.length,
+      empirically_anchored_segments: anchoredSegments.length,
+      weakly_anchored_segments: weakSegments.length,
+      outside_empirical_scope_segments: outOfScopeSegments.length,
+      all_empirical_segments_anchored: empiricalChecks.length > 0 && weakSegments.length === 0
+    },
+    checks,
+    guardrails: {
+      corpus_only: true,
+      evaluates_truth_or_falsity: false,
+      weak_anchor_is_not_falsehood: true,
+      treats_illustrative_material_as_proof: false,
+      treats_related_quantification_as_matching_proof: false,
+      generates_examples_to_support_argument: false,
+      generates_argument: false,
+      infers_generalization: false,
+      fine_provenance_required_for_empirical_anchor: true,
+      note: "MIR08 vérifie uniquement l'ancrage empirique disponible dans le corpus actif. Il ne juge pas la vérité d'une affirmation, ne choisit pas d'exemple pour construire un argument et ne transforme ni un matériau illustratif ni une quantification seulement voisine en preuve."
+    }
+  };
+}
+
+
+
+const MET01_GEO_PATTERNS = Object.freeze([
+  { id: "france", label: "France", scale: "country", pattern: /\bfrance\b/ },
+  { id: "france_metropolitaine", label: "France métropolitaine", scale: "country_scope", pattern: /\bfrance metropolitaine\b/ },
+  { id: "union_europeenne", label: "Union européenne", scale: "supranational", pattern: /\b(?:union europeenne|ue|european union)\b/ },
+  { id: "europe", label: "Europe", scale: "continent", pattern: /\beurope\b/ },
+  { id: "caraibes", label: "Caraïbes", scale: "region", pattern: /\b(?:caraibes|caribbean)\b/ },
+  { id: "martinique", label: "Martinique", scale: "territory", pattern: /\bmartinique\b/ },
+  { id: "guadeloupe", label: "Guadeloupe", scale: "territory", pattern: /\bguadeloupe\b/ },
+  { id: "reunion", label: "La Réunion", scale: "territory", pattern: /\b(?:la )?reunion\b/ },
+  { id: "guyane", label: "Guyane", scale: "territory", pattern: /\bguyane\b/ },
+  { id: "republique_dominicaine", label: "République dominicaine", scale: "country", pattern: /\b(?:republique dominicaine|dominican republic)\b/ },
+  { id: "le_havre", label: "Le Havre", scale: "port_or_city", pattern: /\b(?:port du )?havre\b/ },
+  { id: "dunkerque", label: "Dunkerque", scale: "port_or_city", pattern: /\bdunkerque\b/ },
+  { id: "rouen", label: "Rouen", scale: "port_or_city", pattern: /\brouen\b/ },
+  { id: "nantes_saint_nazaire", label: "Nantes–Saint-Nazaire", scale: "port_or_city", pattern: /\b(?:nantes|saint nazair|montoir)\b/ },
+  { id: "gennevilliers", label: "Gennevilliers", scale: "port_or_city", pattern: /\bgennevilliers\b/ },
+  { id: "anvers", label: "Anvers", scale: "port_or_city", pattern: /\b(?:anvers|antwerp)\b/ },
+  { id: "rotterdam", label: "Rotterdam", scale: "port_or_city", pattern: /\brotterdam\b/ }
+]);
+
+const MET01_INDICATOR_PATTERNS = Object.freeze([
+  { id: "volume_saisies", label: "volume de saisies", pattern: /\b(?:volume|volumes|tonne|tonnes|kg|kilogramme|kilogrammes)\b[^.\n]{0,80}\b(?:saisi|saisie|saisies|intercepte|interceptees|interceptes)\b|\b(?:saisi|saisie|saisies|intercepte|interceptees|interceptes)\b[^.\n]{0,80}\b(?:volume|volumes|tonne|tonnes|kg|kilogramme|kilogrammes)\b/ },
+  { id: "part_pourcentage", label: "part ou proportion en pourcentage", pattern: /\b\d{1,3}(?:[.,]\d+)?\s*%\b/ },
+  { id: "image_opinion", label: "image / opinion", pattern: /\b(?:image|opinion)\b[^.\n]{0,100}\b(?:police|gendarmerie|forces de securite interieure|fsi)\b|\b(?:police|gendarmerie|forces de securite interieure|fsi)\b[^.\n]{0,100}\b(?:image|opinion)\b/ },
+  { id: "confiance", label: "confiance", pattern: /\bconfiance\b|\bfaire confiance\b/ },
+  { id: "taux_non_reponse", label: "taux de non-réponse", pattern: /\b(?:taux de non reponse|non reponse)\b/ },
+  { id: "flux_routes", label: "flux / routes de trafic", pattern: /\b(?:flux|route|routes|corridor|corridors|pipeline|pathway|pathways)\b[^.\n]{0,100}\b(?:cocaine|stupefiant|drug|trafic|traffick)\b|\b(?:cocaine|stupefiant|drug|trafic|traffick)\b[^.\n]{0,100}\b(?:flux|route|routes|corridor|corridors|pipeline|pathway|pathways)\b/ },
+  { id: "vulnerabilite_portuaire", label: "vulnérabilité portuaire", pattern: /\bvulnerabilit|\bvulnerable\b[^.\n]{0,80}\bport/ }
+]);
+
+const MET01_METHOD_PATTERNS = Object.freeze([
+  { id: "enquete", label: "enquête", pattern: /\benquete\b|\bsurvey\b/ },
+  { id: "questionnaire", label: "questionnaire / question d’enquête", pattern: /\bquestionnaire\b|\bquestion\b[^.\n]{0,40}\b(?:repond|répond|respond)/ },
+  { id: "statistiques", label: "données statistiques", pattern: /\bstatistique|\bdonnees\b|\bdata\b/ },
+  { id: "donnees_saisies", label: "données de saisies / interceptions", pattern: /\b(?:saisie|saisies|interception|interceptions|intercepte|interceptes|interceptees)\b/ },
+  { id: "entretiens", label: "entretiens", pattern: /\bentretien|\binterview\b/ }
+]);
+
+function met01SelectedMaterials(body, store) {
+  let ids = [];
+  if (Array.isArray(body.material_ids)) ids = body.material_ids;
+  else {
+    const left = cleanString(body.left_material_id);
+    const right = cleanString(body.right_material_id);
+    ids = [left, right].filter(Boolean);
+  }
+  ids = [...new Set(ids.map(cleanString).filter(Boolean))];
+  if (ids.length !== 2) {
+    const error = new Error("MET01 exige exactement deux matériaux du corpus à comparer.");
+    error.statusCode = 400;
+    throw error;
+  }
+  return ids.map(value => {
+    const selector = mir04ParseSelector(value);
+    const selected = exactMaterial(store, selector);
+    return {
+      selector,
+      selected,
+      material_id: selector.material_id,
+      publication_id: cleanString(selected.raw.publication_id)
+    };
+  });
+}
+
+function met01MaterialTexts(item, store) {
+  const proof = runDoc02({ material_id: item.material_id });
+  const primaryTexts = [];
+  const contextTexts = [];
+  const add = (target, value) => {
+    const cleaned = cleanString(value);
+    if (cleaned && !target.includes(cleaned)) target.push(cleaned);
+  };
+
+  if (item.selected.kind === "chunk") add(primaryTexts, item.selected.raw.texte);
+  else if (item.selected.kind === "node") add(primaryTexts, item.selected.raw.libelle);
+  else {
+    const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+    add(primaryTexts, relationSummary(item.selected.raw, nodeById).text);
+  }
+  for (const p of proof.proofs || []) add(contextTexts, p.text);
+  const texts = [...new Set([...primaryTexts, ...contextTexts])];
+
+  return { proof, primaryTexts, contextTexts, texts };
+}
+
+function met01ExtractPeriods(texts) {
+  const years = new Set();
+  const evidence = [];
+  const patterns = [
+    /\b(?:en|depuis|entre|durant|pendant|au cours de|a partir de|jusqu en)\s+((?:19|20)\d{2})\b/g,
+    /\b((?:19|20)\d{2})\s+(?:contre|versus|vs\.?|et|a)\s+((?:19|20)\d{2})\b/g
+  ];
+  for (const text of texts) {
+    const normalized = normalizeText(text);
+    for (const pattern of patterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        for (const value of match.slice(1).filter(Boolean)) years.add(value);
+        const raw = cleanString(match[0]);
+        if (raw && !evidence.includes(raw)) evidence.push(raw);
+      }
+    }
+  }
+  return { years: [...years].sort(), evidence: evidence.slice(0, 6) };
+}
+
+function met01ExtractPopulation(texts) {
+  const fields = [];
+  const groups = [];
+  const groupPatterns = [
+    /\b18\s*[-–]\s*29 ans\b/g,
+    /\b65 ans et plus\b/g,
+    /\bpersonnes agees de 18 ans et plus\b/g,
+    /\bdescendants d immigres\b/g,
+    /\bhabitants des qpv\b/g,
+    /\bresidents des qpv\b/g,
+    /\bensemble de la population\b/g
+  ];
+  for (const text of texts) {
+    const raw = cleanString(text);
+    const normalized = normalizeText(raw);
+    const fieldMatches = raw.match(/(?:Champ|Note)\s*:\s*[^\n.]+(?:\.)?/gi) || [];
+    for (const value of fieldMatches) {
+      const cleaned = cleanString(value);
+      if (cleaned && !fields.includes(cleaned)) fields.push(cleaned);
+    }
+    for (const pattern of groupPatterns) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(normalized)) !== null) {
+        const value = cleanString(match[0]);
+        if (value && !groups.includes(value)) groups.push(value);
+      }
+    }
+  }
+  return { fields: fields.slice(0, 4), groups: groups.slice(0, 8) };
+}
+
+function met01ExtractGeography(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_GEO_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label, scale: item.scale }));
+}
+
+function met01ExtractIndicators(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_INDICATOR_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label }));
+}
+
+function met01ExtractMethods(texts) {
+  const combined = normalizeText(texts.join(" "));
+  return MET01_METHOD_PATTERNS
+    .filter(item => item.pattern.test(combined))
+    .map(item => ({ id: item.id, label: item.label }));
+}
+
+function met01Profile(item, store) {
+  const context = met01MaterialTexts(item, store);
+  const publication = publicationMeta(store, item.publication_id);
+  const primaryIndicators = met01ExtractIndicators(context.primaryTexts);
+  return {
+    material_id: item.material_id,
+    publication,
+    provenance: context.proof.provenance,
+    evidence_refs: (context.proof.proofs || []).map(proof => ({
+      proof_id: proof.proof_id,
+      locator: proof.locator,
+      section: proof.section
+    })),
+    periods: met01ExtractPeriods(context.texts),
+    population: met01ExtractPopulation(context.texts),
+    geography: met01ExtractGeography(context.texts),
+    indicators: primaryIndicators.length ? primaryIndicators : met01ExtractIndicators(context.texts),
+    methods: met01ExtractMethods(context.texts),
+    source_context: {
+      publication_id: publication.publication_id,
+      organisme_producteur: publication.organisme_producteur || null,
+      type_document: publication.type_document || null,
+      publication_year: publication.annee_publication || null
+    }
+  };
+}
+
+function met01SetIntersection(left, right, key = x => x) {
+  const rightValues = new Set(right.map(key));
+  return left.filter(value => rightValues.has(key(value)));
+}
+
+function met01Criterion(id, label, status, left, right, note) {
+  return { id, label, status, left, right, methodological_note: note };
+}
+
+function met01AssessCriteria(left, right) {
+  const criteria = [];
+
+  const sharedYears = met01SetIntersection(left.periods.years, right.periods.years);
+  let periodStatus = "insufficient_documentation";
+  let periodNote = "La période d'observation n'est pas suffisamment explicite dans les deux matériaux pour vérifier l'alignement temporel.";
+  if (left.periods.years.length && right.periods.years.length) {
+    if (sharedYears.length) {
+      periodStatus = "documented_overlap";
+      periodNote = `Au moins une année d'observation est commune (${sharedYears.join(", ")}). Vérifier néanmoins que les fenêtres d'observation et la date de collecte sont équivalentes.`;
+    } else {
+      periodStatus = "different_periods_to_review";
+      periodNote = "Les années d'observation explicitement repérées ne se recouvrent pas. La comparaison exige de vérifier que cet écart temporel est acceptable.";
+    }
+  }
+  criteria.push(met01Criterion("period", "Période", periodStatus, left.periods, right.periods, periodNote));
+
+  const leftPopulationTokens = [...left.population.fields, ...left.population.groups].map(normalizeText);
+  const rightPopulationTokens = [...right.population.fields, ...right.population.groups].map(normalizeText);
+  const sharedPopulation = met01SetIntersection(leftPopulationTokens, rightPopulationTokens);
+  let populationStatus = "insufficient_documentation";
+  let populationNote = "Le champ ou la population n'est pas suffisamment explicite dans les deux matériaux.";
+  if (leftPopulationTokens.length && rightPopulationTokens.length) {
+    if (sharedPopulation.length) {
+      populationStatus = "documented_alignment";
+      populationNote = "Un même champ ou groupe de population est explicitement repéré dans les deux matériaux. Vérifier que les règles d'inclusion/exclusion sont identiques.";
+    } else {
+      populationStatus = "different_populations_to_review";
+      populationNote = "Les populations ou champs explicitement repérés diffèrent. MET01 ne conclut pas à l'incomparabilité : l'analyste doit vérifier si cette différence est compatible avec son objectif.";
+    }
+  }
+  criteria.push(met01Criterion("population", "Population / champ", populationStatus, left.population, right.population, populationNote));
+
+  const sharedGeo = met01SetIntersection(left.geography, right.geography, item => item.id);
+  let geoStatus = "insufficient_documentation";
+  let geoNote = "L'unité géographique n'est pas suffisamment explicite dans les deux matériaux.";
+  if (left.geography.length && right.geography.length) {
+    if (sharedGeo.length) {
+      geoStatus = "documented_overlap";
+      geoNote = `Un périmètre géographique commun est explicitement repéré (${sharedGeo.map(item => item.label).join(", ")}). Vérifier que l'échelle effective d'observation est la même.`;
+    } else {
+      geoStatus = "different_geographic_scopes_to_review";
+      geoNote = "Les périmètres géographiques nommés diffèrent. Cela n'interdit pas une comparaison, mais impose de contrôler l'échelle et le contexte territorial.";
+    }
+  }
+  criteria.push(met01Criterion("geography", "Unité géographique", geoStatus, left.geography, right.geography, geoNote));
+
+  const sharedIndicators = met01SetIntersection(left.indicators, right.indicators, item => item.id);
+  let indicatorStatus = "insufficient_documentation";
+  let indicatorNote = "La définition de l'indicateur ou de la mesure n'est pas suffisamment explicite dans les deux matériaux.";
+  if (left.indicators.length && right.indicators.length) {
+    if (sharedIndicators.length) {
+      indicatorStatus = "documented_overlap";
+      indicatorNote = `Au moins un type de mesure est commun (${sharedIndicators.map(item => item.label).join(", ")}). Cela ne garantit pas que les définitions, dénominateurs ou protocoles soient identiques.`;
+    } else {
+      indicatorStatus = "different_indicator_definitions_to_review";
+      indicatorNote = "Les mesures explicitement repérées ne portent pas sur le même indicateur. Une mise en parallèle directe serait méthodologiquement fragile sans justification supplémentaire.";
+    }
+  }
+  criteria.push(met01Criterion("indicator", "Définition de l’indicateur", indicatorStatus, left.indicators, right.indicators, indicatorNote));
+
+  const samePublication = left.source_context.publication_id === right.source_context.publication_id;
+  const sameProducer = normalizeText(left.source_context.organisme_producteur) === normalizeText(right.source_context.organisme_producteur)
+    && Boolean(cleanString(left.source_context.organisme_producteur));
+  const sameType = normalizeText(left.source_context.type_document) === normalizeText(right.source_context.type_document)
+    && Boolean(cleanString(left.source_context.type_document));
+  let sourceStatus = "different_sources_to_review";
+  let sourceNote = "Les matériaux proviennent de sources documentaires différentes. Vérifier la méthode de production des données avant toute comparaison directe.";
+  if (samePublication) {
+    sourceStatus = "same_publication_context";
+    sourceNote = "Les deux matériaux proviennent de la même publication. Cela réduit un écart de contexte documentaire, sans garantir à lui seul l'identité du protocole ou de l'indicateur.";
+  } else if (sameProducer && sameType) {
+    sourceStatus = "partially_aligned_source_context";
+    sourceNote = "Le producteur et le type de document sont communs, mais les protocoles et sources de données doivent encore être vérifiés.";
+  }
+  criteria.push(met01Criterion("source_method", "Source / méthode", sourceStatus, {
+    ...left.source_context,
+    method_markers: left.methods
+  }, {
+    ...right.source_context,
+    method_markers: right.methods
+  }, sourceNote));
+
+  return criteria;
+}
+
+function runMet01(body) {
+  const action = SUPPORTED_ACTIONS.MET01;
+  const store = getCorpusStore();
+  const selected = met01SelectedMaterials(body, store);
+  const profiles = selected.map(item => met01Profile(item, store));
+  const criteria = met01AssessCriteria(profiles[0], profiles[1]);
+
+  const explicitDifferences = criteria.filter(item => item.status.startsWith("different_"));
+  const insufficient = criteria.filter(item => item.status === "insufficient_documentation");
+  const aligned = criteria.filter(item => ["documented_alignment", "documented_overlap", "same_publication_context", "partially_aligned_source_context"].includes(item.status));
+
+  let verificationState = "comparability_not_established_from_available_materials";
+  if (explicitDifferences.length) verificationState = "comparability_requires_caution";
+  else if (!insufficient.length && aligned.length === criteria.length) verificationState = "several_conditions_aligned_no_equivalence_claim";
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.7-met01",
+    action,
+    input_mode: "two_selected_materials",
+    materials: profiles,
+    criteria,
+    summary: {
+      verification_state: verificationState,
+      criteria_checked: criteria.length,
+      documented_alignments: aligned.length,
+      differences_to_review: explicitDifferences.length,
+      insufficiently_documented_criteria: insufficient.length,
+      comparability_decision: "analyst_required",
+      note: explicitDifferences.length
+        ? "Au moins une différence de périmètre ou de mesure est explicitement repérée. MET01 signale les points à contrôler mais ne conclut pas à l'incomparabilité."
+        : insufficient.length
+          ? "Aucune incompatibilité décisive n'est déduite, mais plusieurs conditions de comparabilité restent insuffisamment documentées."
+          : "Plusieurs conditions sont documentées comme alignées. MET01 ne transforme pas cet alignement en équivalence automatique."
+    },
+    methodological_questions: criteria.map(item => ({
+      criterion_id: item.id,
+      status: item.status,
+      question: item.id === "period"
+        ? "Les périodes et fenêtres d'observation sont-elles suffisamment proches pour répondre à la même question ?"
+        : item.id === "population"
+          ? "Les populations, champs et règles d'inclusion sont-ils définis de manière comparable ?"
+          : item.id === "geography"
+            ? "Les unités géographiques et leurs échelles sont-elles comparables ?"
+            : item.id === "indicator"
+              ? "Les indicateurs mesurent-ils réellement le même objet avec la même définition et le même dénominateur ?"
+              : "Les sources, méthodes de collecte et protocoles sont-ils suffisamment homogènes pour soutenir la comparaison ?"
+    })),
+    guardrails: {
+      corpus_only: true,
+      compares_exactly_two_materials: true,
+      performs_substantive_comparison_for_user: false,
+      declares_equivalence: false,
+      declares_incomparability_automatically: false,
+      infers_missing_scope: false,
+      uses_publication_year_as_observation_period: false,
+      note: "MET01 vérifie les conditions documentaires de la comparaison (période, population, territoire, indicateur, source/méthode). Il signale les écarts et les informations manquantes ; la décision de comparer reste à l'analyste."
+    }
+  };
+}
+
+
+const MET02_STATISTICAL_ASSOCIATION_RELATIONS = new Set(["ASSOCIATION"]);
+const MET02_GENERIC_ASSOCIATION_RELATIONS = new Set(["ASSOCIE_A"]);
+const MET02_CAUSAL_OR_CONTRIBUTIVE_RELATIONS = new Set([
+  "CONTRIBUE_A",
+  "CONTRIBUE_A_PREVENIR",
+  "CONTRIBUE_PARTIELLEMENT_A",
+  "PEUT_CONTRIBUER_A",
+  "INFLUENCE",
+  "ACCENTUE",
+  "ACCROIT",
+  "FAVORISE",
+  "FRAGILISE",
+  "FREINE",
+  "RENFORCE",
+  "RENFORCE_LE_BESOIN_DE",
+  "SOUTIENT"
+]);
+const MET02_DESCRIPTIVE_RELATIONS = new Set([
+  "CARACTERISE",
+  "ILLUSTRE",
+  "QUANTIFIE",
+  "PRESENTE",
+  "MET_EN_EVIDENCE",
+  "DOCUMENTE",
+  "OBSERVEE_DANS",
+  "SE_MANIFESTE_PAR",
+  "TAUX_ELEVE_DE",
+  "TAUX_FAIBLE_DE"
+]);
+const MET02_TEMPORAL_RELATIONS = new Set(["PRECEDE", "FAIT_SUITE_A", "PROLONGE"]);
+const MET02_NORMATIVE_OR_ACTION_RELATIONS = new Set([
+  "PRECONISE",
+  "A_POUR_OBJECTIF",
+  "PERMET_DE",
+  "MET_EN_OEUVRE",
+  "UTILISE_POUR"
+]);
+
+const MET02_SOURCE_PATTERNS = Object.freeze({
+  association: [
+    /\bassocie(?:e|es|s)?\b/,
+    /\bassociation\b/,
+    /\bcorrel(?:e|ee|es|es|ation|ations)\b/,
+    /\bsont lies\b/,
+    /\best lie\b/,
+    /\blinked\b/,
+    /\bassociated\b/,
+    /\bcorrelat(?:ed|ion)\b/
+  ],
+  causal_wording: [
+    /\bcaus(?:e|es|er|al|alite)\b/,
+    /\bentraine(?:e|es|s)?\b/,
+    /\bprovoque(?:e|es|s)?\b/,
+    /\bconduit a\b/,
+    /\bsous l effet de\b/,
+    /\bs explique par\b/,
+    /\bexplique(?:e|es|s)? par\b/,
+    /\bcontribue(?:nt)? a\b/,
+    /\binfluence(?:nt)?\b/,
+    /\baccroit\b/,
+    /\baccentue\b/,
+    /\bfragilise\b/,
+    /\bfavorise\b/,
+    /\breduit\b/,
+    /\bdiminue\b/,
+    /\bcausal effect\b/,
+    /\bcauses?\b/,
+    /\bleads? to\b/,
+    /\bresults? in\b/
+  ],
+  uncertainty: [
+    /\bpeut\b/,
+    /\bpourrait\b/,
+    /\bpourraient\b/,
+    /\bsusceptible\b/,
+    /\bsemblerait\b/,
+    /\bsemble\b/,
+    /\bprobable\b/,
+    /\blikely\b/,
+    /\bmay\b/,
+    /\bcould\b/
+  ],
+  adjustment: [
+    /\ba autres caracteristiques identiques\b/,
+    /\btoutes choses egales par ailleurs\b/,
+    /\bapres prise en compte\b/,
+    /\bcontrole(?:e|es|s)? pour\b/,
+    /\bajuste(?:e|es|s)?\b/,
+    /\bregression\b/
+  ],
+  causal_identification_method: [
+    /\beffet causal\b/,
+    /\bcausal effect\b/,
+    /\brandomis/,
+    /\bdifference(?:s)? en differences\b/,
+    /\bdifference[- ]in[- ]differences\b/,
+    /\bvariable instrumentale\b/,
+    /\binstrumental variable\b/,
+    /\bregression discontinuity\b/,
+    /\bexperience naturelle\b/,
+    /\bnatural experiment\b/
+  ]
+});
+
+function met02RelationSelector(body, store) {
+  const materialId = cleanString(body.material_id);
+  const relationId = cleanString(body.relation_id);
+  if (materialId) {
+    const match = materialId.match(/^relation:(.+)$/i);
+    if (!match) {
+      const error = new Error("MET02 exige une relation du corpus : material_id doit être de la forme relation:Rxxxx.");
+      error.statusCode = 400;
+      throw error;
+    }
+    const selector = { kind: "relation", id: cleanString(match[1]), material_id: `relation:${cleanString(match[1])}` };
+    return { selector, selected: exactMaterial(store, selector) };
+  }
+  if (relationId) {
+    const selector = { kind: "relation", id: relationId, material_id: `relation:${relationId}` };
+    return { selector, selected: exactMaterial(store, selector) };
+  }
+  const error = new Error("MET02 exige une relation précise : material_id=relation:Rxxxx ou relation_id=Rxxxx.");
+  error.statusCode = 400;
+  throw error;
+}
+
+function met02PatternMatches(text, patterns) {
+  const normalized = normalizeText(text);
+  return patterns.filter(pattern => pattern.test(normalized)).map(pattern => pattern.source);
+}
+
+function met02RelevantProofText(proofs, sourceLabel, targetLabel) {
+  const anchorTokens = new Set([...tokenize(sourceLabel), ...tokenize(targetLabel)]);
+  const candidates = [];
+  for (const proof of proofs || []) {
+    const text = cleanString(proof.text);
+    if (!text) continue;
+    const segments = text
+      .split(/\n+|(?<=[.!?])\s+/)
+      .map(cleanString)
+      .filter(segment => segment.length >= 20);
+    for (const segment of segments) {
+      const tokens = [...new Set(tokenize(segment))];
+      const overlap = tokens.filter(token => anchorTokens.has(token));
+      if (!overlap.length) continue;
+      candidates.push({
+        text: segment,
+        overlap_count: overlap.length,
+        overlap_ratio: anchorTokens.size ? overlap.length / anchorTokens.size : 0,
+        proof_id: proof.proof_id
+      });
+    }
+  }
+  candidates.sort((a, b) => b.overlap_count - a.overlap_count || b.overlap_ratio - a.overlap_ratio || a.text.length - b.text.length);
+  const selected = candidates.slice(0, 5);
+  return {
+    text: selected.length ? selected.map(item => item.text).join("\n") : (proofs || []).map(proof => cleanString(proof.text)).filter(Boolean).join("\n"),
+    evidence_segments: selected.map(item => ({ proof_id: item.proof_id, text: item.text }))
+  };
+}
+
+function met02RelationFamily(relationType) {
+  const type = cleanString(relationType).toUpperCase();
+  if (MET02_STATISTICAL_ASSOCIATION_RELATIONS.has(type)) return "statistical_association";
+  if (MET02_GENERIC_ASSOCIATION_RELATIONS.has(type)) return "generic_association";
+  if (MET02_CAUSAL_OR_CONTRIBUTIVE_RELATIONS.has(type)) return "causal_or_contributive_wording";
+  if (MET02_DESCRIPTIVE_RELATIONS.has(type)) return "descriptive_or_evidentiary";
+  if (MET02_TEMPORAL_RELATIONS.has(type)) return "temporal_sequence";
+  if (MET02_NORMATIVE_OR_ACTION_RELATIONS.has(type)) return "normative_or_action_link";
+  return "other_structured_link";
+}
+
+function met02CausalInterpretation(family, sourceSignals) {
+  if (family === "statistical_association") {
+    return {
+      status: "association_does_not_establish_causality",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: "La relation est explicitement encodée comme ASSOCIATION. Elle peut documenter une covariation ou un lien statistique, mais ne doit pas être reformulée comme une causalité."
+    };
+  }
+  if (family === "generic_association") {
+    return {
+      status: "generic_association_no_causal_inference",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: "ASSOCIE_A est un lien sémantique générique du graphe ; il ne constitue pas une preuve statistique ni causale."
+    };
+  }
+  if (family === "causal_or_contributive_wording" || sourceSignals.causal_wording_detected) {
+    return {
+      status: sourceSignals.causal_identification_method_detected
+        ? "causal_wording_with_method_marker_requires_review"
+        : "causal_or_contributive_wording_requires_methodological_verification",
+      causal_inference_allowed: false,
+      methodological_verification_required: true,
+      note: sourceSignals.causal_identification_method_detected
+        ? "Un vocabulaire causal et au moins un marqueur de méthode d'identification causale sont repérés dans la source. MET02 ne valide pas pour autant la causalité : le protocole doit être examiné par l'analyste."
+        : "Le lien comporte un vocabulaire causal ou contributif, mais le libellé de relation et l'extrait documentaire ne suffisent pas à établir une causalité méthodologiquement démontrée."
+    };
+  }
+  return {
+    status: "no_causal_inference_from_relation_type",
+    causal_inference_allowed: false,
+    methodological_verification_required: false,
+    note: "La nature de ce lien n'appelle pas, à elle seule, une lecture causale. MET02 n'en déduit aucune causalité."
+  };
+}
+
+function runMet02(body) {
+  const action = SUPPORTED_ACTIONS.MET02;
+  const store = getCorpusStore();
+  const { selector, selected } = met02RelationSelector(body, store);
+  const relation = selected.raw;
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const sourceNode = nodeById.get(cleanString(relation.source_id)) || {};
+  const targetNode = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: selector.material_id });
+  const relevantProof = met02RelevantProofText(
+    proofLookup.proofs || [],
+    cleanString(sourceNode.libelle),
+    cleanString(targetNode.libelle)
+  );
+  const proofText = relevantProof.text;
+  const relationType = cleanString(relation.type_relation).toUpperCase();
+  const family = met02RelationFamily(relationType);
+
+  const associationMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.association);
+  const causalMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.causal_wording);
+  const uncertaintyMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.uncertainty);
+  const adjustmentMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.adjustment);
+  const methodMatches = met02PatternMatches(proofText, MET02_SOURCE_PATTERNS.causal_identification_method);
+
+  const sourceSignals = {
+    association_language_detected: associationMatches.length > 0,
+    causal_wording_detected: causalMatches.length > 0 || family === "causal_or_contributive_wording",
+    uncertainty_language_detected: uncertaintyMatches.length > 0,
+    adjustment_or_control_language_detected: adjustmentMatches.length > 0,
+    causal_identification_method_detected: methodMatches.length > 0
+  };
+  const causalInterpretation = met02CausalInterpretation(family, sourceSignals);
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.8-met02",
+    action,
+    input_mode: "selected_relation",
+    relation: {
+      material_id: selector.material_id,
+      relation_id: cleanString(relation.relation_id),
+      relation_type: relationType,
+      source: {
+        node_id: cleanString(relation.source_id),
+        label: cleanString(sourceNode.libelle),
+        node_type: cleanString(sourceNode.type_noeud) || null
+      },
+      target: {
+        node_id: cleanString(relation.cible_id),
+        label: cleanString(targetNode.libelle),
+        node_type: cleanString(targetNode.type_noeud) || null
+      },
+      publication: publicationMeta(store, cleanString(relation.publication_id))
+    },
+    assessment: {
+      relation_family: family,
+      graph_direction_is_causal_direction: false,
+      statistical_association: family === "statistical_association",
+      generic_association: family === "generic_association",
+      causal_or_contributive_wording: family === "causal_or_contributive_wording",
+      source_signals: sourceSignals,
+      source_signal_scope: {
+        method: "relation_relevant_proof_segments",
+        evidence_segments: relevantProof.evidence_segments
+      },
+      causal_interpretation: causalInterpretation
+    },
+    provenance: {
+      ...proofLookup.provenance,
+      proof_count: (proofLookup.proofs || []).length,
+      proof_ids: (proofLookup.proofs || []).map(proof => proof.proof_id)
+    },
+    methodological_note: family === "statistical_association"
+      ? "Le graphe encode ici une ASSOCIATION : la coexistence ou la covariation documentée ne doit pas être transformée en relation de cause à effet."
+      : family === "causal_or_contributive_wording"
+        ? "Le libellé exprime une contribution, une influence ou un effet possible. MET02 signale ce niveau de formulation sans conclure que la causalité est démontrée."
+        : "MET02 décrit la nature documentaire du lien sélectionné et empêche sa surinterprétation causale.",
+    guardrails: {
+      corpus_only: true,
+      checks_one_explicit_relation: true,
+      converts_association_to_causality: false,
+      treats_graph_direction_as_causal_direction: false,
+      declares_causality_from_relation_label_alone: false,
+      declares_causality_from_wording_alone: false,
+      evaluates_truth_or_falsity: false,
+      rewrites_relation: false,
+      note: "MET02 qualifie le lien tel qu'il est documenté. Une relation ASSOCIATION reste une association ; un vocabulaire causal ou contributif déclenche une vérification méthodologique, pas une validation automatique de causalité."
+    }
+  };
+}
+
+
+
+const MET04_PROBLEM_RELATIONS = new Set(["REPOND_A", "RENFORCE_LE_BESOIN_DE"]);
+const MET04_ACTOR_OUT_RELATIONS = new Set(["MOBILISE"]);
+const MET04_ACTOR_IN_RELATIONS = new Set(["EST_DESTINATAIRE_DE"]);
+const MET04_ORIGIN_RELATIONS = new Set(["PRECONISE", "PORTE", "IMPULSE"]);
+const MET04_EFFECT_RELATIONS = new Set([
+  "CONTRIBUE_A", "CONTRIBUE_A_PREVENIR", "CONTRIBUE_PARTIELLEMENT_A",
+  "PERMET_DE", "RENFORCE", "SOUTIENT", "FAVORISE", "ACCENTUE", "ACCROIT",
+  "INFLUENCE", "A_POUR_OBJECTIF"
+]);
+const MET04_DEPENDENCY_RELATIONS = new Set(["S_APPUIE_SUR", "REPOSE_SUR"]);
+const MET04_LIMIT_RELATIONS = new Set(["NUANCE", "REMET_EN_CAUSE", "CONTREDIT", "FREINE"]);
+
+function met04RecommendationSelector(body, store) {
+  const materialId = cleanString(body.material_id);
+  const nodeId = cleanString(body.node_id || body.recommendation_id);
+
+  let selector;
+  if (materialId) {
+    const match = materialId.match(/^node:(.+)$/i);
+    if (!match) {
+      const error = new Error("MET04 exige un nœud de recommandation : material_id=node:Nxxxx.");
+      error.statusCode = 400;
+      throw error;
+    }
+    selector = { kind: "node", id: cleanString(match[1]), material_id: `node:${cleanString(match[1])}` };
+  } else if (nodeId) {
+    selector = { kind: "node", id: nodeId, material_id: `node:${nodeId}` };
+  } else {
+    const error = new Error("MET04 exige une recommandation précise du corpus : material_id=node:Nxxxx, node_id ou recommendation_id.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const selected = exactMaterial(store, selector);
+  const nodeType = normalizeText(selected.raw.type_noeud);
+  if (nodeType !== "recommandation") {
+    const error = new Error(`Le nœud ${selector.id} n'est pas typé recommandation dans le corpus actif.`);
+    error.statusCode = 400;
+    throw error;
+  }
+  return { selector, selected };
+}
+
+function met04RelationMaterial(relation, store, category) {
+  const nodeById = new Map(store.nodes.map(node => [cleanString(node.node_id), node]));
+  const source = nodeById.get(cleanString(relation.source_id)) || {};
+  const target = nodeById.get(cleanString(relation.cible_id)) || {};
+  const proofLookup = runDoc02({ material_id: `relation:${cleanString(relation.relation_id)}` });
+  return {
+    material_id: `relation:${cleanString(relation.relation_id)}`,
+    relation_id: cleanString(relation.relation_id),
+    relation_type: cleanString(relation.type_relation).toUpperCase(),
+    category,
+    source: {
+      node_id: cleanString(relation.source_id),
+      label: cleanString(source.libelle),
+      node_type: cleanString(source.type_noeud) || null
+    },
+    target: {
+      node_id: cleanString(relation.cible_id),
+      label: cleanString(target.libelle),
+      node_type: cleanString(target.type_noeud) || null
+    },
+    publication: publicationMeta(store, cleanString(relation.publication_id)),
+    provenance: {
+      ...proofLookup.provenance,
+      proof_count: (proofLookup.proofs || []).length,
+      proof_ids: (proofLookup.proofs || []).map(proof => proof.proof_id)
+    },
+    proofs: proofLookup.proofs || []
+  };
+}
+
+function met04ConnectedRelations(recommendationNode, store) {
+  const recommendationId = cleanString(recommendationNode.node_id);
+  const relevant = [];
+
+  for (const relation of store.relations) {
+    const sourceId = cleanString(relation.source_id);
+    const targetId = cleanString(relation.cible_id);
+    const type = cleanString(relation.type_relation).toUpperCase();
+    let category = null;
+
+    if (sourceId === recommendationId && MET04_PROBLEM_RELATIONS.has(type)) category = "problem_or_need";
+    else if (sourceId === recommendationId && MET04_ACTOR_OUT_RELATIONS.has(type)) category = "implementation_actor";
+    else if (targetId === recommendationId && MET04_ACTOR_IN_RELATIONS.has(type)) category = "implementation_actor";
+    else if (targetId === recommendationId && MET04_ORIGIN_RELATIONS.has(type)) category = "recommendation_origin";
+    else if (sourceId === recommendationId && MET04_EFFECT_RELATIONS.has(type)) category = "expected_effect_or_mechanism";
+    else if (sourceId === recommendationId && MET04_DEPENDENCY_RELATIONS.has(type)) category = "conditions_or_dependencies";
+    else if ((sourceId === recommendationId || targetId === recommendationId) && MET04_LIMIT_RELATIONS.has(type)) category = "limits_or_tensions";
+
+    if (category) relevant.push(met04RelationMaterial(relation, store, category));
+  }
+
+  return relevant;
+}
+
+function met04Criterion(id, label, materials, documentedNote, missingNote) {
+  return {
+    id,
+    label,
+    status: materials.length ? "documented_in_graph" : "not_documented_in_graph",
+    relation_count: materials.length,
+    materials,
+    note: materials.length ? documentedNote : missingNote
+  };
+}
+
+function runMet04(body) {
+  const action = SUPPORTED_ACTIONS.MET04;
+  const store = getCorpusStore();
+  const { selector, selected } = met04RecommendationSelector(body, store);
+  const recommendation = selected.raw;
+  const nodeProof = runDoc02({ material_id: selector.material_id });
+  const relationMaterials = met04ConnectedRelations(recommendation, store);
+  const byCategory = new Map();
+  for (const material of relationMaterials) {
+    if (!byCategory.has(material.category)) byCategory.set(material.category, []);
+    byCategory.get(material.category).push(material);
+  }
+
+  const criteria = [
+    met04Criterion(
+      "problem_or_need",
+      "Problème ou besoin auquel la recommandation répond",
+      byCategory.get("problem_or_need") || [],
+      "Le graphe relie explicitement la recommandation à au moins un problème ou besoin documenté.",
+      "Aucun lien explicite vers un problème ou besoin n'est documenté dans le graphe pour cette recommandation."
+    ),
+    met04Criterion(
+      "implementation_actor",
+      "Acteur de mise en œuvre ou destinataire",
+      byCategory.get("implementation_actor") || [],
+      "Au moins un acteur mobilisé ou destinataire est explicitement documenté.",
+      "Aucun acteur de mise en œuvre ou destinataire n'est explicitement documenté dans le graphe."
+    ),
+    met04Criterion(
+      "expected_effect_or_mechanism",
+      "Effet attendu ou mécanisme d'action",
+      byCategory.get("expected_effect_or_mechanism") || [],
+      "Le graphe documente au moins un effet attendu, objectif ou mécanisme associé à la recommandation.",
+      "Aucun effet attendu ni mécanisme d'action n'est explicitement documenté dans le graphe."
+    ),
+    met04Criterion(
+      "conditions_or_dependencies",
+      "Conditions, appuis ou dépendances",
+      byCategory.get("conditions_or_dependencies") || [],
+      "Au moins une condition, dépendance ou ressource d'appui est explicitement documentée.",
+      "Aucune condition de réussite, dépendance ou ressource d'appui n'est explicitement documentée dans le graphe."
+    ),
+    met04Criterion(
+      "limits_or_tensions",
+      "Limites, tensions ou contrepoints documentés",
+      byCategory.get("limits_or_tensions") || [],
+      "Le graphe contient au moins une limite, tension ou contradiction explicitement reliée à la recommandation.",
+      "Aucune limite, tension ou contradiction explicite n'est reliée à cette recommandation dans le graphe ; cette absence ne prouve pas qu'il n'en existe pas."
+    )
+  ];
+
+  const originMaterials = byCategory.get("recommendation_origin") || [];
+  const documentedCriteria = criteria.filter(item => item.status === "documented_in_graph");
+  const missingCriteria = criteria.filter(item => item.status === "not_documented_in_graph");
+
+  return {
+    ok: true,
+    engine: "reflection-assist-v0.9-met04",
+    action,
+    input_mode: "selected_recommendation_node",
+    recommendation: {
+      material_id: selector.material_id,
+      node_id: cleanString(recommendation.node_id),
+      label: cleanString(recommendation.libelle),
+      node_type: cleanString(recommendation.type_noeud),
+      publication: publicationMeta(store, cleanString(recommendation.publication_id)),
+      provenance: {
+        ...nodeProof.provenance,
+        proof_count: (nodeProof.proofs || []).length,
+        proof_ids: (nodeProof.proofs || []).map(proof => proof.proof_id)
+      },
+      proofs: nodeProof.proofs || []
+    },
+    recommendation_origin: {
+      documented: originMaterials.length > 0,
+      materials: originMaterials,
+      note: originMaterials.length
+        ? "Le corpus documente explicitement au moins un auteur, porteur ou émetteur de la recommandation."
+        : "Aucun auteur, porteur ou émetteur n'est relié explicitement à cette recommandation dans le graphe."
+    },
+    criteria,
+    summary: {
+      verification_state: missingCriteria.length
+        ? "recommendation_requires_additional_documentation"
+        : "several_documentary_dimensions_present_no_feasibility_verdict",
+      criteria_checked: criteria.length,
+      documented_criteria: documentedCriteria.length,
+      undocumented_criteria: missingCriteria.length,
+      feasibility_decision: "analyst_required",
+      desirability_decision: "analyst_required",
+      effectiveness_decision: "analyst_required",
+      note: missingCriteria.length
+        ? "MET04 fait apparaître les dimensions documentées et celles qui restent absentes du graphe. Une absence de lien n'est pas une preuve d'irréalisme ni d'inefficacité."
+        : "Plusieurs dimensions sont documentées dans le corpus. MET04 n'en déduit ni faisabilité, ni efficacité, ni opportunité."
+    },
+    methodological_questions: criteria.map(item => ({
+      criterion_id: item.id,
+      status: item.status,
+      question: item.id === "problem_or_need"
+        ? "À quel problème précisément documenté cette recommandation répond-elle ?"
+        : item.id === "implementation_actor"
+          ? "Qui devrait la mettre en œuvre, avec quel mandat et quelles responsabilités ?"
+          : item.id === "expected_effect_or_mechanism"
+            ? "Par quel mécanisme cette mesure est-elle censée produire l'effet attendu, et ce mécanisme est-il documenté ?"
+            : item.id === "conditions_or_dependencies"
+              ? "Quelles conditions, ressources ou dépendances sont nécessaires à sa mise en œuvre ?"
+              : "Quelles limites, tensions, effets indésirables ou contrepoints doivent encore être recherchés ?"
+    })),
+    guardrails: {
+      corpus_only: true,
+      checks_exact_recommendation_node: true,
+      rewrites_recommendation: false,
+      generates_recommendation: false,
+      declares_feasibility: false,
+      declares_effectiveness: false,
+      declares_desirability: false,
+      infers_missing_problem: false,
+      infers_missing_actor: false,
+      infers_missing_conditions: false,
+      treats_absence_of_limit_as_absence_of_risk: false,
+      converts_documented_effect_into_proven_causality: false,
+      note: "MET04 éprouve la documentation d'une recommandation déjà structurée dans le corpus. Il met en évidence problèmes, acteurs, mécanismes, conditions et limites explicitement reliés, sans décider si la recommandation est bonne, faisable ou efficace."
+    }
+  };
+}
+
+function runReflectionAssist(body = {}) {
+  const actionId = cleanString(body.action_id || "DOC01").toUpperCase();
+  const action = SUPPORTED_ACTIONS[actionId];
+  if (!action) {
+    const error = new Error(`Action non prise en charge : ${actionId || "(vide)"}.`);
+    error.statusCode = 400;
+    throw error;
+  }
+
+  if (actionId === "DOC01") return runDoc01(body);
+  if (actionId === "DOC02") return runDoc02(body);
+  if (actionId === "DOC03") return runDoc03(body);
+  if (actionId === "MIR01") return runMir01(body);
+  if (actionId === "MIR04") return runMir04(body);
+  if (actionId === "MIR08") return runMir08(body);
+  if (actionId === "MET01") return runMet01(body);
+  if (actionId === "MET02") return runMet02(body);
+  if (actionId === "MET04") return runMet04(body);
+
+  const error = new Error(`Action non implémentée : ${actionId}.`);
+  error.statusCode = 400;
+  throw error;
+}
+
+module.exports = {
+  runReflectionAssist,
+  SUPPORTED_ACTIONS
+};

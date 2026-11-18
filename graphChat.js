@@ -409,7 +409,9 @@ async function callAnthropic({ apiKey, model, system, userText }) {
       if (!toolUse?.input) {
         throw graphChatError("Le modèle n'a pas retourné la réponse structurée attendue.", 503, "invalid_llm_output");
       }
-      return toolUse.input;
+      // stop_reason « max_tokens » = le modèle a été interrompu avant la fin :
+      // la réponse est alors signalée comme incomplète (champ tronque).
+      return { input: toolUse.input, stopReason: cleanString(json.stop_reason || "", 40) };
     } catch (error) {
       lastError = error;
       const retryable =
@@ -449,9 +451,13 @@ function cleanMultilineText(value, max = MAX_RAW_ANSWER_CHARS) {
     .trim();
 }
 
-function trimAtSentence(value, max) {
+// `state` (facultatif) : objet partagé qui signale qu'un texte a dû être raccourci
+// (state.truncated = true). Cela permet d'indiquer au public qu'une réponse est
+// incomplète au lieu de la présenter comme entière.
+function trimAtSentence(value, max, state = null) {
   const text = cleanPublicText(value, Math.max(max + 220, max));
   if (text.length <= max) return text;
+  if (state) state.truncated = true;
   const chunk = text.slice(0, max + 1);
   const stops = [". ", "? ", "! ", "; ", ", "];
   let cut = -1;
@@ -461,7 +467,7 @@ function trimAtSentence(value, max) {
   return chunk.slice(0, cut + (/[.!?;]/.test(chunk[cut]) ? 1 : 0)).trim();
 }
 
-function parsePublicResponse(value) {
+function parsePublicResponse(value, state = null) {
   const text = cleanMultilineText(value);
   if (!text) return { intro: "", sections: [] };
 
@@ -480,7 +486,7 @@ function parsePublicResponse(value) {
 
   if (tokens.length) {
     const prefix = text.slice(0, tokens[0].start).trim();
-    if (prefix) intro = trimAtSentence(prefix, 900);
+    if (prefix) intro = trimAtSentence(prefix, 900, state);
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
@@ -489,19 +495,23 @@ function parsePublicResponse(value) {
       if (!content) continue;
 
       if (token.type === "INTRO") {
-        if (!intro) intro = trimAtSentence(content, 900);
+        if (!intro) intro = trimAtSentence(content, 900, state);
         continue;
       }
       if (token.type === "SECTION") {
         const title = cleanPublicText(content, 120);
-        if (!title || sections.length >= 4) { current = null; continue; }
+        if (!title) { current = null; continue; }
+        if (sections.length >= 4) { if (state) state.truncated = true; current = null; continue; }
         current = { titre: title, items: [] };
         sections.push(current);
         continue;
       }
       if (token.type === "ITEM") {
-        const item = trimAtSentence(content, 520);
-        if (current && item && current.items.length < 6) current.items.push(item);
+        const item = trimAtSentence(content, 520, state);
+        if (current && item) {
+          if (current.items.length < 6) current.items.push(item);
+          else if (state) state.truncated = true;
+        }
         continue;
       }
     }
@@ -513,15 +523,22 @@ function parsePublicResponse(value) {
   // Repli robuste : on retire tous les marqueurs bruts avant affichage.
   const publicText = trimAtSentence(
     text.replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "),
-    MAX_ANSWER_CHARS
+    MAX_ANSWER_CHARS,
+    state
   );
-  const parts = publicText.split(/\s+(?=\d+\.\s+)/g);
+  // Découpage d'une liste numérotée « 1. … 2. … » écrite en ligne.
+  // Un numéro de liste : 1 ou 2 chiffres, après une fin de phrase ou un deux-points,
+  // suivi d'une majuscule. Une année (« depuis 2016. Il… ») ou une page
+  // (« p. 12. ») ne doit jamais être prise pour un numéro de liste : sinon la
+  // phrase précédente est coupée (bug « …depuis » constaté le 18/11/2026).
+  const parts = publicText.split(/(?<=[.:;!?])(?<!\bp\.)\s+(?=[1-9]\d?\.\s+\p{Lu})/u);
   if (parts.length > 1) {
-    const fallbackIntro = trimAtSentence(parts.shift().replace(/[:\s]+$/, ""), 900);
-    const items = parts
-      .map(x => trimAtSentence(x.replace(/^\d+\.\s*/, ""), 520))
-      .filter(Boolean)
-      .slice(0, 6);
+    const fallbackIntro = trimAtSentence(parts.shift().replace(/[:\s]+$/, ""), 900, state);
+    const allItems = parts
+      .map(x => trimAtSentence(x.replace(/^\d+\.\s*/, ""), 520, state))
+      .filter(Boolean);
+    if (allItems.length > 6 && state) state.truncated = true;
+    const items = allItems.slice(0, 6);
     return { intro: fallbackIntro, sections: items.length ? [{ titre: "Éléments documentés", items }] : [] };
   }
   return { intro: publicText, sections: [] };
@@ -534,7 +551,7 @@ function firstSentences(text, count = 2) {
   return parts.slice(0, count).join(" ").trim();
 }
 
-function applyQuestionStyle(parsedPublic, question) {
+function applyQuestionStyle(parsedPublic, question, state = null) {
   const profile = questionProfile(question);
   let intro = parsedPublic.intro || "";
   let sections = Array.isArray(parsedPublic.sections) ? parsedPublic.sections : [];
@@ -561,10 +578,13 @@ function applyQuestionStyle(parsedPublic, question) {
   }
 
   // Dernière barrière : aucun marqueur interne ne doit parvenir au public.
-  intro = cleanPublicText(intro.replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 1200);
+  // Correctif 18/11/2026 : cette barrière coupait auparavant le texte au
+  // caractère près (1200 caractères pour l'introduction), en plein mot.
+  // Elle coupe désormais en fin de phrase et signale la coupe (state.truncated).
+  intro = trimAtSentence(intro.replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), MAX_ANSWER_CHARS, state);
   sections = sections.map(s => ({
     titre: cleanPublicText(String(s.titre || "").replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 140),
-    items: (s.items || []).map(item => cleanPublicText(String(item).replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 560)).filter(Boolean)
+    items: (s.items || []).map(item => trimAtSentence(String(item).replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 560, state)).filter(Boolean)
   })).filter(s => s.titre && s.items.length);
 
   return { intro, sections };
@@ -612,7 +632,10 @@ function hasExplicitPriorityEvidence(graph) {
   );
 }
 
-function finalizeAnswer(raw, graph, question = "") {
+function finalizeAnswer(raw, graph, question = "", meta = {}) {
+  // Suivi des coupes : true si le texte du modèle a dû être raccourci ici,
+  // ou si le modèle lui-même s'est arrêté faute de jetons (stop_reason max_tokens).
+  const truncation = { truncated: meta?.stopReason === "max_tokens" };
   const validNodeIds = new Set(graph.nodes.map(n => n.node_id));
   const relationMap = new Map(graph.relations.map(r => [r.relation_id, r]));
 
@@ -641,7 +664,7 @@ function finalizeAnswer(raw, graph, question = "") {
   const nodeMap = new Map(graph.nodes.map(n => [n.node_id, n]));
   const profile = questionProfile(question);
   let insufficient = Boolean(raw?.insuffisant);
-  const parsedPublic = applyQuestionStyle(parsePublicResponse(raw?.reponse), question);
+  const parsedPublic = applyQuestionStyle(parsePublicResponse(raw?.reponse, truncation), question, truncation);
   let answer = parsedPublic.intro;
   let sections = parsedPublic.sections;
 
@@ -698,7 +721,10 @@ function finalizeAnswer(raw, graph, question = "") {
     relations_selectionnees: relationIds,
     resultats,
     preuves,
-    insuffisant: insufficient
+    insuffisant: insufficient,
+    // Nouveau champ (18/11/2026) : la réponse publique est incomplète.
+    // L'interface doit alors le signaler à l'utilisateur.
+    tronque: Boolean(truncation.truncated)
   };
 }
 
@@ -724,8 +750,8 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
 
       const apiKey = await getAnthropicApiKey();
       const { system, userText } = buildPrompt(graph);
-      const raw = await callAnthropic({ apiKey, model, system, userText });
-      const data = finalizeAnswer(raw, graph, graph.question);
+      const { input: raw, stopReason } = await callAnthropic({ apiKey, model, system, userText });
+      const data = finalizeAnswer(raw, graph, graph.question, { stopReason });
 
       console.log(JSON.stringify({
         event: "graph_chat_completed",
@@ -735,6 +761,9 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
         relations: relationCount,
         question_chars: graph.question.length,
         insufficient: data.insuffisant,
+        truncated: data.tronque,
+        stop_reason: stopReason,
+        raw_answer_chars: String(raw?.reponse || "").length,
         duration_ms: Date.now() - startedAt
       }));
 

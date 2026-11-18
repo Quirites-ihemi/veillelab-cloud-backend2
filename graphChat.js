@@ -10,7 +10,9 @@ const DEFAULT_ALLOWED_ORIGINS = [
 const MAX_QUESTION_CHARS = Number(process.env.GRAPH_CHAT_MAX_QUESTION_CHARS || 700);
 const MAX_NODES = Number(process.env.GRAPH_CHAT_MAX_NODES || 160);
 const MAX_RELATIONS = Number(process.env.GRAPH_CHAT_MAX_RELATIONS || 320);
-const MAX_NODE_LABEL_CHARS = 360;
+// 600 (au lieu de 360 jusqu'au 18/11/2026) : deux libellés du corpus dépassaient 360 caractères
+// (N0284 : 424, N0288 : 457) et étaient coupés en plein mot avant d'être transmis au modèle.
+const MAX_NODE_LABEL_CHARS = 600;
 const MAX_PAGE_CHARS = 100;
 const RATE_LIMIT = Number(process.env.GRAPH_CHAT_RATE_LIMIT || 30);
 const RATE_WINDOW_MS = Number(process.env.GRAPH_CHAT_RATE_WINDOW_MS || 5 * 60 * 1000);
@@ -728,6 +730,138 @@ function finalizeAnswer(raw, graph, question = "", meta = {}) {
   };
 }
 
+// ---------------------------------------------------------------------------
+// INVENTAIRE DÉTERMINISTE (correctif comptage, 18/11/2026)
+//
+// Pour les questions qui demandent de COMPTER ou de LISTER TOUS les éléments
+// d'un type (« Combien de recommandations ? », « Liste toutes les
+// recommandations », « Quels acteurs sont mentionnés ? »), la réponse est
+// calculée directement à partir des nœuds du graphe, sans appel au modèle :
+// le nombre annoncé est exactement le nombre d'éléments restitués, et aucun
+// élément n'est oublié ni inventé. La réponse précise qu'elle porte sur les
+// éléments retenus dans le graphe (sélection éditoriale), pas sur toute la
+// publication. Toutes les autres questions passent par le modèle, comme avant.
+// ---------------------------------------------------------------------------
+
+const INVENTORY_TYPES = [
+  { key: "recommandation", types: ["recommandation"], singular: "recommandation", plural: "recommandations", feminine: true,
+    words: ["recommandation", "recommandations", "preconisation", "preconisations"] },
+  { key: "acteur", types: ["acteur"], singular: "acteur", plural: "acteurs", feminine: false,
+    words: ["acteur", "acteurs"] },
+  { key: "probleme", types: ["probleme"], singular: "problème", plural: "problèmes", feminine: false,
+    words: ["probleme", "problemes"] },
+  { key: "action", types: ["action"], singular: "action", plural: "actions", feminine: true,
+    words: ["action", "actions"] },
+  { key: "tendance", types: ["tendance", "tendance_forte"], singular: "tendance", plural: "tendances", feminine: true,
+    words: ["tendance", "tendances"] },
+  { key: "signal_faible", types: ["signal_faible"], singular: "signal faible", plural: "signaux faibles", feminine: false,
+    words: ["signal faible", "signaux faibles"] },
+  { key: "localisation", types: ["localisation"], singular: "localisation", plural: "localisations", feminine: true,
+    words: ["localisation", "localisations", "lieu", "lieux"] },
+  { key: "methode", types: ["methode"], singular: "méthode", plural: "méthodes", feminine: true,
+    words: ["methode", "methodes"] },
+  { key: "instrument_dispositif", types: ["instrument_dispositif"], singular: "instrument ou dispositif", plural: "instruments ou dispositifs", feminine: false,
+    words: ["instrument", "instruments", "dispositif", "dispositifs"] }
+];
+
+function normalizeForMatch(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[’']/g, " ")
+    .replace(/[^a-z0-9_ ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+// Renvoie l'entrée d'INVENTORY_TYPES visée, ou null si la question ne demande
+// pas un inventaire complet d'un type. Volontairement étroit : toute question
+// qui qualifie ou filtre (« principaux », « qui répondent à », « sur le thème »…)
+// reste traitée par le modèle.
+function detectInventoryRequest(question) {
+  const q = normalizeForMatch(question);
+  if (!q) return null;
+
+  const match = INVENTORY_TYPES.find(entry => entry.words.some(w => new RegExp(`\\b${w}\\b`).test(q)));
+  if (!match) return null;
+
+  // Questions qui restreignent ou qualifient : pas d'inventaire.
+  const restrictive = /\b(principa(l|le|ux|les)|plus importante?s?|essentiel(le)?s?|majeure?s?|prioritaires?|priorite|repond(ent)?|concern(e|ent)|portant sur|liee?s? a|lie a|relatives? a|sur le|sur la|sur les|en matiere de|pour (le|la|les|lutter)|qui (porte|mene|pilote|doit|doivent)|a qui|par qui|pourquoi|comment|exemple)\b/;
+  if (restrictive.test(q)) return null;
+
+  const words = match.words.join("|");
+  const asksCount = /\b(combien|nombre)\b/.test(q);
+  const asksAll = /\b(liste|lister|listez|enumere|enumerer|toutes?|tous|l ensemble|ensemble des|integralite|exhausti(f|ve))\b/.test(q);
+  // « Quelles recommandations sont formulées ? », « Quels acteurs sont mentionnés ? »
+  const asksWhichAre = new RegExp(
+    `^(quel(le)?s?|quelles sont les|quels sont les)\\s+(${words})\\s+(sont|figurent)?\\s*(formulee?s?|mentionnee?s?|identifiee?s?|citee?s?|presente?s?|proposee?s?|evoquee?s?|retenue?s?|dans (la publication|le graphe|le rapport|le document))?\\s*$`
+  ).test(q) || new RegExp(`^(quel(le)?s? sont les)\\s+(${words})\\s*$`).test(q);
+
+  if (!(asksCount || asksAll || asksWhichAre)) return null;
+  return match;
+}
+
+function formatInventoryPages(value) {
+  const ref = cleanString(value, MAX_PAGE_CHARS);
+  if (!ref) return "";
+  const parts = ref.split(/\s*[;,]\s*/).filter(Boolean);
+  if (parts.length && parts.every(p => /\d{1,2}:\d{2}/.test(p))) {
+    return `${parts.length > 1 ? "timecodes" : "timecode"} ${parts.join(", ")}`;
+  }
+  return `p. ${parts.join(", ")}`;
+}
+
+function buildInventoryAnswer(graph, entry) {
+  const wanted = new Set(entry.types);
+  const items = graph.nodes.filter(n => wanted.has(normalizeForMatch(n.type_noeud).replace(/ /g, "_")));
+  const count = items.length;
+  const noun = count > 1 ? entry.plural : entry.singular;
+
+  if (!count) {
+    return {
+      reponse: `Le graphe de cette publication ne contient aucun élément de type « ${entry.singular} ». Le graphe est une sélection des informations de la publication : il ne couvre pas nécessairement tout son contenu.`,
+      sections: [],
+      noeuds_selectionnes: [],
+      relations_selectionnees: [],
+      resultats: [],
+      preuves: [],
+      insuffisant: true,
+      tronque: false,
+      mode: "inventaire"
+    };
+  }
+
+  const retenu = entry.feminine ? (count > 1 ? "retenues" : "retenue") : (count > 1 ? "retenus" : "retenu");
+  const reponse = `Le graphe de cette publication contient ${count} ${noun}. Cette liste porte uniquement sur les éléments retenus dans le graphe, qui est une sélection de la publication : elle n'est pas nécessairement exhaustive par rapport au document original.`;
+
+  const sectionItems = items.map(n => {
+    const label = cleanPublicText(n.libelle, MAX_NODE_LABEL_CHARS);
+    const pages = formatInventoryPages(n.page_source);
+    return pages ? `${label} (${pages}).` : `${label}.`;
+  });
+
+  const titre = `${entry.plural.charAt(0).toUpperCase()}${entry.plural.slice(1)} ${entry.feminine ? "retenues" : "retenus"} dans le graphe`;
+  const nodeIds = items.map(n => n.node_id);
+
+  return {
+    reponse,
+    sections: [{ titre: count > 1 ? titre : `${entry.singular.charAt(0).toUpperCase()}${entry.singular.slice(1)} ${retenu} dans le graphe`, items: sectionItems }],
+    noeuds_selectionnes: nodeIds,
+    relations_selectionnees: [],
+    resultats: [],
+    preuves: items.slice(0, 12).map(n => ({
+      type: "noeud",
+      node_id: n.node_id,
+      libelle: n.libelle,
+      page_source: n.page_source
+    })),
+    insuffisant: false,
+    tronque: false,
+    mode: "inventaire"
+  };
+}
+
 function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
   if (!firestore || typeof getAnthropicApiKey !== "function" || !model) {
     throw new Error("Configuration graph-chat incomplète.");
@@ -748,10 +882,22 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
       nodeCount = graph.nodes.length;
       relationCount = graph.relations.length;
 
-      const apiKey = await getAnthropicApiKey();
-      const { system, userText } = buildPrompt(graph);
-      const { input: raw, stopReason } = await callAnthropic({ apiKey, model, system, userText });
-      const data = finalizeAnswer(raw, graph, graph.question, { stopReason });
+      // Inventaire complet d'un type demandé : réponse calculée depuis le graphe,
+      // sans appel au modèle (comptage exact, aucun oubli).
+      const inventory = detectInventoryRequest(graph.question);
+      let data;
+      let stopReason = "";
+      let rawAnswerChars = 0;
+      if (inventory) {
+        data = buildInventoryAnswer(graph, inventory);
+      } else {
+        const apiKey = await getAnthropicApiKey();
+        const { system, userText } = buildPrompt(graph);
+        const result = await callAnthropic({ apiKey, model, system, userText });
+        stopReason = result.stopReason;
+        rawAnswerChars = String(result.input?.reponse || "").length;
+        data = finalizeAnswer(result.input, graph, graph.question, { stopReason });
+      }
 
       console.log(JSON.stringify({
         event: "graph_chat_completed",
@@ -760,10 +906,11 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
         nodes: nodeCount,
         relations: relationCount,
         question_chars: graph.question.length,
+        mode: inventory ? `inventaire:${inventory.key}` : "modele",
         insufficient: data.insuffisant,
         truncated: data.tronque,
         stop_reason: stopReason,
-        raw_answer_chars: String(raw?.reponse || "").length,
+        raw_answer_chars: rawAnswerChars,
         duration_ms: Date.now() - startedAt
       }));
 
@@ -806,5 +953,7 @@ module.exports = {
   finalizeAnswer,
   parsePublicResponse,
   applyQuestionStyle,
-  questionProfile
+  questionProfile,
+  detectInventoryRequest,
+  buildInventoryAnswer
 };

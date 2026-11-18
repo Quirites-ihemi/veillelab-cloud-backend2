@@ -60,10 +60,26 @@ function buildCorpusStore() {
   }
 
   const nodeIds = new Set();
+  const nodePublicationKeys = new Set();
+  const nodeTypeById = new Map();
   for (const node of nodes) {
     const nodeId = String(node?.node_id || "").trim();
+    const publicationId = String(node?.publication_id || "").trim();
+    const nodeType = String(node?.type_noeud || "").trim();
     invariant(nodeId, "node_id vide");
-    invariant(!nodeIds.has(nodeId), `node_id dupliqué : ${nodeId}`);
+    invariant(publicationId, `publication_id vide pour ${nodeId}`);
+    // Un même concept peut être documenté par plusieurs publications.
+    // En revanche, une publication ne doit contenir qu'une fiche par nœud.
+    const publicationKey = `${publicationId}::${nodeId}`;
+    invariant(!nodePublicationKeys.has(publicationKey),
+      `node_id dupliqué dans ${publicationId} : ${nodeId}`);
+    nodePublicationKeys.add(publicationKey);
+    if (nodeTypeById.has(nodeId)) {
+      invariant(nodeTypeById.get(nodeId) === nodeType,
+        `type_noeud contradictoire pour ${nodeId}`);
+    } else {
+      nodeTypeById.set(nodeId, nodeType);
+    }
     nodeIds.add(nodeId);
   }
 

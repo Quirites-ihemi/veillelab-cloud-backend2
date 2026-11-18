@@ -1,0 +1,18 @@
+QUIRITÈS — Patch minimal corpus 58, 13 novembre 2026
+
+Contient : 5 JSON dans corpus/, corpusStore.js, et deux corrections ciblées de l'indexation des nœuds partagés dans globalSearch.js et reflectionAssist.js, plus verifier_corpus.js.
+
+Le ZIP ne modifie ni les consignes ni les traitements IA T01 à T06.
+Aucun fichier n'est déployé automatiquement. Les autres fichiers du backend, y compris corpus/expertise_nodes.json, restent inchangés.
+
+Dans Google Cloud Shell, après avoir importé ce ZIP :
+
+  cd ~/backend_corpus_20261113_test
+  unzip -o ~/Quirites_patch_corpus58_20261113.zip
+  node verifier_corpus.js
+
+Attendu : OK — Corpus 58 publications, 1 466 nœuds, 1 280 relations, 1 161 chunks; moteurs chargés sans erreur.
+
+Important : pour DOC02 « Remonter à la preuve », les 15 identifiants de nœuds partagés exigent désormais le champ publication_id pour éviter de confondre les sources. Si l'interface n'envoie pas publication_id lors de la demande DOC02, ce point doit être ajusté lors de la mise à jour du frontend.
+
+PUB133 : 22 références aux chunks manquants, conservées comme prévu ; publication avec graphe seul, sans preuves textuelles dans le backend.

@@ -307,14 +307,23 @@ function chunkProof(chunk) {
   };
 }
 
-function exactMaterial(store, selector) {
+function exactMaterial(store, selector, publicationId = "") {
   if (selector.kind === "chunk") {
     const item = store.contents.find(chunk => cleanString(chunk.chunk_id) === selector.id);
     if (item) return { kind: "chunk", raw: item };
   }
   if (selector.kind === "node") {
-    const item = store.nodes.find(node => cleanString(node.node_id) === selector.id);
+    const matching = store.nodes.filter(node => cleanString(node.node_id) === selector.id);
+    const pid = cleanString(publicationId);
+    const item = pid
+      ? matching.find(node => cleanString(node.publication_id) === pid)
+      : matching.length === 1 ? matching[0] : null;
     if (item) return { kind: "node", raw: item };
+    if (!pid && matching.length > 1) {
+      const error = new Error(`Le nœud ${selector.id} appartient à plusieurs publications : publication_id est obligatoire pour une preuve exacte.`);
+      error.statusCode = 400;
+      throw error;
+    }
   }
   if (selector.kind === "relation") {
     const item = store.relations.find(relation => cleanString(relation.relation_id) === selector.id);
@@ -330,7 +339,7 @@ function runDoc02(body) {
   const action = SUPPORTED_ACTIONS.DOC02;
   const selector = parseMaterialSelector(body);
   const store = getCorpusStore();
-  const selected = exactMaterial(store, selector);
+  const selected = exactMaterial(store, selector, body.publication_id);
   const publicationId = cleanString(selected.raw.publication_id);
   const manifest = store.manifestByPublicationId.get(publicationId) || {};
   const level = cleanString(manifest.provenance_level) || "C";

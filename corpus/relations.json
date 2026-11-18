@@ -11518,5 +11518,482 @@
     "cible_id": "N1613",
     "page_source": "",
     "chunk_id_source": "C1233;C1234"
+  },
+  {
+    "relation_id": "R134_01",
+    "publication_id": "PUB134",
+    "source_id": "N1632",
+    "type_relation": "ASSOCIATION",
+    "cible_id": "N1631",
+    "page_source": "18;19",
+    "chunk_id_source": "C1237;C1238"
+  },
+  {
+    "relation_id": "R134_02",
+    "publication_id": "PUB134",
+    "source_id": "N1633",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1634",
+    "page_source": "23",
+    "chunk_id_source": "C1241"
+  },
+  {
+    "relation_id": "R134_03",
+    "publication_id": "PUB134",
+    "source_id": "N1634",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1631",
+    "page_source": "22;23",
+    "chunk_id_source": "C1241"
+  },
+  {
+    "relation_id": "R134_04",
+    "publication_id": "PUB134",
+    "source_id": "N1635",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1631",
+    "page_source": "21;28",
+    "chunk_id_source": "C1240;C1248"
+  },
+  {
+    "relation_id": "R134_05",
+    "publication_id": "PUB134",
+    "source_id": "N1636",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1635",
+    "page_source": "28",
+    "chunk_id_source": "C1247"
+  },
+  {
+    "relation_id": "R134_06",
+    "publication_id": "PUB134",
+    "source_id": "N1637",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1630",
+    "page_source": "24;31",
+    "chunk_id_source": "C1242;C1249"
+  },
+  {
+    "relation_id": "R134_07",
+    "publication_id": "PUB134",
+    "source_id": "N1638",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1630",
+    "page_source": "27;28",
+    "chunk_id_source": "C1246"
+  },
+  {
+    "relation_id": "R134_08",
+    "publication_id": "PUB134",
+    "source_id": "N1639",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1630",
+    "page_source": "24;25",
+    "chunk_id_source": "C1243"
+  },
+  {
+    "relation_id": "R134_09",
+    "publication_id": "PUB134",
+    "source_id": "N1640",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1630",
+    "page_source": "26",
+    "chunk_id_source": "C1244"
+  },
+  {
+    "relation_id": "R134_10",
+    "publication_id": "PUB134",
+    "source_id": "N1641",
+    "type_relation": "PEUT_CONTRIBUER_A",
+    "cible_id": "N1630",
+    "page_source": "30",
+    "chunk_id_source": "C1249"
+  },
+  {
+    "relation_id": "R134_11",
+    "publication_id": "PUB134",
+    "source_id": "N1642",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1630",
+    "page_source": "26;45",
+    "chunk_id_source": "C1245;C1259"
+  },
+  {
+    "relation_id": "R134_12",
+    "publication_id": "PUB134",
+    "source_id": "N1644",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1636",
+    "page_source": "37",
+    "chunk_id_source": "C1254"
+  },
+  {
+    "relation_id": "R134_13",
+    "publication_id": "PUB134",
+    "source_id": "N1645",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1631",
+    "page_source": "37;38",
+    "chunk_id_source": "C1255"
+  },
+  {
+    "relation_id": "R134_14",
+    "publication_id": "PUB134",
+    "source_id": "N1646",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1634",
+    "page_source": "39;47",
+    "chunk_id_source": "C1257;C1261"
+  },
+  {
+    "relation_id": "R134_15",
+    "publication_id": "PUB134",
+    "source_id": "N1645",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1647",
+    "page_source": "38;48",
+    "chunk_id_source": "C1255;C1263"
+  },
+  {
+    "relation_id": "R134_16",
+    "publication_id": "PUB134",
+    "source_id": "N1647",
+    "type_relation": "COMPREND",
+    "cible_id": "N1646",
+    "page_source": "48;49",
+    "chunk_id_source": "C1263"
+  },
+  {
+    "relation_id": "R135_01",
+    "publication_id": "PUB135",
+    "source_id": "N1649",
+    "type_relation": "COMPREND",
+    "cible_id": "N1679",
+    "page_source": "35",
+    "chunk_id_source": "C1268"
+  },
+  {
+    "relation_id": "R135_02",
+    "publication_id": "PUB135",
+    "source_id": "N1680",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1649",
+    "page_source": "35",
+    "chunk_id_source": "C1268;C1269"
+  },
+  {
+    "relation_id": "R135_03",
+    "publication_id": "PUB135",
+    "source_id": "N1659",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1654",
+    "page_source": "47",
+    "chunk_id_source": "C1270"
+  },
+  {
+    "relation_id": "R135_04",
+    "publication_id": "PUB135",
+    "source_id": "N1660",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1654",
+    "page_source": "55;70",
+    "chunk_id_source": "C1276;C1277"
+  },
+  {
+    "relation_id": "R135_05",
+    "publication_id": "PUB135",
+    "source_id": "N1654",
+    "type_relation": "PEUT_CONTRIBUER_A",
+    "cible_id": "N1655",
+    "page_source": "50;51",
+    "chunk_id_source": "C1271;C1272"
+  },
+  {
+    "relation_id": "R135_06",
+    "publication_id": "PUB135",
+    "source_id": "N1671",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1670",
+    "page_source": "99;100",
+    "chunk_id_source": "C1279;C1280"
+  },
+  {
+    "relation_id": "R135_07",
+    "publication_id": "PUB135",
+    "source_id": "N1672",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1670",
+    "page_source": "103;104",
+    "chunk_id_source": "C1281"
+  },
+  {
+    "relation_id": "R135_08",
+    "publication_id": "PUB135",
+    "source_id": "N1677",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1671",
+    "page_source": "119",
+    "chunk_id_source": "C1285"
+  },
+  {
+    "relation_id": "R136_01",
+    "publication_id": "PUB136",
+    "source_id": "N1696",
+    "type_relation": "COMPREND",
+    "cible_id": "N1709",
+    "page_source": "63;65",
+    "chunk_id_source": "C1301;C1303"
+  },
+  {
+    "relation_id": "R136_02",
+    "publication_id": "PUB136",
+    "source_id": "N1696",
+    "type_relation": "COMPREND",
+    "cible_id": "N1710",
+    "page_source": "63",
+    "chunk_id_source": "C1301;C1302"
+  },
+  {
+    "relation_id": "R136_03",
+    "publication_id": "PUB136",
+    "source_id": "N1696",
+    "type_relation": "COMPREND",
+    "cible_id": "N1711",
+    "page_source": "63;72",
+    "chunk_id_source": "C1301;C1307"
+  },
+  {
+    "relation_id": "R136_04",
+    "publication_id": "PUB136",
+    "source_id": "N1713",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1709",
+    "page_source": "65;66",
+    "chunk_id_source": "C1303;C1304"
+  },
+  {
+    "relation_id": "R136_05",
+    "publication_id": "PUB136",
+    "source_id": "N1698",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1710",
+    "page_source": "63;68;69",
+    "chunk_id_source": "C1302;C1305;C1306"
+  },
+  {
+    "relation_id": "R136_06",
+    "publication_id": "PUB136",
+    "source_id": "N1698",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1696",
+    "page_source": "63;68;69",
+    "chunk_id_source": "C1301;C1305;C1306"
+  },
+  {
+    "relation_id": "R136_07",
+    "publication_id": "PUB136",
+    "source_id": "N1696",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1697",
+    "page_source": "61;63",
+    "chunk_id_source": "C1301;C1302;C1306"
+  },
+  {
+    "relation_id": "R136_08",
+    "publication_id": "PUB136",
+    "source_id": "N1691",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1711",
+    "page_source": "70;73",
+    "chunk_id_source": "C1307;C1308"
+  },
+  {
+    "relation_id": "R136_09",
+    "publication_id": "PUB136",
+    "source_id": "N1692",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1691",
+    "page_source": "46;54",
+    "chunk_id_source": "C1294;C1295;C1296"
+  },
+  {
+    "relation_id": "R136_10",
+    "publication_id": "PUB136",
+    "source_id": "N1695",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1691",
+    "page_source": "59",
+    "chunk_id_source": "C1295;C1299"
+  },
+  {
+    "relation_id": "R136_11",
+    "publication_id": "PUB136",
+    "source_id": "N1694",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1715",
+    "page_source": "77;79",
+    "chunk_id_source": "C1293;C1311"
+  },
+  {
+    "relation_id": "R136_12",
+    "publication_id": "PUB136",
+    "source_id": "N1687",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1698",
+    "page_source": "26;67",
+    "chunk_id_source": "C1289;C1305"
+  },
+  {
+    "relation_id": "R136_13",
+    "publication_id": "PUB136",
+    "source_id": "N1688",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1687",
+    "page_source": "26;27",
+    "chunk_id_source": "C1289;C1290"
+  },
+  {
+    "relation_id": "R136_14",
+    "publication_id": "PUB136",
+    "source_id": "N1690",
+    "type_relation": "CONTRIBUE_A",
+    "cible_id": "N1684",
+    "page_source": "21;31;32",
+    "chunk_id_source": "C1286;C1292"
+  },
+  {
+    "relation_id": "R136_15",
+    "publication_id": "PUB136",
+    "source_id": "N1703",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1702",
+    "page_source": "94;95",
+    "chunk_id_source": "C1314;C1315"
+  },
+  {
+    "relation_id": "R136_16",
+    "publication_id": "PUB136",
+    "source_id": "N1704",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1702",
+    "page_source": "96",
+    "chunk_id_source": "C1314;C1316"
+  },
+  {
+    "relation_id": "R136_17",
+    "publication_id": "PUB136",
+    "source_id": "N1705",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1704",
+    "page_source": "96;97",
+    "chunk_id_source": "C1316;C1317"
+  },
+  {
+    "relation_id": "R137_01",
+    "publication_id": "PUB137",
+    "source_id": "N1717",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N0671",
+    "page_source": "3;8",
+    "chunk_id_source": "C1324;C1332"
+  },
+  {
+    "relation_id": "R137_02",
+    "publication_id": "PUB137",
+    "source_id": "N1719",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1717",
+    "page_source": "3",
+    "chunk_id_source": "C1325"
+  },
+  {
+    "relation_id": "R137_03",
+    "publication_id": "PUB137",
+    "source_id": "N1724",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1716",
+    "page_source": "2;10;11",
+    "chunk_id_source": "C1322;C1337"
+  },
+  {
+    "relation_id": "R137_04",
+    "publication_id": "PUB137",
+    "source_id": "N1727",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N1716",
+    "page_source": "2;5;7",
+    "chunk_id_source": "C1322;C1329;C1331"
+  },
+  {
+    "relation_id": "R137_05",
+    "publication_id": "PUB137",
+    "source_id": "N1727",
+    "type_relation": "ILLUSTRE",
+    "cible_id": "N0679",
+    "page_source": "5;6;7",
+    "chunk_id_source": "C1329;C1330;C1331"
+  },
+  {
+    "relation_id": "R137_06",
+    "publication_id": "PUB137",
+    "source_id": "N1735",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1716",
+    "page_source": "2",
+    "chunk_id_source": "C1322;C1323"
+  },
+  {
+    "relation_id": "R137_07",
+    "publication_id": "PUB137",
+    "source_id": "N1735",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1724",
+    "page_source": "2;10;11",
+    "chunk_id_source": "C1323;C1337"
+  },
+  {
+    "relation_id": "R137_08",
+    "publication_id": "PUB137",
+    "source_id": "N1735",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1730",
+    "page_source": "12;13",
+    "chunk_id_source": "C1339;C1341"
+  },
+  {
+    "relation_id": "R137_09",
+    "publication_id": "PUB137",
+    "source_id": "N1738",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1723",
+    "page_source": "10",
+    "chunk_id_source": "C1336"
+  },
+  {
+    "relation_id": "R137_10",
+    "publication_id": "PUB137",
+    "source_id": "N1737",
+    "type_relation": "REPOND_A",
+    "cible_id": "N1730",
+    "page_source": "12;13",
+    "chunk_id_source": "C1340;C1341"
+  },
+  {
+    "relation_id": "R137_11",
+    "publication_id": "PUB137",
+    "source_id": "N1721",
+    "type_relation": "ASSOCIATION",
+    "cible_id": "N1728",
+    "page_source": "8;9",
+    "chunk_id_source": "C1333;C1334"
+  },
+  {
+    "relation_id": "R137_12",
+    "publication_id": "PUB137",
+    "source_id": "N1725",
+    "type_relation": "ASSOCIATION",
+    "cible_id": "N1728",
+    "page_source": "11",
+    "chunk_id_source": "C1338"
   }
 ]

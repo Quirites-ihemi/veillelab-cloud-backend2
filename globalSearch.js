@@ -302,6 +302,7 @@ function buildSearchIndex(store) {
   }
 
   const nodeById = new Map(store.nodes.map(n => [String(n.node_id), n]));
+  const nodeByPublication = new Map(store.nodes.map(n => [`${String(n.publication_id)}::${String(n.node_id)}`, n]));
 
   const docs = [];
   for (const chunk of store.contents) {
@@ -361,8 +362,8 @@ function buildSearchIndex(store) {
   for (const rel of store.relations) {
     const pid = String(rel.publication_id);
     const pub = publicationMeta.get(pid) || {};
-    const source = nodeById.get(String(rel.source_id));
-    const target = nodeById.get(String(rel.cible_id));
+    const source = nodeByPublication.get(`${pid}::${String(rel.source_id)}`) || nodeById.get(String(rel.source_id));
+    const target = nodeByPublication.get(`${pid}::${String(rel.cible_id)}`) || nodeById.get(String(rel.cible_id));
     const mainText = [
       source?.libelle,
       source?.libelle_normalise,

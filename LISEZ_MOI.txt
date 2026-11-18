@@ -1,0 +1,24 @@
+QUIRITÈS — MISE À JOUR CLOUD RUN 58 → 62, CORPUS UNIQUEMENT
+
+5 fichiers à placer dans le sous-dossier corpus/ du projet Cloud Shell :
+ - publications.json
+ - nodes.json
+ - relations.json
+ - contents.json
+ - corpus_manifest.json   (indispensable pour activer les 62 publications)
+
+Aucun fichier JavaScript, traitement IA, Dockerfile ou configuration Cloud Run modifié.
+Anciennes lignes de nœuds, relations et chunks préservées.
+Anciennes fiches publications préservées exactement (y compris les couvertures PUB128 à PUB130).
+Exceptions antérieures conservées (PUB133, réutilisations de nœuds).
+
+Depuis Google Cloud Shell :
+  cd ~/backend_corpus_20261113_test
+  unzip -o ~/Quirites_MAJ_CloudRun_62_PUBLICATIONS_5_JSON.zip -d .
+  node -e "console.log(require('./corpusStore').getCorpusStatus())"
+
+Une fois 62 / 1562 / 1333 / 1272 affichés :
+  gcloud run deploy veillelab-cloud-backend2 --source . --region europe-west9 --project quirites-veille-lab-cloud --service-account=quirites-cloud-run@quirites-veille-lab-cloud.iam.gserviceaccount.com
+
+Enfin interroger /corpus-status sur l'URL de production.
+Cette archive ne déclenche aucun déploiement toute seule.

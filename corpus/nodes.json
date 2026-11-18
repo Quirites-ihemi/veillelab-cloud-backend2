@@ -13192,5 +13192,869 @@
     "libelle_normalise": "Antoine Chauveau distingue trois formes d'accompagnement des structures disposant de moyens limités : la prévention et la sensibilisation, l'audit des dispositifs de sécurité et l'assistance à la gestion de crise après une attaque. Il souligne les difficultés particulières rencontrées par les petites collectivités et les petites et moyennes entreprises.",
     "page_source": "",
     "chunk_id_source": "C1234"
+  },
+  {
+    "node_id": "N1630",
+    "publication_id": "PUB134",
+    "type_noeud": "notion_idee",
+    "libelle": "Inadéquation des compétences chez les ressortissants de pays tiers",
+    "libelle_normalise": "Écart entre les compétences ou qualifications des ressortissants de pays tiers et les exigences des emplois occupés, comprenant les inadéquations verticales et horizontales.",
+    "page_source": "4;17",
+    "chunk_id_source": "C1235;C1237"
+  },
+  {
+    "node_id": "N1631",
+    "publication_id": "PUB134",
+    "type_noeud": "notion_idee",
+    "libelle": "Déclassement professionnel des diplômés nés hors de l'Union européenne",
+    "libelle_normalise": "Les travailleurs hautement qualifiés nés hors de l'Union européenne occupent plus fréquemment que les personnes nées dans le pays des emplois inférieurs à leur niveau de formation.",
+    "page_source": "17;18;50",
+    "chunk_id_source": "C1237;C1264"
+  },
+  {
+    "node_id": "N1632",
+    "publication_id": "PUB134",
+    "type_noeud": "notion_idee",
+    "libelle": "Durée du séjour",
+    "libelle_normalise": "La durée de résidence dans le pays d'accueil constitue une dimension de l'intégration professionnelle. Les comparaisons entre groupes de migrants ne permettent pas de distinguer les effets de durée des effets de cohorte.",
+    "page_source": "18;19",
+    "chunk_id_source": "C1238"
+  },
+  {
+    "node_id": "N1633",
+    "publication_id": "PUB134",
+    "type_noeud": "notion_idee",
+    "libelle": "Déclassement professionnel et maîtrise du français, 44 % contre 31 %",
+    "libelle_normalise": "En France, 44 % des personnes ayant une faible maîtrise du français occupent un emploi inférieur à leur niveau de formation, contre 31 % de celles qui parlent couramment français.",
+    "page_source": "23",
+    "chunk_id_source": "C1241"
+  },
+  {
+    "node_id": "N1634",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Barrières linguistiques à l'accès aux emplois qualifiés",
+    "libelle_normalise": "Une maîtrise insuffisante de la langue du pays d'accueil entrave l'accès des migrants à des emplois correspondant à leurs qualifications, particulièrement dans les professions réglementées.",
+    "page_source": "22;23",
+    "chunk_id_source": "C1241"
+  },
+  {
+    "node_id": "N1635",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de reconnaissance des qualifications étrangères",
+    "libelle_normalise": "Les procédures de reconnaissance des diplômes étrangers, leur complexité administrative et les différences entre systèmes éducatifs limitent la valorisation des qualifications des migrants.",
+    "page_source": "21;28;29",
+    "chunk_id_source": "C1240;C1248"
+  },
+  {
+    "node_id": "N1636",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Absence de justificatifs de qualification chez les réfugiés",
+    "libelle_normalise": "L'absence de diplômes, de relevés de formation ou d'attestations d'expérience professionnelle complique l'évaluation et la reconnaissance des compétences des réfugiés.",
+    "page_source": "28",
+    "chunk_id_source": "C1247"
+  },
+  {
+    "node_id": "N1637",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Contraintes familiales et garde d'enfants des femmes migrantes",
+    "libelle_normalise": "Les responsabilités familiales et l'accès insuffisant à des modes de garde abordables limitent la formation, l'insertion professionnelle et l'accès des femmes migrantes à des emplois correspondant à leurs qualifications.",
+    "page_source": "24;30;31",
+    "chunk_id_source": "C1242;C1249"
+  },
+  {
+    "node_id": "N1638",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Discrimination des immigrés dans le recrutement",
+    "libelle_normalise": "Les stéréotypes et les pratiques discriminatoires des employeurs limitent l'accès des immigrés aux emplois qualifiés et contribuent à la sous-valorisation de leurs diplômes et de leur expérience.",
+    "page_source": "27;28",
+    "chunk_id_source": "C1246"
+  },
+  {
+    "node_id": "N1639",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Méconnaissance du marché du travail et faiblesse des réseaux professionnels",
+    "libelle_normalise": "La méconnaissance des pratiques de recrutement et l'accès limité aux réseaux professionnels restreignent les possibilités des migrants de trouver un emploi adapté à leurs compétences.",
+    "page_source": "24;25",
+    "chunk_id_source": "C1243"
+  },
+  {
+    "node_id": "N1640",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Restrictions des autorisations de travail et mobilité professionnelle",
+    "libelle_normalise": "Les restrictions attachées aux titres de séjour et aux autorisations de travail peuvent limiter la mobilité des ressortissants de pays tiers entre employeurs, secteurs, professions ou territoires.",
+    "page_source": "26",
+    "chunk_id_source": "C1244"
+  },
+  {
+    "node_id": "N1641",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Décalage territorial entre logements disponibles et opportunités d'emploi",
+    "libelle_normalise": "Les disparités territoriales entre l'offre de logements et les besoins de main-d'œuvre peuvent entraver la mobilité géographique et l'accès des migrants aux emplois correspondant à leurs compétences.",
+    "page_source": "30",
+    "chunk_id_source": "C1249"
+  },
+  {
+    "node_id": "N1642",
+    "publication_id": "PUB134",
+    "type_noeud": "probleme",
+    "libelle": "Fragmentation des dispositifs d'intégration professionnelle",
+    "libelle_normalise": "Le manque de coordination entre les organismes, les politiques et les services d'intégration limite la continuité et l'efficacité de l'accompagnement professionnel des migrants.",
+    "page_source": "26;44;45",
+    "chunk_id_source": "C1245;C1259"
+  },
+  {
+    "node_id": "N1643",
+    "publication_id": "PUB134",
+    "type_noeud": "notion_idee",
+    "libelle": "Arbitrage entre priorité à l'emploi et priorité aux compétences",
+    "libelle_normalise": "Les politiques d'intégration professionnelle sont confrontées à un arbitrage entre insertion rapide dans l'emploi et recherche d'une meilleure adéquation entre qualifications et postes occupés.",
+    "page_source": "34;35",
+    "chunk_id_source": "C1252"
+  },
+  {
+    "node_id": "N1644",
+    "publication_id": "PUB134",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Passeport européen des qualifications pour les réfugiés",
+    "libelle_normalise": "Dispositif permettant d'évaluer et de présenter les qualifications des réfugiés lorsque les documents officiels font défaut, sans constituer une reconnaissance formelle des diplômes.",
+    "page_source": "37",
+    "chunk_id_source": "C1254"
+  },
+  {
+    "node_id": "N1645",
+    "publication_id": "PUB134",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Expérience sans frontières, valorisation des compétences des migrants",
+    "libelle_normalise": "Programme expérimental français de valorisation de l'expérience professionnelle des migrants, combinant diagnostic des compétences, accompagnement personnalisé, validation des acquis et formations adaptées.",
+    "page_source": "37;38",
+    "chunk_id_source": "C1255"
+  },
+  {
+    "node_id": "N1646",
+    "publication_id": "PUB134",
+    "type_noeud": "action",
+    "libelle": "Formation linguistique adaptée aux métiers et aux secteurs professionnels",
+    "libelle_normalise": "Articulation de l'apprentissage de la langue du pays d'accueil avec les compétences et les exigences linguistiques propres aux métiers afin de faciliter l'accès à des emplois qualifiés.",
+    "page_source": "39;47",
+    "chunk_id_source": "C1257;C1261"
+  },
+  {
+    "node_id": "N1647",
+    "publication_id": "PUB134",
+    "type_noeud": "methode",
+    "libelle": "Accompagnement intégré, reconnaissance des qualifications, formation et accès à l'emploi",
+    "libelle_normalise": "Approche coordonnée associant reconnaissance des qualifications, formation linguistique et professionnelle et accompagnement vers l'emploi pour favoriser une intégration durable des migrants.",
+    "page_source": "48;49",
+    "chunk_id_source": "C1263"
+  },
+  {
+    "node_id": "N0010",
+    "publication_id": "PUB134",
+    "type_noeud": "acteur",
+    "libelle": "Direction générale des étrangers en France",
+    "libelle_normalise": "Direction générale des étrangers en France",
+    "page_source": "33",
+    "chunk_id_source": "C1250"
+  },
+  {
+    "node_id": "N0252",
+    "publication_id": "PUB135",
+    "type_noeud": "notion_idee",
+    "libelle": "Harcèlement scolaire",
+    "libelle_normalise": "Situations de harcèlement entre élèves donnant lieu à des réclamations auprès de la médiation de l'éducation nationale.",
+    "page_source": "34;35",
+    "chunk_id_source": "C1267"
+  },
+  {
+    "node_id": "N1649",
+    "publication_id": "PUB135",
+    "type_noeud": "tendance",
+    "libelle": "Environ 1 000 réclamations évoquant des violences contre les enfants à l'école en 2025",
+    "libelle_normalise": "En 2025, la médiation recense environ 1 000 réclamations évoquant des violences contre des élèves ou étudiants, contre environ 400 par an en 2023 et 2024. Ces données portent sur les réclamations et non sur l'ensemble des violences scolaires.",
+    "page_source": "35",
+    "chunk_id_source": "C1268"
+  },
+  {
+    "node_id": "N1679",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Violences commises par des adultes envers les élèves et étudiants, 30 % des réclamations pour violences",
+    "libelle_normalise": "En 2025, 30 % des quelque 1 000 réclamations évoquant des violences contre les enfants à l'école concernent des violences commises par des adultes, contre 70 % pour les violences entre élèves ou étudiants.",
+    "page_source": "35",
+    "chunk_id_source": "C1268"
+  },
+  {
+    "node_id": "N1680",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Défaillances dans la prévention, le traitement et le suivi des violences entre élèves",
+    "libelle_normalise": "Les réclamations concernant les violences entre élèves signalent fréquemment des insuffisances dans la prévention, le traitement ou le suivi des situations par l'institution scolaire.",
+    "page_source": "35",
+    "chunk_id_source": "C1269"
+  },
+  {
+    "node_id": "N1654",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de repérage des signes de souffrance psychique chez les élèves",
+    "libelle_normalise": "Les personnels scolaires ne sont pas toujours suffisamment préparés à reconnaître les manifestations de troubles psychiques, notamment lorsque celles-ci prennent la forme d'absentéisme ou de comportements difficiles à interpréter.",
+    "page_source": "50;51",
+    "chunk_id_source": "C1271;C1272"
+  },
+  {
+    "node_id": "N1655",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Prise en compte insuffisante des troubles psychiques des élèves",
+    "libelle_normalise": "Des difficultés de communication entre familles et établissements peuvent empêcher la reconnaissance des besoins spécifiques des élèves souffrant de troubles psychiques et compromettre leur accompagnement.",
+    "page_source": "50;51;54",
+    "chunk_id_source": "C1273;C1274;C1275"
+  },
+  {
+    "node_id": "N1656",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Risque d'aggravation de la souffrance psychique par les procédures administratives",
+    "libelle_normalise": "La rigidité de certaines procédures scolaires, notamment d'inscription ou d'examen, et l'absence de prise en compte des situations individuelles peuvent provoquer ou aggraver la souffrance psychique d'élèves vulnérables.",
+    "page_source": "51;53;54",
+    "chunk_id_source": "C1273;C1274;C1275"
+  },
+  {
+    "node_id": "N1659",
+    "publication_id": "PUB135",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Protocole de santé mentale à l'école, du repérage à la prise en charge",
+    "libelle_normalise": "Protocole ministériel destiné à mobiliser la communauté éducative autour de la santé mentale et à formaliser les responsabilités de chacun, du repérage des difficultés à la prise en charge des élèves.",
+    "page_source": "47",
+    "chunk_id_source": "C1270"
+  },
+  {
+    "node_id": "N1660",
+    "publication_id": "PUB135",
+    "type_noeud": "recommandation",
+    "libelle": "Renforcer la formation des personnels au repérage des difficultés de santé mentale",
+    "libelle_normalise": "La médiatrice préconise de renforcer la formation des personnels pour améliorer l'identification des signes de souffrance psychique et l'accompagnement des élèves concernés.",
+    "page_source": "51;70",
+    "chunk_id_source": "C1271;C1277"
+  },
+  {
+    "node_id": "N1683",
+    "publication_id": "PUB135",
+    "type_noeud": "notion_idee",
+    "libelle": "Violences psychologiques chez les étudiants de première année",
+    "libelle_normalise": "Selon le baromètre de santé mentale des étudiants cité dans le rapport, 33 % des étudiants de première année déclarent avoir subi des violences psychologiques, contre 28 % de l'ensemble des étudiants interrogés.",
+    "page_source": "80;81",
+    "chunk_id_source": "C1278"
+  },
+  {
+    "node_id": "N1670",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Modes de gestion des personnels générateurs de souffrance psychique",
+    "libelle_normalise": "Certains modes d'organisation et de gestion administrative des personnels peuvent produire ou aggraver des situations de souffrance psychique, notamment lorsque les difficultés individuelles ne sont pas suffisamment prises en compte.",
+    "page_source": "113;114;115;116",
+    "chunk_id_source": "C1283;C1284"
+  },
+  {
+    "node_id": "N1671",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisances dans l'accompagnement des victimes de harcèlement au travail",
+    "libelle_normalise": "Les personnels victimes de harcèlement au travail peuvent rencontrer des difficultés pour obtenir un accompagnement institutionnel, une protection adaptée et une réparation des préjudices subis.",
+    "page_source": "98;99;100;101;102",
+    "chunk_id_source": "C1279;C1280"
+  },
+  {
+    "node_id": "N1672",
+    "publication_id": "PUB135",
+    "type_noeud": "probleme",
+    "libelle": "Difficultés de reconnaissance des dommages psychiques liés aux accidents de service",
+    "libelle_normalise": "La reconnaissance de dommages psychiques comme imputables au service peut se heurter à des difficultés administratives et procédurales, fragilisant la situation des agents concernés.",
+    "page_source": "103;104",
+    "chunk_id_source": "C1281"
+  },
+  {
+    "node_id": "N1677",
+    "publication_id": "PUB135",
+    "type_noeud": "recommandation",
+    "libelle": "Protocole de traitement, de suivi et de réparation des situations de harcèlement au travail",
+    "libelle_normalise": "La médiatrice recommande de renforcer les procédures de traitement des situations de harcèlement au travail, en assurant un suivi des victimes et en prenant en compte la réparation des préjudices.",
+    "page_source": "105;119",
+    "chunk_id_source": "C1282;C1285"
+  },
+  {
+    "node_id": "N1681",
+    "publication_id": "PUB135",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Cellule d'écoute et de signalement des violences, discriminations et harcèlements",
+    "libelle_normalise": "Dispositif de l'administration centrale destiné à recueillir et traiter les signalements des personnels concernant les violences, discriminations, harcèlements et agissements sexistes.",
+    "page_source": "23;24",
+    "chunk_id_source": "C1265"
+  },
+  {
+    "node_id": "N1682",
+    "publication_id": "PUB135",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Médiateur de l'éducation nationale, autorité externe de signalement des lanceurs d'alerte",
+    "libelle_normalise": "Le décret du 3 octobre 2022 désigne le médiateur de l'éducation nationale et de l'enseignement supérieur comme autorité externe compétente pour recevoir et traiter les signalements des lanceurs d'alerte relevant des ministères concernés.",
+    "page_source": "24",
+    "chunk_id_source": "C1266"
+  },
+  {
+    "node_id": "N1684",
+    "publication_id": "PUB136",
+    "type_noeud": "tendance",
+    "libelle": "Demandes d'asile devant l'Office français de protection des réfugiés et apatrides, 145 211 en 2025",
+    "libelle_normalise": "En 2025, 145 211 demandes d'asile ont été introduites devant l'Office français de protection des réfugiés et apatrides, soit une diminution de 5,5 % par rapport à 2024. Leur nombre a presque doublé depuis 2015.",
+    "page_source": "20;34",
+    "chunk_id_source": "C1286"
+  },
+  {
+    "node_id": "N1685",
+    "publication_id": "PUB136",
+    "type_noeud": "tendance",
+    "libelle": "Réexamens de demandes d'asile, 23 % des demandes devant l'Office français de protection des réfugiés et apatrides en 2025",
+    "libelle_normalise": "En 2025, 33 710 demandes de réexamen ont été introduites devant l'Office français de protection des réfugiés et apatrides, soit une hausse de 43 % en un an. Elles représentent 23 % des demandes, contre 15 % en 2024, et masquent une baisse plus importante des premières demandes.",
+    "page_source": "22;23",
+    "chunk_id_source": "C1287"
+  },
+  {
+    "node_id": "N1686",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Taux synthétique de protection internationale, 52,1 % en 2025",
+    "libelle_normalise": "Le taux synthétique de protection, intégrant les décisions de l'Office français de protection des réfugiés et apatrides et de la Cour nationale du droit d'asile, atteint 52,1 % en France en 2025, contre 39,2 % en 2021. Sa progression est notamment liée à la composition des demandes selon les pays d'origine.",
+    "page_source": "34;35",
+    "chunk_id_source": "C1288"
+  },
+  {
+    "node_id": "N1687",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Concentration des demandes d'asile en Île-de-France, 42 % entre 2021 et 2025",
+    "libelle_normalise": "L'Île-de-France concentre 42 % des demandes d'asile enregistrées en guichet unique sur la période 2021-2025. Cette concentration territoriale crée des tensions sur les capacités d'accueil et d'hébergement, malgré les mécanismes de répartition régionale.",
+    "page_source": "25;26",
+    "chunk_id_source": "C1289"
+  },
+  {
+    "node_id": "N1688",
+    "publication_id": "PUB136",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Orientation régionale des demandeurs d'asile depuis l'Île-de-France",
+    "libelle_normalise": "Dispositif de répartition des demandeurs d'asile enregistrés en Île-de-France vers d'autres régions. En 2025, l'orientation régionale a ramené de 36 % à 21 % la part du flux national de primo-demandeurs concentrée en Île-de-France. Plus de 97 000 demandeurs ont accepté une orientation régionale entre 2021 et 2025.",
+    "page_source": "26;27",
+    "chunk_id_source": "C1290"
+  },
+  {
+    "node_id": "N1689",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Engorgement de l'accueil des demandeurs d'asile en Guyane",
+    "libelle_normalise": "La forte hausse des demandes d'asile en Guyane, notamment d'origine haïtienne, a déstabilisé les services préfectoraux. Le délai de convocation en guichet unique a atteint 22 mois en février 2025. Le renforcement des effectifs et les adaptations procédurales ont permis de ramener ce délai à 22 jours en mai 2026.",
+    "page_source": "28;29",
+    "chunk_id_source": "C1291"
+  },
+  {
+    "node_id": "N1690",
+    "publication_id": "PUB136",
+    "type_noeud": "tendance",
+    "libelle": "Ressortissants ukrainiens, basculement de la protection temporaire vers l'asile",
+    "libelle_normalise": "Les demandes d'asile déposées par des ressortissants ukrainiens augmentent fortement à partir de 2023, parallèlement à la diminution du nombre d'autorisations provisoires de séjour au titre de la protection temporaire. Le rapport évoque notamment les renouvellements administratifs fréquents, les différences de droits sociaux et la recherche d'une protection plus durable comme facteurs possibles.",
+    "page_source": "31;32;33",
+    "chunk_id_source": "C1292"
+  },
+  {
+    "node_id": "N1691",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Délais d'instruction des demandes d'asile, 163 jours devant l'Office français de protection des réfugiés et apatrides en 2025",
+    "libelle_normalise": "Le délai moyen d'instruction des demandes d'asile devant l'Office français de protection des réfugiés et apatrides atteint 163 jours en 2025, contre une cible de 120 jours. Il s'élève à 188 jours lorsque le demandeur est convoqué à un entretien individuel. Les délais restent sensibles aux volumes de demandes et aux opérations de résorption des stocks de dossiers.",
+    "page_source": "50;51;52",
+    "chunk_id_source": "C1295"
+  },
+  {
+    "node_id": "N1692",
+    "publication_id": "PUB136",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Espace France asile de Cergy, délai global de 90,7 jours",
+    "libelle_normalise": "Pôle territorial ouvert à Cergy en mai 2025 regroupant les services préfectoraux, l'Office français de l'immigration et de l'intégration et l'Office français de protection des réfugiés et apatrides. Entre mai et décembre 2025, 2 377 demandes y ont été déposées, avec un délai global de procédure de 90,7 jours. Ces premiers résultats ne sont pas nécessairement représentatifs d'un déploiement national.",
+    "page_source": "46;54",
+    "chunk_id_source": "C1294;C1296"
+  },
+  {
+    "node_id": "N1693",
+    "publication_id": "PUB136",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Chambres territoriales de la Cour nationale du droit d'asile, réduction des délais de jugement",
+    "libelle_normalise": "Déploiement de chambres territoriales de la Cour nationale du droit d'asile à partir de 2024 afin de rapprocher la juridiction des demandeurs et de réduire les délais de jugement. Le rapport constate une diminution de près d'un mois du délai moyen entre 2023 et 2025, notamment grâce à la réduction des renvois d'audience.",
+    "page_source": "56;57",
+    "chunk_id_source": "C1297"
+  },
+  {
+    "node_id": "N1694",
+    "publication_id": "PUB136",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Pacte européen sur la migration et l'asile, nouvelle procédure d'asile à la frontière",
+    "libelle_normalise": "Réforme applicable à partir du 12 juin 2026 prévoyant un filtrage aux frontières extérieures et un examen au fond des demandes d'asile à la frontière par l'Office français de protection des réfugiés et apatrides. La procédure comporte des délais spécifiques et nécessite des capacités d'hébergement dédiées. Sa mise en œuvre matérielle et juridique demeure partiellement inachevée à la date du rapport.",
+    "page_source": "41;42;43",
+    "chunk_id_source": "C1293"
+  },
+  {
+    "node_id": "N1695",
+    "publication_id": "PUB136",
+    "type_noeud": "recommandation",
+    "libelle": "Réduire les délais d'instruction et de jugement, déployer France asile et développer le recours au juge unique",
+    "libelle_normalise": "Le rapporteur spécial recommande de réduire les délais devant l'Office français de protection des réfugiés et apatrides et la Cour nationale du droit d'asile, notamment par la dématérialisation des procédures, le déploiement des espaces France asile pilotes et un recours accru au juge unique prévu par la législation.",
+    "page_source": "59",
+    "chunk_id_source": "C1299"
+  },
+  {
+    "node_id": "N1696",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Coût minimal identifié de l'asile, 1,85 milliard d'euros en 2025",
+    "libelle_normalise": "La commission des finances du Sénat estime à 1,85 milliard d'euros le coût minimal identifiable de l'asile en France en 2025, en agrégeant plusieurs missions budgétaires. Cette estimation ne comprend notamment pas les dépenses médicales, certaines aides sociales, la scolarisation des enfants et les dépenses de police liées aux éloignements.",
+    "page_source": "61;62;63",
+    "chunk_id_source": "C1301"
+  },
+  {
+    "node_id": "N1697",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Données budgétaires et statistiques lacunaires sur les dépenses d'asile",
+    "libelle_normalise": "La dispersion des dépenses entre plusieurs missions budgétaires et l'insuffisance des données sur certaines catégories de bénéficiaires empêchent de déterminer le coût complet de la politique d'asile. Les données relatives à la présence des demandeurs d'asile et des réfugiés dans l'hébergement d'urgence généraliste ne sont notamment disponibles qu'à partir de 2025.",
+    "page_source": "61;63;69",
+    "chunk_id_source": "C1301;C1302;C1306"
+  },
+  {
+    "node_id": "N1698",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Saturation du dispositif national d'accueil et report vers l'hébergement d'urgence",
+    "libelle_normalise": "Le taux d'occupation des structures du dispositif national d'accueil avoisine 100 % en 2025. Une partie des demandeurs d'asile éligibles n'y trouve pas de place, entraînant un report vers l'hébergement d'urgence généraliste, dont le coût journalier moyen est plus élevé et qui ne propose pas le même accompagnement social.",
+    "page_source": "67;68;69",
+    "chunk_id_source": "C1305;C1306"
+  },
+  {
+    "node_id": "N1699",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Coût mensuel de prise en charge des demandeurs d'asile, 93,9 millions d'euros",
+    "libelle_normalise": "Les dépenses mensuelles moyennes de prise en charge des demandeurs d'asile en attente d'une décision sont estimées à 93,9 millions d'euros en 2025 sur le périmètre retenu de la mission Immigration, asile et intégration. Le rapport estime qu'une réduction d'un mois de procédure pourrait produire une économie de cet ordre, sans qu'il s'agisse d'une économie constatée.",
+    "page_source": "59;60",
+    "chunk_id_source": "C1300"
+  },
+  {
+    "node_id": "N1700",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Suivi statistique insuffisant des déboutés de l'asile et des obligations de quitter le territoire français",
+    "libelle_normalise": "Le rapport relève des données incohérentes ou contradictoires sur les éloignements des personnes déboutées du droit d'asile. L'absence de suivi statistique fiable par les services compétents du ministère de l'Intérieur limite l'évaluation des décisions et de leur exécution.",
+    "page_source": "84;85",
+    "chunk_id_source": "C1312"
+  },
+  {
+    "node_id": "N1701",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Obligations de quitter le territoire français visant les déboutés de l'asile, taux d'exécution moyen estimé à 5,5 %",
+    "libelle_normalise": "À partir des données communiquées au rapporteur spécial, le taux d'exécution des obligations de quitter le territoire français visant les personnes déboutées du droit d'asile est estimé entre 3 % et 8 % selon les années de 2019 à 2025, avec une moyenne de 5,5 %. Ce résultat doit être interprété avec prudence en raison des incohérences statistiques signalées.",
+    "page_source": "85;86",
+    "chunk_id_source": "C1313"
+  },
+  {
+    "node_id": "N1702",
+    "publication_id": "PUB136",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Programme d'accompagnement global et individualisé des réfugiés, destiné aux plus vulnérables",
+    "libelle_normalise": "Dispositif d'accompagnement des bénéficiaires de la protection internationale vers le logement, l'emploi et l'accès aux droits. Initialement dimensionné pour 50 000 personnes, le programme a été réduit à une file active de 25 000 bénéficiaires et cible désormais principalement les réfugiés les plus vulnérables, sans emploi et sans logement.",
+    "page_source": "92;93;94",
+    "chunk_id_source": "C1314"
+  },
+  {
+    "node_id": "N1703",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Programme d'accompagnement global et individualisé des réfugiés, 17,5 % des bénéficiaires de protection accompagnés",
+    "libelle_normalise": "Environ 46 500 bénéficiaires de la protection internationale sont entrés dans le programme d'accompagnement global et individualisé des réfugiés entre 2022 et 2025, soit 17,5 % de l'ensemble des personnes ayant obtenu une protection durant cette période. Le rapport souligne la limitation de la couverture du dispositif.",
+    "page_source": "94;95",
+    "chunk_id_source": "C1315"
+  },
+  {
+    "node_id": "N1704",
+    "publication_id": "PUB136",
+    "type_noeud": "probleme",
+    "libelle": "Sous-représentation des femmes dans le programme d'accompagnement global et individualisé des réfugiés",
+    "libelle_normalise": "En 2024, les femmes représentent 36 % des personnes accompagnées dans le programme d'accompagnement global et individualisé des réfugiés, alors qu'elles représentent 48 % des bénéficiaires de la protection internationale. Le rapport souligne le manque d'évaluation permettant d'expliquer précisément cet écart.",
+    "page_source": "96",
+    "chunk_id_source": "C1316"
+  },
+  {
+    "node_id": "N1705",
+    "publication_id": "PUB136",
+    "type_noeud": "recommandation",
+    "libelle": "Évaluer le programme d'accompagnement global et individualisé des réfugiés et rationaliser son articulation avec le premier accueil",
+    "libelle_normalise": "Le rapporteur spécial recommande d'évaluer les résultats du programme d'accompagnement global et individualisé des réfugiés, notamment pour identifier les difficultés d'accès rencontrées par les femmes. Il préconise également de confier, lorsque cela est pertinent, l'accompagnement des réfugiés à l'opérateur assurant déjà leur premier accueil, dans un même marché public.",
+    "page_source": "96;97",
+    "chunk_id_source": "C1317"
+  },
+  {
+    "node_id": "N1706",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Retraits de protection internationale, 1 139 en 2025",
+    "libelle_normalise": "En 2025, l'Office français de protection des réfugiés et apatrides a procédé à 1 139 retraits ou fins de protection internationale, contre 312 en 2020. Les motifs comprennent notamment la cessation du besoin de protection, la fraude et les menaces graves pour l'ordre public.",
+    "page_source": "99;100",
+    "chunk_id_source": "C1319"
+  },
+  {
+    "node_id": "N1707",
+    "publication_id": "PUB136",
+    "type_noeud": "recommandation",
+    "libelle": "Réduire la validité des titres de séjour des réfugiés et protégés subsidiaires",
+    "libelle_normalise": "Le rapporteur spécial recommande de réduire la durée de validité des titres de séjour à quatre ans pour les réfugiés et deux ans pour les bénéficiaires de la protection subsidiaire, afin de réexaminer plus régulièrement la persistance des conditions justifiant leur protection.",
+    "page_source": "98;99",
+    "chunk_id_source": "C1318"
+  },
+  {
+    "node_id": "N1708",
+    "publication_id": "PUB136",
+    "type_noeud": "recommandation",
+    "libelle": "Renforcer les retraits de protection internationale pour tous motifs",
+    "libelle_normalise": "Le rapporteur spécial recommande de renforcer les procédures de retrait de protection internationale conduites par l'Office français de protection des réfugiés et apatrides, notamment à partir des signalements préfectoraux relatifs aux menaces pour l'ordre public, tout en maintenant le traitement des autres motifs de retrait.",
+    "page_source": "100",
+    "chunk_id_source": "C1320"
+  },
+  {
+    "node_id": "N1709",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Coût de l'hébergement dans le dispositif national d'accueil, 940 millions d'euros en 2025",
+    "libelle_normalise": "En 2025, les dépenses exécutées d'hébergement dans le dispositif national d'accueil atteignent 940 millions d'euros, contre 636 millions en 2019, soit une hausse de 48 %. Cette progression dépasse celle du nombre de places financées, qui augmente de 13 % sur la période.",
+    "page_source": "64;65",
+    "chunk_id_source": "C1303"
+  },
+  {
+    "node_id": "N1710",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Hébergement d'urgence généraliste, 242 millions d'euros estimés pour l'asile en 2025",
+    "libelle_normalise": "La commission des finances estime à 242 millions d'euros en 2025 le coût de l'hébergement d'urgence généraliste des demandeurs d'asile et des réfugiés. Cette estimation repose sur environ 22 100 personnes présentes dans ces structures et sur un coût journalier moyen de 30 euros, en supposant un niveau de présence constant sur l'année.",
+    "page_source": "63",
+    "chunk_id_source": "C1302"
+  },
+  {
+    "node_id": "N1711",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Allocation pour demandeur d'asile, 320 millions d'euros dépensés en 2025",
+    "libelle_normalise": "Les dépenses exécutées au titre de l'allocation pour demandeur d'asile atteignent 320 millions d'euros en 2025, dont 218 millions pour les demandeurs d'asile et 102 millions pour les bénéficiaires de la protection temporaire. Elles diminuent de 14 % par rapport à 2024. Le rapport relève l'effet de la réduction des durées de versement et du renforcement des contrôles.",
+    "page_source": "71;72;73",
+    "chunk_id_source": "C1307;C1308"
+  },
+  {
+    "node_id": "N1712",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Budget de l'Office français de protection des réfugiés et apatrides, 110 millions d'euros en 2025",
+    "libelle_normalise": "Le budget de l'Office français de protection des réfugiés et apatrides atteint environ 110 millions d'euros en 2025, contre 69 millions en 2019, soit une hausse de 58 %. Cette progression est principalement liée au renforcement des effectifs de l'organisme pour augmenter sa capacité d'instruction des demandes d'asile.",
+    "page_source": "74;75",
+    "chunk_id_source": "C1309"
+  },
+  {
+    "node_id": "N1713",
+    "publication_id": "PUB136",
+    "type_noeud": "tendance",
+    "libelle": "Augmentation du coût des nuitées d'hébergement, inflation et revalorisations salariales",
+    "libelle_normalise": "Entre 2019 et 2024, le coût moyen journalier de l'hébergement augmente dans la plupart des catégories de structures du dispositif national d'accueil. Il progresse notamment de 14 % dans les centres d'accueil pour demandeurs d'asile et de 43 % dans les centres provisoires d'hébergement des réfugiés. Le rapport attribue ces évolutions à l'inflation et aux revalorisations salariales.",
+    "page_source": "65;66",
+    "chunk_id_source": "C1304"
+  },
+  {
+    "node_id": "N1714",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Dépenses d'intégration des réfugiés, 85 millions d'euros en 2023, soit 4,5 % des dépenses identifiées",
+    "libelle_normalise": "En 2023, les dépenses estimées pour les bénéficiaires de la protection internationale dans le cadre du contrat d'intégration républicaine représentent 38,1 millions d'euros. Ajoutées aux dépenses du programme d'accompagnement global et individualisé des réfugiés, estimées à 47 millions, elles atteignent environ 85 millions d'euros, soit 4,5 % des dépenses d'asile identifiées pour cette année.",
+    "page_source": "76;77",
+    "chunk_id_source": "C1310"
+  },
+  {
+    "node_id": "N1715",
+    "publication_id": "PUB136",
+    "type_noeud": "notion_idee",
+    "libelle": "Coût prévisionnel du pacte européen sur la migration et l'asile, 89,7 millions d'euros en 2026",
+    "libelle_normalise": "Le coût prévisionnel actualisé de la mise en œuvre du pacte européen sur la migration et l'asile atteint 89,7 millions d'euros pour 2026, contre 84,8 millions initialement prévus. Il comprend notamment les nouvelles exigences d'accueil, les capacités de traitement à la frontière et les moyens supplémentaires des administrations concernées. Il ne s'agit pas d'une dépense exécutée.",
+    "page_source": "77;78;79",
+    "chunk_id_source": "C1311"
+  },
+  {
+    "node_id": "N0010",
+    "publication_id": "PUB136",
+    "type_noeud": "acteur",
+    "libelle": "Direction générale des étrangers en France",
+    "libelle_normalise": "Direction générale des étrangers en France, administration centrale du ministère de l'Intérieur chargée notamment du pilotage des politiques d'asile, d'immigration et d'intégration.",
+    "page_source": "84;85;92;96",
+    "chunk_id_source": "C1312;C1313;C1314;C1316"
+  },
+  {
+    "node_id": "N0015",
+    "publication_id": "PUB136",
+    "type_noeud": "localisation",
+    "libelle": "Île-de-France",
+    "libelle_normalise": "Île-de-France",
+    "page_source": "25;26;27",
+    "chunk_id_source": "C1289;C1290"
+  },
+  {
+    "node_id": "N0411",
+    "publication_id": "PUB136",
+    "type_noeud": "localisation",
+    "libelle": "Guyane",
+    "libelle_normalise": "guyane",
+    "page_source": "28;29",
+    "chunk_id_source": "C1291"
+  },
+  {
+    "node_id": "N1716",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Convergence des marchés de drogues illicites, nouvelles substances et médicaments détournés",
+    "libelle_normalise": "convergence des marchés de drogues illicites nouvelles substances et médicaments détournés",
+    "page_source": "1;2",
+    "chunk_id_source": "C1321;C1322"
+  },
+  {
+    "node_id": "N1717",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Diversification des routes du trafic, transferts en mer, semi-submersibles et drones",
+    "libelle_normalise": "diversification des routes du trafic transferts en mer semi-submersibles et drones",
+    "page_source": "3;8",
+    "chunk_id_source": "C1324;C1325;C1332"
+  },
+  {
+    "node_id": "N1718",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Corruption et intimidation des personnels des chaînes logistiques portuaires",
+    "libelle_normalise": "corruption et intimidation des personnels des chaînes logistiques portuaires",
+    "page_source": "3",
+    "chunk_id_source": "C1324"
+  },
+  {
+    "node_id": "N1719",
+    "publication_id": "PUB137",
+    "type_noeud": "signal_faible",
+    "libelle": "Utilisation de drones pour le trafic de drogues, notamment en milieu carcéral",
+    "libelle_normalise": "utilisation de drones pour le trafic de drogues notamment en milieu carcéral",
+    "page_source": "3",
+    "chunk_id_source": "C1325"
+  },
+  {
+    "node_id": "N1720",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Recrutement de jeunes vulnérables pour des violences commanditées par les réseaux criminels",
+    "libelle_normalise": "recrutement de jeunes vulnérables pour des violences commanditées par les réseaux criminels",
+    "page_source": "3",
+    "chunk_id_source": "C1326"
+  },
+  {
+    "node_id": "N1721",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Diffusion géographique et sociale de la cocaïne en Europe, 4,3 millions d'usagers adultes en 2024",
+    "libelle_normalise": "diffusion géographique et sociale de la cocaïne en europe 4,3 millions d'usagers adultes en 2024",
+    "page_source": "8;9;15",
+    "chunk_id_source": "C1333;C1344"
+  },
+  {
+    "node_id": "N1722",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Crack, scènes ouvertes de consommation et tensions urbaines dans certaines villes",
+    "libelle_normalise": "crack scènes ouvertes de consommation et tensions urbaines dans certaines villes",
+    "page_source": "9",
+    "chunk_id_source": "C1335"
+  },
+  {
+    "node_id": "N1723",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Précurseurs de synthèse conçus pour contourner les contrôles réglementaires",
+    "libelle_normalise": "précurseurs de synthèse conçus pour contourner les contrôles réglementaires",
+    "page_source": "10",
+    "chunk_id_source": "C1336"
+  },
+  {
+    "node_id": "N1724",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Développement des cathinones synthétiques, substitutions et produits mal identifiés",
+    "libelle_normalise": "développement des cathinones synthétiques substitutions et produits mal identifiés",
+    "page_source": "10;11",
+    "chunk_id_source": "C1337"
+  },
+  {
+    "node_id": "N1725",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Disponibilité croissante de la kétamine, polyconsommation et quadruplement des entrées en traitement",
+    "libelle_normalise": "disponibilité croissante de la kétamine polyconsommation et quadruplement des entrées en traitement",
+    "page_source": "11",
+    "chunk_id_source": "C1338"
+  },
+  {
+    "node_id": "N1726",
+    "publication_id": "PUB137",
+    "type_noeud": "tendance",
+    "libelle": "Maintien de l'offre d'héroïne, stocks d'opium estimés à 12 000 tonnes en Afghanistan en 2025",
+    "libelle_normalise": "maintien de l'offre d'héroïne stocks d'opium estimés à 12 000 tonnes en afghanistan en 2025",
+    "page_source": "13;14",
+    "chunk_id_source": "C1343"
+  },
+  {
+    "node_id": "N1727",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Cannabinoïdes synthétiques et semi-synthétiques, intoxications et nouveaux modes de consommation",
+    "libelle_normalise": "cannabinoïdes synthétiques et semi-synthétiques intoxications et nouveaux modes de consommation",
+    "page_source": "5;7",
+    "chunk_id_source": "C1329;C1331"
+  },
+  {
+    "node_id": "N1728",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Cocaïne, intoxications aiguës et implication dans environ un quart des décès liés aux drogues dans 20 pays",
+    "libelle_normalise": "cocaïne intoxications aiguës et implication dans environ un quart des décès liés aux drogues dans 20 pays",
+    "page_source": "9",
+    "chunk_id_source": "C1334"
+  },
+  {
+    "node_id": "N1729",
+    "publication_id": "PUB137",
+    "type_noeud": "notion_idee",
+    "libelle": "Mortalité liée aux drogues dans l'Union européenne, au moins 7 600 décès en 2024",
+    "libelle_normalise": "mortalité liée aux drogues dans l'union européenne au moins 7 600 décès en 2024",
+    "page_source": "12;16",
+    "chunk_id_source": "C1339;C1345"
+  },
+  {
+    "node_id": "N1730",
+    "publication_id": "PUB137",
+    "type_noeud": "signal_faible",
+    "libelle": "Nitazènes signalés dans trois quarts des États membres, orphines dans plus d'un tiers",
+    "libelle_normalise": "nitazènes signalés dans trois quarts des états membres orphines dans plus d'un tiers",
+    "page_source": "12;13",
+    "chunk_id_source": "C1341"
+  },
+  {
+    "node_id": "N1731",
+    "publication_id": "PUB137",
+    "type_noeud": "signal_faible",
+    "libelle": "Fentanyl en Bulgarie, plus de 100 décès impliquant cette substance entre 2024 et 2025",
+    "libelle_normalise": "fentanyl en bulgarie plus de 100 décès impliquant cette substance entre 2024 et 2025",
+    "page_source": "13",
+    "chunk_id_source": "C1342"
+  },
+  {
+    "node_id": "N1732",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Infections virales associées à l'injection de drogues, insuffisances de prévention et de soins",
+    "libelle_normalise": "infections virales associées à l'injection de drogues insuffisances de prévention et de soins",
+    "page_source": "4;5",
+    "chunk_id_source": "C1328"
+  },
+  {
+    "node_id": "N1733",
+    "publication_id": "PUB137",
+    "type_noeud": "probleme",
+    "libelle": "Insuffisance des prises en charge intégrées, addiction à la cocaïne et santé mentale",
+    "libelle_normalise": "insuffisance des prises en charge intégrées addiction à la cocaïne et santé mentale",
+    "page_source": "9",
+    "chunk_id_source": "C1334"
+  },
+  {
+    "node_id": "N1734",
+    "publication_id": "PUB137",
+    "type_noeud": "notion_idee",
+    "libelle": "Consommation annuelle dans l'Union européenne, 24,9 millions d'adultes pour le cannabis et 4,3 millions pour la cocaïne",
+    "libelle_normalise": "consommation annuelle dans l'union européenne 24,9 millions d'adultes pour le cannabis et 4,3 millions pour la cocaïne",
+    "page_source": "15",
+    "chunk_id_source": "C1344"
+  },
+  {
+    "node_id": "N1735",
+    "publication_id": "PUB137",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Surveillance européenne des drogues, eaux usées, analyses toxicologiques et alerte précoce",
+    "libelle_normalise": "surveillance européenne des drogues eaux usées analyses toxicologiques et alerte précoce",
+    "page_source": "2",
+    "chunk_id_source": "C1323"
+  },
+  {
+    "node_id": "N1736",
+    "publication_id": "PUB137",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Formation européenne à la prévention des addictions fondée sur les données probantes",
+    "libelle_normalise": "formation européenne à la prévention des addictions fondée sur les données probantes",
+    "page_source": "4",
+    "chunk_id_source": "C1327"
+  },
+  {
+    "node_id": "N1737",
+    "publication_id": "PUB137",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Naloxone à emporter, programmes déclarés dans 19 pays européens en 2025",
+    "libelle_normalise": "naloxone à emporter programmes déclarés dans 19 pays européens en 2025",
+    "page_source": "12",
+    "chunk_id_source": "C1340"
+  },
+  {
+    "node_id": "N1738",
+    "publication_id": "PUB137",
+    "type_noeud": "instrument_dispositif",
+    "libelle": "Projet de renforcement du contrôle européen des précurseurs de drogues",
+    "libelle_normalise": "projet de renforcement du contrôle européen des précurseurs de drogues",
+    "page_source": "10",
+    "chunk_id_source": "C1336"
+  },
+  {
+    "node_id": "N0667",
+    "publication_id": "PUB137",
+    "type_noeud": "notion_idee",
+    "libelle": "Expansion mondiale de l’offre de cocaïne",
+    "libelle_normalise": "expansion mondiale de l’offre de cocaïne",
+    "page_source": "8",
+    "chunk_id_source": "C1332"
+  },
+  {
+    "node_id": "N0671",
+    "publication_id": "PUB137",
+    "type_noeud": "notion_idee",
+    "libelle": "Adaptation des modes opératoires des réseaux criminels au renforcement des contrôles portuaires",
+    "libelle_normalise": "adaptation des modes opératoires des réseaux criminels au renforcement des contrôles portuaires",
+    "page_source": "3;8",
+    "chunk_id_source": "C1324;C1332"
+  },
+  {
+    "node_id": "N0679",
+    "publication_id": "PUB137",
+    "type_noeud": "notion_idee",
+    "libelle": "Recomposition de l’offre de cannabis : diversification des produits et des provenances",
+    "libelle_normalise": "recomposition de l’offre de cannabis : diversification des produits et des provenances",
+    "page_source": "5;6",
+    "chunk_id_source": "C1329;C1330"
   }
 ]

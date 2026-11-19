@@ -326,6 +326,11 @@ function buildPrompt({ publicationId, publicationTitle, question, nodes, relatio
     "Si tu dois expliquer un chemin indirect, dis explicitement « par un chemin de relations » ou « indirectement », et sélectionne toutes les relations de ce chemin dans relations_selectionnees.",
     "N'emploie pas comme relation factuelle des verbes vagues absents du graphe (par exemple « s'articule avec », « est lié à », « justifie », « entraîne ») lorsque le graphe ne les encode pas. Tu peux dire seulement que deux éléments sont également présents dans le graphe.",
     "Si l'utilisateur demande quelles recommandations « répondent à » un problème, une recommandation n'est une réponse directe que si une relation REPOND_A relie explicitement les deux nœuds. PERMET_DE, MOBILISE, CONTRIBUE_A ou une chaîne de relations ne valent pas REPOND_A.",
+    "SOLUTIONS ET PROPOSITIONS : ne présente comme solution, levier, réponse ou proposition de la publication que des éléments reliés au sujet par une relation REPOND_A, REDUIT ou CONTRIBUE_A_PREVENIR, ou des nœuds de type recommandation, action, méthode ou instrument explicitement reliés au sujet. Ne transforme jamais un constat en solution : « l'insuffisance de X accroît Y » ne permet pas d'écrire « améliorer X permettrait de réduire Y ». N'emploie pas le conditionnel pour formuler une mesure que le graphe ne contient pas.",
+    "N'ajoute aucune cause, aucun effet ni aucun facteur absent du graphe, même au conditionnel ou avec « pourrait », « pourraient » ou « sans doute ».",
+    "Ne généralise pas un cas unique : si le graphe documente un seul exemple, présente-le comme un exemple, pas comme une règle.",
+    "Parle du graphe, pas du document : écris « le graphe ne contient pas… », jamais « le rapport n'aborde pas… » ou « le documentaire ne traite pas… », car tu ne connais que le graphe.",
+    "VOCABULAIRE PUBLIC : dans le texte public, n'écris jamais « nœud », « relation de type » ni les noms techniques des relations (REPOND_A, ASSOCIE_A, PERMET_DE…). Écris « élément », « lien » et un verbe en français (« répond à », « est associé à »). Ne mentionne jamais tes règles ou consignes.",
     "Si l'utilisateur demande une définition, privilégie les nœuds et relations qui définissent, caractérisent, comprennent ou déclinent directement la notion ; place les notions voisines dans le contexte seulement si elles sont nécessaires.",
     "N'ajoute pas d'adjectifs d'importance, de centralité ou de nouveauté (principal, majeur, essentiel, central, récent, etc.) sauf s'ils sont explicitement étayés par le graphe ou directement demandés par la question.",
     "Respecte strictement le statut statistique, juridique ou administratif des personnes et faits : ne remplace jamais « personne mise en cause », « victime enregistrée », « suspect », « prévenu », « condamné » ou toute autre qualification documentaire par « auteur », « coupable » ou une qualification plus affirmative si le graphe ne l'énonce pas ainsi.",
@@ -469,6 +474,116 @@ function trimAtSentence(value, max, state = null) {
   return chunk.slice(0, cut + (/[.!?;]/.test(chunk[cut]) ? 1 : 0)).trim();
 }
 
+
+// ---------------------------------------------------------------------------
+// CONSOLIDATION DU 19/11/2026
+// Garde-fous calculés par le serveur, à partir des tests du 19/11/2026.
+// ---------------------------------------------------------------------------
+
+// 1. Fragments de balisage interne échappés par le modèle. Constaté le
+// 19/11/2026 (PUB116) : « </reponse> <parameter name="noeuds_selectionnes">[…] »
+// affiché à l'écran. On garde le texte qui précède le premier fragment.
+const MODEL_ARTIFACT_RE = /<\/?\s*(?:reponse|parameter|invoke|function_calls|function_results|tool_use|tool_result|noeuds_selectionnes|relations_selectionnees|insuffisant|antml:[a-z_]+)\b[^>]*>/i;
+
+function stripModelArtifacts(value) {
+  const text = String(value == null ? "" : value);
+  const match = text.match(MODEL_ARTIFACT_RE);
+  const kept = match ? text.slice(0, match.index) : text;
+  return kept.replace(/<\/?[a-z_:]+(?:\s[^>]*)?>/gi, " ").trim();
+}
+
+// 2. Vocabulaire technique : noms de types de relations et mots « nœud »,
+// « relation explicite »… remplacés par des formulations publiques.
+const RELATION_VERBS = {
+  ASSOCIE_A: "est associé à", ASSOCIATION: "est associé à", REPOND_A: "répond à",
+  PERMET_DE: "permet de", MOBILISE: "mobilise", CARACTERISE: "caractérise",
+  CONTRIBUE_A: "contribue à", CONTRIBUE_PARTIELLEMENT_A: "contribue partiellement à",
+  ILLUSTRE: "illustre", CONCERNE: "concerne", COMPREND: "comprend",
+  S_INSCRIT_DANS: "s'inscrit dans", SE_DECLINE_EN: "se décline en", REDUIT: "réduit",
+  FAVORISE: "favorise", ACCROIT: "accroît", FRAGILISE: "fragilise", ENTRETIENT: "entretient",
+  EXPOSE_A: "expose à", S_APPUIE_SUR: "s'appuie sur", REPOSE_SUR: "repose sur",
+  LOCALISE_DANS: "est localisé dans", PARTICIPE_A: "participe à", MENE: "mène",
+  EST_DESTINATAIRE_DE: "est destinataire de", MET_EN_OEUVRE: "met en œuvre",
+  CONTRIBUE_A_PREVENIR: "contribue à prévenir", PEUT_CONTRIBUER_A: "peut contribuer à",
+  OBSERVEE_DANS: "est observé dans", SE_MANIFESTE_PAR: "se manifeste par",
+  SE_TRADUIT_PAR: "se traduit par", RENFORCE: "renforce", ENCADRE: "encadre",
+  PILOTE: "pilote", EXPERTISE_SUR: "a une expertise sur", ACCENTUE: "accentue"
+};
+
+function relationVerb(code) {
+  const key = String(code || "").toUpperCase();
+  return RELATION_VERBS[key] || key.toLowerCase().replace(/_/g, " ");
+}
+
+function dejargon(value) {
+  let t = String(value == null ? "" : value);
+  t = t.replace(/\b(?:la |une )?relation(?: documentée)?(?: est)? de type\s+([A-Z][A-Z_]{2,})(?:\s*\([^)]*\))?/g,
+    (m, code) => `le lien documenté « ${relationVerb(code)} »`);
+  t = t.replace(/\b(?:de|du) type\s+([A-Z][A-Z_]{2,})(?:\s*\([^)]*\))?/g, (m, code) => `« ${relationVerb(code)} »`);
+  t = t.replace(/\b([A-Z]{2,}(?:_[A-Z]+)+|ASSOCIATION|CARACTERISE|ILLUSTRE|CONCERNE|COMPREND|MOBILISE|FAVORISE|REDUIT|FRAGILISE|ENTRETIENT|ACCROIT)\b/g,
+    (m, code) => `« ${relationVerb(code)} »`);
+  const pairs = [
+    [/\b(les |des )?nœuds et (?:les )?relations(?: (?:fournis|fournies|documentés|documentées|du graphe))?/gi, (m, art) => `${art || ""}éléments du graphe`],
+    [/\b(les |des )?nœuds ou (?:les )?relations(?: (?:fournis|fournies))?/gi, (m, art) => `${art || ""}éléments du graphe`],
+    [/\bnœuds\b/g, "éléments"], [/\bNœuds\b/g, "Éléments"],
+    [/\bnœud\b/g, "élément"], [/\bNœud\b/g, "Élément"],
+    [/\b([Ll])e élément\b/g, "$1'élément"], [/\b([Dd])u élément\b/g, (m, d) => `${d}e l'élément`],
+    [/\b([Aa])u élément\b/g, (m, a) => (a === "A" ? "À" : "à") + " l'élément"], [/\b([Cc])e élément\b/g, "$1et élément"],
+    [/\baucune relation(s)? explicite(s)?/g, "aucun lien explicite"],
+    [/\baucune relation\b/g, "aucun lien"],
+    [/\b(une|la|cette) relation (directe|explicite|documentée)\b/g, (m, art, adj) => `${{ une: "un", la: "le", cette: "ce" }[art]} lien ${{ directe: "direct", explicite: "explicite", documentée: "documenté" }[adj]}`],
+    [/\brelations (directes|explicites|documentées)\b/g, (m, adj) => `liens ${{ directes: "directs", explicites: "explicites", documentées: "documentés" }[adj]}`],
+    [/\brelations (fournies|du graphe)\b/g, "liens du graphe"],
+    [/\b[Mm]a règle absolue\b/g, "le principe de cet outil"]
+  ];
+  for (const [re, by] of pairs) t = t.replace(re, by);
+  return t.replace(/\s{2,}/g, " ").trim();
+}
+
+// 3. Nombre annoncé dans une réponse rédigée (« deux axes », « trois éléments »)
+// qui ne correspond ni au nombre de sections ni au nombre d'éléments listés :
+// remplacé par « plusieurs ». Constaté 4 fois le 19/11/2026.
+const COUNT_WORDS = { deux: 2, trois: 3, quatre: 4, cinq: 5, six: 6, sept: 7, huit: 8, neuf: 9, dix: 10 };
+const COUNT_NOUNS = "raisons|solutions|réponses|axes|leviers|facteurs|éléments|mesures|actions|pistes|volets|dimensions|catégories|types|recommandations|problèmes|causes|enjeux|propositions|approches|registres|niveaux|formes|modalités|dispositifs|outils|explications|aspects|points|moyens";
+
+function fixAnnouncedCount(intro, sections) {
+  const list = Array.isArray(sections) ? sections : [];
+  const totalItems = list.reduce((sum, sec) => sum + ((sec && sec.items) || []).length, 0);
+  const re = new RegExp(`\\b(deux|trois|quatre|cinq|six|sept|huit|neuf|dix|[2-9]|1[0-9])\\s+((?:grand(?:e)?s\\s+|principa(?:les|ux)\\s+)?)(${COUNT_NOUNS})\\b`, "gi");
+  return String(intro || "").replace(re, (m, num, adj, noun) => {
+    const n = COUNT_WORDS[num.toLowerCase()] || Number(num);
+    if (n === totalItems || n === list.length) return m;
+    const word = /^[A-ZÉ]/.test(num) ? "Plusieurs" : "plusieurs";
+    return `${word} ${adj || ""}${noun}`.replace(/\s{2,}/g, " ");
+  });
+}
+
+// 4. Ligne de source lisible : pages uniques et triées, timecodes uniques,
+// autres repères (« article web », « Partie I »), sans le titre de la publication.
+function summarizeSourceRefs(values, max = 10) {
+  const pages = new Set();
+  const ranges = new Set();
+  const times = new Set();
+  const labels = new Set();
+  for (const value of values) {
+    for (const part of String(value || "").split(/\s*[;,]\s*/)) {
+      const v = part.trim().replace(/^p\.?\s*/i, "");
+      if (!v) continue;
+      if (/^\d+$/.test(v)) pages.add(Number(v));
+      else if (/^\d+\s*[-–]\s*\d+$/.test(v)) ranges.add(v.replace(/\s*[-–]\s*/, "-"));
+      else if (/^\d{1,2}:\d{2}(?::\d{2})?(?:\s*[-–]\s*\d{1,2}:\d{2}(?::\d{2})?)?$/.test(v)) times.add(v.replace(/\s*[-–]\s*/, "–"));
+      else labels.add(v);
+    }
+  }
+  const out = [];
+  const pageList = [...[...pages].sort((a, b) => a - b).map(String), ...ranges];
+  if (pageList.length) out.push(`p. ${pageList.slice(0, max).join(", ")}${pageList.length > max ? ", …" : ""}`);
+  const timeList = [...times].sort();
+  if (timeList.length) out.push(`${timeList.length > 1 ? "timecodes" : "timecode"} ${timeList.slice(0, max).join(", ")}${timeList.length > max ? ", …" : ""}`);
+  if (labels.size) out.push([...labels].slice(0, 4).join(", "));
+  return out.join(" ; ");
+}
+
 function parsePublicResponse(value, state = null) {
   const text = cleanMultilineText(value);
   if (!text) return { intro: "", sections: [] };
@@ -583,10 +698,10 @@ function applyQuestionStyle(parsedPublic, question, state = null) {
   // Correctif 18/11/2026 : cette barrière coupait auparavant le texte au
   // caractère près (1200 caractères pour l'introduction), en plein mot.
   // Elle coupe désormais en fin de phrase et signale la coupe (state.truncated).
-  intro = trimAtSentence(intro.replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), MAX_ANSWER_CHARS, state);
+  intro = dejargon(trimAtSentence(intro.replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), MAX_ANSWER_CHARS, state));
   sections = sections.map(s => ({
-    titre: cleanPublicText(String(s.titre || "").replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 140),
-    items: (s.items || []).map(item => trimAtSentence(String(item).replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 560, state)).filter(Boolean)
+    titre: dejargon(cleanPublicText(String(s.titre || "").replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 140)),
+    items: (s.items || []).map(item => dejargon(trimAtSentence(String(item).replace(/\b(?:INTRO|SECTION|ITEM)\s*:/gi, " "), 560, state))).filter(Boolean)
   })).filter(s => s.titre && s.items.length);
 
   return { intro, sections };
@@ -612,7 +727,12 @@ function collectProvenance(nodeIds, relationIds, nodeMap, relationMap) {
 
   relationIds.forEach(id => add(relationMap.get(id)?.page_source));
   nodeIds.forEach(id => add(nodeMap.get(id)?.page_source));
-  return refs.slice(0, 8);
+  // Correctif 19/11/2026 : une seule ligne lisible. Les pages des liens retenus
+  // sont prioritaires ; celles des éléments ne servent que s'il n'y a aucun lien.
+  const fromRelations = relationIds.map(id => relationMap.get(id)?.page_source).filter(Boolean);
+  const fromNodes = nodeIds.map(id => nodeMap.get(id)?.page_source).filter(Boolean);
+  const summary = summarizeSourceRefs(fromRelations.length ? fromRelations : fromNodes);
+  return summary ? [summary] : refs.slice(0, 8);
 }
 
 function hasVisibleProvenance(answer, sections) {
@@ -666,9 +786,9 @@ function finalizeAnswer(raw, graph, question = "", meta = {}) {
   const nodeMap = new Map(graph.nodes.map(n => [n.node_id, n]));
   const profile = questionProfile(question);
   let insufficient = Boolean(raw?.insuffisant);
-  const parsedPublic = applyQuestionStyle(parsePublicResponse(raw?.reponse, truncation), question, truncation);
-  let answer = parsedPublic.intro;
+  const parsedPublic = applyQuestionStyle(parsePublicResponse(stripModelArtifacts(raw?.reponse), truncation), question, truncation);
   let sections = parsedPublic.sections;
+  let answer = fixAnnouncedCount(parsedPublic.intro, sections);
 
   // Barrière déterministe contre l'invention d'un ordre de priorité.
   // Un simple nœud contenant le mot « priorité » ne suffit pas à établir
@@ -690,8 +810,7 @@ function finalizeAnswer(raw, graph, question = "", meta = {}) {
   if (!insufficient && !hasVisibleProvenance(answer, sections)) {
     const provenance = collectProvenance(nodeIds, relationIds, nodeMap, relationMap);
     if (provenance.length) {
-      const title = cleanPublicText(graph.publicationTitle || "la publication sélectionnée", 220);
-      answer = `${answer}${answer ? " " : ""}Provenance — ${title} : ${provenance.join(" ; ")}.`;
+      answer = `${answer}${answer ? " " : ""}Source : ${provenance.join(" ; ")}.`;
     }
   }
 
@@ -862,6 +981,125 @@ function buildInventoryAnswer(graph, entry) {
   };
 }
 
+
+// ---------------------------------------------------------------------------
+// RÉPONSES À UN PROBLÈME, CALCULÉES DEPUIS LE GRAPHE (consolidation 19/11/2026)
+//
+// Pour « Que propose la publication pour X ? », « Quelles réponses à X ? »,
+// « Comment lutter contre X ? » : si X correspond clairement à un élément du
+// graphe, la réponse liste exactement les éléments reliés à X par un lien de
+// réponse (REPOND_A, REDUIT, CONTRIBUE_A_PREVENIR…), sans appel au modèle.
+// S'il n'y en a aucun, la réponse le dit. Constaté le 19/11/2026 : le modèle
+// rattachait une recommandation au mauvais problème (PUB010) ou construisait
+// une solution à partir d'une chaîne de liens (PUB116).
+// Si X n'est pas identifiable sans ambiguïté, la question passe par le modèle.
+// ---------------------------------------------------------------------------
+
+const RESPONSE_RELATION_TYPES = new Set([
+  "REPOND_A", "REDUIT", "CONTRIBUE_A_PREVENIR", "ATTENUE", "PREVIENT", "LIMITE",
+  "RESOUT", "TRAITE", "LUTTE_CONTRE", "REMEDIE_A"
+]);
+
+const RESPONDER_TYPE_LABELS = {
+  recommandation: "Recommandation", action: "Action", methode: "Méthode",
+  instrument_dispositif: "Instrument ou dispositif", notion_idee: "Notion", acteur: "Acteur",
+  probleme: "Problème", tendance: "Tendance", tendance_forte: "Tendance", localisation: "Localisation"
+};
+
+const MATCH_STOPWORDS = new Set((
+  "les des une pour dans sur par est qui que quoi aux ces son ses leur leurs avec plus sont cette " +
+  "elle ils elles nous vous face contre entre sans selon tout tous toute toutes fait faire font comme mais " +
+  "donc car ainsi aussi tres bien quel quels quelle quelles comment pourquoi propose proposee proposees " +
+  "proposes preconise recommande rapport publication document documentaire podcast etude note article " +
+  "graphe solution solutions reponse reponses mesure mesures piste pistes levier leviers remede remedes " +
+  "lutter reduire remedier repondre repond repondent apporte apportee apportees apportent existe existent " +
+  "prevoit traiter quoi lutte"
+).split(" "));
+
+function matchTokens(text) {
+  const prepared = String(text || "").replace(/mal[-\s]?[êe]tre/gi, "maletre");
+  return normalizeForMatch(prepared)
+    .split(" ")
+    .filter(w => w.length >= 3 && !MATCH_STOPWORDS.has(w))
+    .map(w => w.slice(0, 5));
+}
+
+function detectResponseRequest(question) {
+  const q = normalizeForMatch(question);
+  if (!q) return false;
+  return /\b(que propose|que preconise|que recommande|quelles? (?:sont les )?(?:solutions?|reponses?|mesures|pistes|remedes|leviers|propositions)|comment (?:lutter|repondre|remedier|reduire|faire face|traiter)|pour (?:lutter|reduire|remedier|repondre a|faire face|traiter)|repond(?:ent)? a|qu est ce qui repond|quelles? recommandations? (?:repond|pour lutter|contre))\b/.test(q)
+    || /\bque fait\b.*\bface (?:a|aux)\b/.test(q);
+}
+
+function findResponseTarget(question, graph) {
+  const wanted = new Set(matchTokens(question));
+  if (!wanted.size) return null;
+  const excluded = new Set(["recommandation", "action", "methode", "instrument_dispositif", "acteur", "expert_public", "localisation"]);
+  const scored = (graph.nodes || [])
+    .filter(n => !excluded.has(normalizeForMatch(n.type_noeud).replace(/ /g, "_")))
+    .map(n => {
+      const tokens = [...new Set(matchTokens(n.libelle))];
+      const hits = tokens.filter(t => wanted.has(t)).length;
+      return { node: n, hits, cover: tokens.length ? hits / tokens.length : 0 };
+    })
+    .filter(x => x.hits >= 2)
+    .sort((a, b) => b.hits - a.hits || b.cover - a.cover);
+  if (!scored.length) return null;
+  const [best, second] = scored;
+  if (second && second.hits === best.hits && second.cover === best.cover) return null; // ambigu : modèle
+  return best.node;
+}
+
+function buildResponseAnswer(graph, target) {
+  const nodeMap = new Map(graph.nodes.map(n => [n.node_id, n]));
+  const rels = (graph.relations || []).filter(r =>
+    r.cible_id === target.node_id &&
+    RESPONSE_RELATION_TYPES.has(String(r.type_relation || "").toUpperCase()) &&
+    nodeMap.has(r.source_id)
+  );
+  const targetLabel = cleanPublicText(target.libelle, MAX_NODE_LABEL_CHARS);
+  const targetProof = { type: "noeud", node_id: target.node_id, libelle: target.libelle, page_source: target.page_source };
+
+  if (!rels.length) {
+    return {
+      reponse: `Le graphe de cette publication ne relie explicitement aucune réponse, solution ou recommandation à « ${targetLabel} ». Il ne permet donc pas d'indiquer ce que la publication propose sur ce point. Le graphe est une sélection de la publication : consultez le document original ou l'Atelier de veille.`,
+      sections: [],
+      noeuds_selectionnes: [target.node_id],
+      relations_selectionnees: [],
+      resultats: [],
+      preuves: [targetProof],
+      insuffisant: true,
+      tronque: false,
+      mode: "reponses"
+    };
+  }
+
+  const items = rels.map(r => {
+    const src = nodeMap.get(r.source_id);
+    const kind = RESPONDER_TYPE_LABELS[normalizeForMatch(src.type_noeud).replace(/ /g, "_")] || "Élément";
+    const pages = formatInventoryPages(r.page_source || src.page_source);
+    const verb = String(r.type_relation || "").toUpperCase() === "REPOND_A" ? "" : ` (lien : « ${relationVerb(r.type_relation)} »)`;
+    return `${kind} : ${cleanPublicText(src.libelle, MAX_NODE_LABEL_CHARS)}${verb}${pages ? ` (${pages})` : ""}.`;
+  });
+  const n = rels.length;
+  const reponse = `Dans le graphe de cette publication, ${n} ${n > 1 ? "éléments sont reliés" : "élément est relié"} explicitement à « ${targetLabel} » comme réponse. Cette liste porte uniquement sur les liens retenus dans le graphe, qui est une sélection de la publication.`;
+
+  return {
+    reponse,
+    sections: [{ titre: n > 1 ? "Réponses documentées dans le graphe" : "Réponse documentée dans le graphe", items }],
+    noeuds_selectionnes: [target.node_id, ...rels.map(r => r.source_id)].slice(0, 8),
+    relations_selectionnees: rels.map(r => r.relation_id).slice(0, 8),
+    resultats: rels.slice(0, 8),
+    preuves: [targetProof, ...rels.map(r => ({
+      type: "relation", relation_id: r.relation_id, source_id: r.source_id,
+      cible_id: r.cible_id, type_relation: r.type_relation, page_source: r.page_source
+    }))].slice(0, 12),
+    insuffisant: false,
+    tronque: false,
+    mode: "reponses"
+  };
+}
+
 function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
   if (!firestore || typeof getAnthropicApiKey !== "function" || !model) {
     throw new Error("Configuration graph-chat incomplète.");
@@ -885,11 +1123,20 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
       // Inventaire complet d'un type demandé : réponse calculée depuis le graphe,
       // sans appel au modèle (comptage exact, aucun oubli).
       const inventory = detectInventoryRequest(graph.question);
+      let responseTarget = null;
+      if (!inventory && detectResponseRequest(graph.question)) {
+        const prof = questionProfile(graph.question);
+        if (!prof.asksPriority && !prof.asksResponsibility) {
+          responseTarget = findResponseTarget(graph.question, graph);
+        }
+      }
       let data;
       let stopReason = "";
       let rawAnswerChars = 0;
       if (inventory) {
         data = buildInventoryAnswer(graph, inventory);
+      } else if (responseTarget) {
+        data = buildResponseAnswer(graph, responseTarget);
       } else {
         const apiKey = await getAnthropicApiKey();
         const { system, userText } = buildPrompt(graph);
@@ -906,7 +1153,7 @@ function createGraphChatHandler({ firestore, getAnthropicApiKey, model }) {
         nodes: nodeCount,
         relations: relationCount,
         question_chars: graph.question.length,
-        mode: inventory ? `inventaire:${inventory.key}` : "modele",
+        mode: inventory ? `inventaire:${inventory.key}` : responseTarget ? "reponses" : "modele",
         insufficient: data.insuffisant,
         truncated: data.tronque,
         stop_reason: stopReason,
@@ -955,5 +1202,12 @@ module.exports = {
   applyQuestionStyle,
   questionProfile,
   detectInventoryRequest,
-  buildInventoryAnswer
+  buildInventoryAnswer,
+  stripModelArtifacts,
+  dejargon,
+  fixAnnouncedCount,
+  summarizeSourceRefs,
+  detectResponseRequest,
+  findResponseTarget,
+  buildResponseAnswer
 };

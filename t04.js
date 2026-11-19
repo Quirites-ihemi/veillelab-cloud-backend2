@@ -26,6 +26,79 @@ function normalize(value) {
     .trim();
 }
 
+// ---- Ancrage textuel (v0.2) -------------------------------------------------
+// Chaque recommandation doit s'appuyer sur une citation exacte de la source,
+// qui contient une formule de prescription. Sinon, l'élément est écarté :
+// un constat reformulé en « il faut » ne peut pas passer.
+const PRESCRIPTION_RE = new RegExp([
+  "recommand", "preconis", "propos", "sugger", "suggere", "conseill",
+  "invit", "appel(le|lent|er|ant)? a", "plaid", "pron(e|ent)", "encourag", "exhort",
+  "il convient", "il faut", "il est (necessaire|indispensable|souhaitable|essentiel|urgent|important|utile)",
+  "il (serait|semble|parait) (necessaire|souhaitable|utile|opportun|pertinent)",
+  "devr(ait|aient|a|ont|ions|iez)", "doi(t|vent) (etre|faire|permettre|pouvoir|s )", "fau(drait|t) ",
+  "gagnerai(t|ent)", "mériterai|meriterai", "orientation", "piste", "mesure n", "action n",
+  "souhait", "demand(e|ent|ons) (que|de|a)", "objectif"
+].join("|"));
+
+function normalizeQuote(value) {
+  return normalize(String(value || "").replace(/[«»“”"]/g, " ").replace(/\u2026/g, "..."));
+}
+
+// La citation est découpée sur les ellipses ; chaque morceau d'au moins 3 mots
+// doit figurer tel quel (après normalisation) dans le texte des extraits cités.
+function citationAncree(citation, texteSources) {
+  const source = normalizeQuote(texteSources);
+  const morceaux = String(citation || "").split(/\.\.\.|\u2026|\[\.\.\.\]/)
+    .map(normalizeQuote).filter(m => m.split(" ").length >= 3);
+  if (!morceaux.length) return false;
+  if (morceaux.join(" ").split(" ").length < 5) return false;
+  return morceaux.every(m => source.includes(m));
+}
+
+function citationPrescriptive(citation) {
+  return PRESCRIPTION_RE.test(normalizeQuote(citation));
+}
+
+// Le formulateur doit être nommé dans les extraits cités ; à défaut, il peut être
+// l'organisme producteur si la citation le désigne de façon générique (« la mission
+// recommande », « la Cour recommande »…). Sinon il est laissé vide plutôt qu'inventé.
+const AUTO_REFERENCE_RE = /\b(la mission|la cour|le rapport|les auteurs?|l etude|l inspection|nous|le document|le conseil|la commission|le senat|l institut|l observatoire|le defenseur|la mediatrice|le comite|l agence|le groupe de travail|la delegation)\b/;
+const MOTS_VIDES = new Set(["de","des","du","la","le","les","l","d","et","en","a","au","aux","pour","sur","par","dans","the","of","and"]);
+
+function motsSignificatifs(value) {
+  return normalize(value).split(" ").filter(m => m.length > 2 && !MOTS_VIDES.has(m));
+}
+
+function formulateurVerifie(formulateur, citation, texteSources, organisme) {
+  const mots = motsSignificatifs(formulateur);
+  if (!mots.length) return "";
+  const source = normalize(texteSources);
+  const presents = mots.filter(m => source.includes(m)).length;
+  if (presents / mots.length >= 0.6) return formulateur;
+  const motsOrg = motsSignificatifs(organisme);
+  const memeQueOrganisme = motsOrg.length && mots.filter(m => motsOrg.includes(m)).length / mots.length >= 0.6;
+  if (memeQueOrganisme && AUTO_REFERENCE_RE.test(normalize(citation))) return formulateur;
+  return "";
+}
+
+function texteDesChunks(ids, index) {
+  return ids.map(id => index.get(id)?.chunk?.texte || "").join("\n");
+}
+
+// Filtre déterministe appliqué après l'extraction et après l'audit.
+function verifierAncrage(items, index) {
+  const gardes = [];
+  const ecartes = [];
+  for (const item of items) {
+    const texte = texteDesChunks(item.chunk_ids, index);
+    if (!citationAncree(item.citation, texte)) { ecartes.push({ ...item, motif: "citation absente de la source" }); continue; }
+    if (!citationPrescriptive(item.citation)) { ecartes.push({ ...item, motif: "citation sans formule de prescription" }); continue; }
+    const organisme = index.get(item.chunk_ids[0])?.pub?.organisme_producteur || "";
+    gardes.push({ ...item, formulateur: formulateurVerifie(item.formulateur, item.citation, texte, organisme) });
+  }
+  return { gardes, ecartes };
+}
+
 function nettoyerCorpusT04(corpus) {
   const propres = [];
   const chunksVus = new Set();
@@ -178,9 +251,10 @@ const EXTRACTION_TOOL = {
             formulateur: { type: "string" },
             destinataire: { type: "string" },
             conditions_modalites: { type: "string" },
+            citation: { type: "string", description: "Copie exacte, mot pour mot, du passage de la source qui formule la prescription (10 à 40 mots)." },
             chunk_ids: { type: "array", minItems: 1, items: { type: "string" } }
           },
-          required: ["formulation", "type_prescription", "objet", "formulateur", "destinataire", "conditions_modalites", "chunk_ids"],
+          required: ["formulation", "type_prescription", "objet", "formulateur", "destinataire", "conditions_modalites", "citation", "chunk_ids"],
           additionalProperties: false
         }
       }
@@ -209,6 +283,10 @@ Tu réalises une EXTRACTION DOCUMENTAIRE STRICTE de recommandations à partir de
 Règles impératives :
 - Extrais uniquement ce qui est EXPLICITEMENT formulé comme recommandation, préconisation, proposition ou orientation dans la source.
 - Ne transforme jamais un constat, un résultat, une corrélation, une hypothèse, une difficulté, un besoin observé ou une analyse en recommandation.
+- Un manque constaté (« il n'existe pas… », « X ne dispose pas de… », « l'utilisation n'est pas homogène », « le manque de transparence empêche… ») est un CONSTAT, jamais une recommandation, même si la réponse semble évidente.
+- Une priorité ou une attente exprimée par des acteurs (« les États considèrent que X constitue une priorité ») n'est pas une recommandation de l'auteur. Ne la retiens que si la source la présente comme une demande explicite, et indique alors ces acteurs comme formulateur.
+- citation = copie EXACTE, mot pour mot, du passage de la source qui contient la formule de prescription (« recommande », « préconise », « propose », « il convient de », « devrait », « appelle à »…). Pas de reformulation. Si tu ne trouves pas un tel passage, n'extrais pas l'élément.
+- formulateur = l'acteur sujet de la formule de prescription dans la citation (« la Cour recommande » → la Cour ; « les autorités douanières appellent à » → ces autorités). Ne mets pas l'organisme producteur par défaut.
 - La formulation doit rester fidèle au degré de prescription de la source. N'écris pas « il faut » si la source dit seulement « pourrait », « devrait être envisagé » ou formule une orientation.
 - type_prescription = recommandation, preconisation, proposition ou orientation selon la formulation réellement documentée.
 - formulation = reformulation courte et fidèle de la recommandation. Ne complète pas avec des informations extérieures.
@@ -233,6 +311,7 @@ Règles impératives :
     formulateur: String(r.formulateur || "").trim(),
     destinataire: String(r.destinataire || "").trim(),
     conditions_modalites: String(r.conditions_modalites || "").trim(),
+    citation: String(r.citation || "").trim(),
     chunk_ids: [...new Set((Array.isArray(r.chunk_ids) ? r.chunk_ids : []).map(String).filter(id => autorises.has(id)))]
   })).filter(r => r.formulation && r.chunk_ids.length);
 }
@@ -273,10 +352,11 @@ const AUDIT_TOOL = {
             formulateur: { type: "string" },
             destinataire: { type: "string" },
             conditions_modalites: { type: "string" },
+            citation: { type: "string" },
             chunk_ids: { type: "array", minItems: 1, items: { type: "string" } },
             conserver: { type: "boolean" }
           },
-          required: ["formulation", "type_prescription", "objet", "formulateur", "destinataire", "conditions_modalites", "chunk_ids", "conserver"],
+          required: ["formulation", "type_prescription", "objet", "formulateur", "destinataire", "conditions_modalites", "citation", "chunk_ids", "conserver"],
           additionalProperties: false
         }
       }
@@ -295,7 +375,7 @@ async function auditerRecommendations({ apiKey, recommendations, index }) {
         const item = index.get(id);
         return item ? `CHUNK ${id}: ${item.chunk.texte}` : "";
       }).filter(Boolean).join("\n");
-      return `ÉLÉMENT ${i + 1}\nFormulation: ${r.formulation}\nType: ${r.type_prescription}\nObjet: ${r.objet}\nFormulateur: ${r.formulateur}\nDestinataire: ${r.destinataire}\nConditions/modalités: ${r.conditions_modalites}\nChunks autorisés: ${r.chunk_ids.join(", ")}\n${sources}`;
+      return `ÉLÉMENT ${i + 1}\nFormulation: ${r.formulation}\nType: ${r.type_prescription}\nObjet: ${r.objet}\nFormulateur: ${r.formulateur}\nCitation: ${r.citation || ""}\nDestinataire: ${r.destinataire}\nConditions/modalités: ${r.conditions_modalites}\nChunks autorisés: ${r.chunk_ids.join(", ")}\n${sources}`;
     }).join("\n\n---\n\n");
 
     const system = `
@@ -303,6 +383,9 @@ Tu audites une extraction STRICTE de recommandations.
 Pour chaque élément :
 - conserve-le uniquement si les extraits cités formulent explicitement une recommandation, préconisation, proposition ou orientation ;
 - retire tout constat, résultat, diagnostic, souhait implicite, hypothèse ou besoin que l'extraction aurait transformé en prescription ;
+- en particulier, retire l'élément si la source se contente de décrire un manque ou une difficulté (« il n'existe pas… », « ne dispose pas… », « n'est pas homogène… ») ;
+- la citation doit être une copie exacte de l'extrait et contenir la formule de prescription ; sinon retire l'élément ;
+- le formulateur est l'acteur sujet de la formule de prescription dans la citation : corrige-le s'il ne correspond pas (par exemple des autorités nationales et non l'organisme qui publie) ;
 - vérifie que la formulation respecte le degré de prescription de la source ;
 - corrige le type de prescription si nécessaire ;
 - n'invente jamais formulateur, destinataire, objet, condition ou modalité : laisse une chaîne vide si ce n'est pas explicite ;
@@ -324,6 +407,7 @@ Pour chaque élément :
         formulateur: String(r.formulateur || "").trim(),
         destinataire: String(r.destinataire || "").trim(),
         conditions_modalites: String(r.conditions_modalites || "").trim(),
+        citation: String(r.citation || original.citation || "").trim(),
         chunk_ids: ids
       });
     });
@@ -388,7 +472,8 @@ async function genererRecommandationsT04({ apiKey, besoin = "", treatment = {}, 
     brutes.push(...items);
   }
 
-  let merged = mergeRecommendations(brutes);
+  const ancrageExtraction = verifierAncrage(brutes, index);
+  let merged = mergeRecommendations(ancrageExtraction.gardes);
   await onProgress({
     stage: "t04_auditing",
     message: "Vérification du caractère explicite et de la provenance des recommandations",
@@ -397,6 +482,8 @@ async function genererRecommandationsT04({ apiKey, besoin = "", treatment = {}, 
     lots_total: lots.length
   });
   merged = await auditerRecommendations({ apiKey, recommendations: merged, index });
+  const ancrageAudit = verifierAncrage(merged, index);
+  merged = ancrageAudit.gardes;
 
   const recommendations = merged.map((r, i) => enrichRecommendation(r, index, i + 1)).filter(r => r.sources.length);
 
@@ -405,7 +492,7 @@ async function genererRecommandationsT04({ apiKey, besoin = "", treatment = {}, 
     nom_traitement: String(treatment.nom_traitement || "Extraction de recommandations"),
     regime_IA: "Extraction stricte",
     besoin: String(besoin || ""),
-    engine: "t04-v0.1-strict-recommendations",
+    engine: "t04-v0.2-ancrage-citation",
     corpus: corpusPropre.map(pub => ({
       publication_id: pub.publication_id,
       titre: pub.titre,
@@ -419,10 +506,11 @@ async function genererRecommandationsT04({ apiKey, besoin = "", treatment = {}, 
       chunks_recus: chunks.length,
       lots_analyses: lots.length,
       recommandations_extraites_avant_audit: brutes.length,
+      recommandations_ecartees_sans_ancrage: ancrageExtraction.ecartes.length + ancrageAudit.ecartes.length,
       recommandations_retenues: recommendations.length,
       audit_fidelite: true,
       connaissance_exterieure_autorisee: false,
-      moteur: "t04-v0.1-strict-recommendations"
+      moteur: "t04-v0.2-ancrage-citation"
     },
     output: {
       recommendations,
@@ -436,5 +524,9 @@ module.exports = {
   nettoyerCorpusT04,
   genererRecommandationsT04,
   mergeRecommendations,
-  pageLabel
+  pageLabel,
+  citationAncree,
+  citationPrescriptive,
+  formulateurVerifie,
+  verifierAncrage
 };

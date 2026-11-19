@@ -41,8 +41,8 @@ async function test(name, fn) {
     const cases = [
       ["Les nœuds et relations fournis traitent exclusivement des problèmes.", /^Les éléments du graphe traitent/],
       ["Bien que le nœud « Risques » soit présent, aucune relation n'indique le moment.", /l'élément « Risques ».*aucun lien n'indique/],
-      ["La relation documentée est de type ASSOCIE_A (est associé à), ce qui signifie…", /le lien documenté « est associé à », ce qui signifie/i],
-      ["Aucune relation de type REPOND_A, PERMET_DE ou MOBILISE ne relie une recommandation.", /« répond à », « permet de » ou « mobilise »/]
+      ["La relation documentée est de type ASSOCIE_A (est associé à), ce qui signifie…", /^Le lien documenté est « associé à », ce qui signifie…$/],
+      ["Aucune relation de type REPOND_A, PERMET_DE ou MOBILISE ne relie une recommandation.", /^Aucun lien « répond à », « permet de » ou « mobilise » ne relie une recommandation\.$/]
     ];
     for (const [input, expected] of cases) {
       const out = G.dejargon(input);
@@ -62,8 +62,21 @@ async function test(name, fn) {
   await test("« Le documentaire n'aborde pas » → « Le graphe de cette publication n'aborde pas »", () => {
     assert.strictEqual(G.dejargon("Le documentaire n'aborde pas directement la question."), "Le graphe de cette publication n'aborde pas directement la question.");
     assert.strictEqual(G.dejargon("En revanche, le rapport ne mentionne pas de date."), "En revanche, le graphe de cette publication ne mentionne pas de date.");
+    // Cas relevé sur la v2 le 19/11/2026 : ne jamais doubler « le graphe de ».
+    const deja = "Le graphe de cette publication ne contient pas d'élément sur ce sujet.";
+    assert.strictEqual(G.dejargon(deja), deja);
+    const deja2 = "Le graphe de cette publication n'aborde pas directement la question.";
+    assert.strictEqual(G.dejargon(deja2), deja2);
     const keep = "Le rapport concerne six départements.";
     assert.strictEqual(G.dejargon(keep), keep);
+  });
+
+  await test("réponse réelle Q18 (v2) : aucun « graphe de le graphe »", () => {
+    const real = "Le documentaire n'aborde pas directement la question du racisme institutionnel ou systémique de la police. Le graphe de cette publication ne contient pas de nœud ou de relation traitant explicitement du racisme. En revanche, le documentaire documente plusieurs phénomènes.";
+    const out = G.dejargon(real);
+    assert.ok(!/graphe de (?:le|la) graphe/i.test(out), out);
+    assert.ok(out.startsWith("Le graphe de cette publication n'aborde pas directement"), out);
+    assert.ok(out.includes("Le graphe de cette publication ne contient pas d'élément ou de relation"), out);
   });
 
   // --- 3. Nombre annoncé (Q7, Q16) ---

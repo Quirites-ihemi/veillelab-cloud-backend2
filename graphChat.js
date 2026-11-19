@@ -517,8 +517,15 @@ function relationVerb(code) {
 
 function dejargon(value) {
   let t = String(value == null ? "" : value);
-  t = t.replace(/\b(?:la |une )?relation(?: documentée)?(?: est)? de type\s+([A-Z][A-Z_]{2,})(?:\s*\([^)]*\))?/g,
-    (m, code) => `le lien documenté « ${relationVerb(code)} »`);
+  // « Aucune relation de type X, Y ou Z » → « aucun lien « x », « y » ou « z » »
+  t = t.replace(/\b([Aa])ucune relation(?: explicite)? de type\s+/g, "$1ucun lien ");
+  // « La relation documentée est de type X (…) » → « Le lien documenté est « x » »
+  t = t.replace(/\b([Ll]a |[Uu]ne )?relation( documentée)?( est)? de type\s+([A-Z][A-Z_]{2,})(?:\s*\([^)]*\))?/g,
+    (m, art, doc, est, code) => {
+      const head = art ? (/^[LU]/.test(art) ? (art.startsWith("U") ? "Un" : "Le") : (art.startsWith("u") ? "un" : "le")) + " lien" : "lien";
+      const verb = est ? relationVerb(code).replace(/^est /, "") : relationVerb(code);
+      return `${head}${doc ? " documenté" : ""}${est ? " est" : ""} « ${verb} »`;
+    });
   t = t.replace(/\b(?:de|du) type\s+([A-Z][A-Z_]{2,})(?:\s*\([^)]*\))?/g, (m, code) => `« ${relationVerb(code)} »`);
   t = t.replace(/\b([A-Z]{2,}(?:_[A-Z]+)+|ASSOCIATION|CARACTERISE|ILLUSTRE|CONCERNE|COMPREND|MOBILISE|FAVORISE|REDUIT|FRAGILISE|ENTRETIENT|ACCROIT)\b/g,
     (m, code) => `« ${relationVerb(code)} »`);
@@ -540,7 +547,7 @@ function dejargon(value) {
   for (const [re, by] of pairs) t = t.replace(re, by);
   // L'assistant ne connaît que le graphe : « Le documentaire n'aborde pas… »
   // devient « Le graphe de cette publication n'aborde pas… » (constaté le 19/11/2026).
-  t = t.replace(/\b(?:[Ll]e|[Ll]a|[Cc]e|[Cc]ette) (?:documentaire|rapport|podcast|publication|note|étude|article|ouvrage|émission|épisode)(?= (?:n['’]aborde pas|ne traite pas|ne mentionne pas|ne contient pas|ne parle pas|n['’]évoque pas|ne documente pas|ne précise pas|n['’]indique pas)\b)/g,
+  t = t.replace(/(?<!graphe de )\b(?:[Ll]e|[Ll]a|[Cc]e|[Cc]ette) (?:documentaire|rapport|podcast|publication|note|étude|article|ouvrage|émission|épisode)(?= (?:n['’]aborde pas|ne traite pas|ne mentionne pas|ne contient pas|ne parle pas|n['’]évoque pas|ne documente pas|ne précise pas|n['’]indique pas)\b)/g,
     m => (/^[LC]/.test(m) ? "Le" : "le") + " graphe de cette publication");
   return t.replace(/\s{2,}/g, " ").trim();
 }

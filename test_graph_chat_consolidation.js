@@ -55,6 +55,17 @@ async function test(name, fn) {
     assert.strictEqual(G.dejargon(input), input);
   });
 
+  await test("jargon : élision correcte (« d'élément », relevé le 19/11 sur test4)", () => {
+    const out = G.dejargon("Le graphe ne contient pas de nœud ou de relation traitant du racisme.");
+    assert.ok(out.includes("pas d'élément ou de relation"), out);
+  });
+  await test("« Le documentaire n'aborde pas » → « Le graphe de cette publication n'aborde pas »", () => {
+    assert.strictEqual(G.dejargon("Le documentaire n'aborde pas directement la question."), "Le graphe de cette publication n'aborde pas directement la question.");
+    assert.strictEqual(G.dejargon("En revanche, le rapport ne mentionne pas de date."), "En revanche, le graphe de cette publication ne mentionne pas de date.");
+    const keep = "Le rapport concerne six départements.";
+    assert.strictEqual(G.dejargon(keep), keep);
+  });
+
   // --- 3. Nombre annoncé (Q7, Q16) ---
   await test("nombre annoncé faux remplacé par « plusieurs » (Q16 : deux axes, trois sections)", () => {
     const out = G.fixAnnouncedCount("L'IA joue un rôle selon deux axes principaux.", [{ titre: "A", items: ["1"] }, { titre: "B", items: ["2"] }, { titre: "C", items: ["3"] }]);

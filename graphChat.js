@@ -529,6 +529,7 @@ function dejargon(value) {
     [/\bnœud\b/g, "élément"], [/\bNœud\b/g, "Élément"],
     [/\b([Ll])e élément\b/g, "$1'élément"], [/\b([Dd])u élément\b/g, (m, d) => `${d}e l'élément`],
     [/\b([Aa])u élément\b/g, (m, a) => (a === "A" ? "À" : "à") + " l'élément"], [/\b([Cc])e élément\b/g, "$1et élément"],
+    [/\b([Dd])e (éléments?)\b/g, "$1'$2"], [/\b([Qq])ue (éléments?)\b/g, "$1u'$2"],
     [/\baucune relation(s)? explicite(s)?/g, "aucun lien explicite"],
     [/\baucune relation\b/g, "aucun lien"],
     [/\b(une|la|cette) relation (directe|explicite|documentée)\b/g, (m, art, adj) => `${{ une: "un", la: "le", cette: "ce" }[art]} lien ${{ directe: "direct", explicite: "explicite", documentée: "documenté" }[adj]}`],
@@ -537,6 +538,10 @@ function dejargon(value) {
     [/\b[Mm]a règle absolue\b/g, "le principe de cet outil"]
   ];
   for (const [re, by] of pairs) t = t.replace(re, by);
+  // L'assistant ne connaît que le graphe : « Le documentaire n'aborde pas… »
+  // devient « Le graphe de cette publication n'aborde pas… » (constaté le 19/11/2026).
+  t = t.replace(/\b(?:[Ll]e|[Ll]a|[Cc]e|[Cc]ette) (?:documentaire|rapport|podcast|publication|note|étude|article|ouvrage|émission|épisode)(?= (?:n['’]aborde pas|ne traite pas|ne mentionne pas|ne contient pas|ne parle pas|n['’]évoque pas|ne documente pas|ne précise pas|n['’]indique pas)\b)/g,
+    m => (/^[LC]/.test(m) ? "Le" : "le") + " graphe de cette publication");
   return t.replace(/\s{2,}/g, " ").trim();
 }
 
@@ -1062,7 +1067,7 @@ function buildResponseAnswer(graph, target) {
 
   if (!rels.length) {
     return {
-      reponse: `Le graphe de cette publication ne relie explicitement aucune réponse, solution ou recommandation à « ${targetLabel} ». Il ne permet donc pas d'indiquer ce que la publication propose sur ce point. Le graphe est une sélection de la publication : consultez le document original ou l'Atelier de veille.`,
+      reponse: `Le graphe de cette publication ne relie explicitement aucune réponse, solution ou recommandation à « ${targetLabel} ». Il ne permet donc pas d'indiquer ce qui y répond dans la publication. Le graphe est une sélection de la publication : consultez le document original ou l'Atelier de veille.`,
       sections: [],
       noeuds_selectionnes: [target.node_id],
       relations_selectionnees: [],

@@ -22,17 +22,30 @@ const CONTROLLED_COMPOUND_CONCEPTS = [
       ["trafic", "stupefiants"],
       ["trafics", "stupefiants"],
       ["drug", "trafficking"],
-      ["cocaine", "smuggling"]
+      ["cocaine", "smuggling"],
+      ["narco", "trafic"],
+      ["narco", "trafics"],
+      ["trafic", "drogue"],
+      ["trafic", "drogues"],
+      ["trafics", "drogue"],
+      ["trafics", "drogues"]
     ],
     alternatives: [
       "narcotrafic",
+      "narcotrafics",
+      "narco-trafic",
+      "narco trafic",
       "trafic de cocaine",
       "trafics de cocaine",
       "trafic de stupefiants",
       "trafics de stupefiants",
       "drug trafficking",
       "cocaine smuggling"
-    ]
+    ],
+    // Famille « drogue » validée le 21 novembre 2026 (produits compris) :
+    // ces mots élargissent le rappel mais pèsent un peu moins que les
+    // expressions précises ci-dessus.
+    broad: ["drogue", "drogues", "stupefiant", "stupefiants", "cocaine", "cannabis", "heroine", "crack", "opium"]
   },
   {
     id: "port",
@@ -60,19 +73,66 @@ const CONTROLLED_COMPOUND_CONCEPTS = [
       "commercial port",
       "commercial ports"
     ]
+  },
+  // Familles validées (24 novembre 2026), communes avec l'application.
+  {
+    id: "ia",
+    patterns: [["intelligence", "artificielle"]],
+    alternatives: ["ia", "intelligence artificielle"]
   }
 ];
 
 const CONTROLLED_CONCEPTS = [
   {
     id: "narcotrafic",
-    triggers: ["narcotrafic", "cocaine", "stupefiants"],
-    alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "narcotrafic").alternatives
+    triggers: ["narcotrafic", "narcotrafics", "narco-trafic", "cocaine", "stupefiant", "stupefiants", "drogue", "drogues", "cannabis", "heroine", "crack", "opium"],
+    alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "narcotrafic").alternatives,
+    broad: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "narcotrafic").broad
   },
   {
     id: "port",
     triggers: ["port", "ports", "portuaire", "portuaires"],
     alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "port").alternatives
+  },
+  {
+    id: "ia",
+    triggers: ["ia"],
+    alternatives: CONTROLLED_COMPOUND_CONCEPTS.find(c => c.id === "ia").alternatives
+  },
+  {
+    id: "feminicide",
+    triggers: ["feminicide", "feminicides", "conjugale", "conjugales", "conjugal", "conjugaux", "intrafamiliale", "intrafamiliales", "intrafamilial", "intrafamiliaux"],
+    alternatives: ["feminicide", "feminicides", "conjugale", "conjugales", "conjugal", "conjugaux", "intrafamiliale", "intrafamiliales", "au sein du couple"]
+  },
+  {
+    id: "videoprotection",
+    triggers: ["videoprotection", "videosurveillance"],
+    alternatives: ["videoprotection", "videosurveillance"]
+  },
+  {
+    id: "prison",
+    triggers: ["prison", "prisons", "carceral", "carcerale", "carceraux", "penitentiaire", "penitentiaires", "detenu", "detenus"],
+    alternatives: ["prison", "prisons", "carceral", "carcerale", "carceraux", "penitentiaire", "penitentiaires", "detenu", "detenus"]
+  },
+  {
+    id: "immigration",
+    triggers: ["immigration", "immigrations", "migration", "migrations", "migrant", "migrants", "etranger", "etrangers"],
+    alternatives: ["immigration", "migration", "migrations", "migrant", "migrants", "etrangers"]
+  },
+  {
+    id: "securite_routiere",
+    triggers: ["routier", "routiere", "routiers", "routieres"],
+    alternatives: ["routier", "routiere", "routiers", "routieres", "route", "routes"]
+  },
+  {
+    id: "jeunes",
+    triggers: ["jeune", "jeunes", "jeunesse", "mineur", "mineurs", "adolescent", "adolescents", "adolescente", "adolescentes"],
+    alternatives: ["jeune", "jeunes", "jeunesse", "mineur", "mineurs", "adolescent", "adolescents"]
+  },
+  {
+    id: "incendies",
+    triggers: ["incendie", "incendies", "feux"],
+    alternatives: ["incendie", "incendies", "feux", "feu"]
   }
 ];
 
@@ -171,10 +231,12 @@ function buildQueryConcepts(queryTokens) {
       }
 
       if (!emittedControlledIds.has(definition.id)) {
+        const broad = unique((definition.broad || []).map(normalizeText).filter(Boolean));
         concepts.push({
           id: definition.id,
           source_tokens: sourceTokens,
-          alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean)),
+          alternatives: unique([...definition.alternatives, ...(definition.broad || [])].map(normalizeText).filter(Boolean)),
+          broad: new Set(broad),
           compound: true
         });
         emittedControlledIds.add(definition.id);
@@ -198,7 +260,8 @@ function buildQueryConcepts(queryTokens) {
     concepts.push({
       id: definition.id,
       source_tokens: matchingTokens,
-      alternatives: unique(definition.alternatives.map(normalizeText).filter(Boolean)),
+      alternatives: unique([...definition.alternatives, ...(definition.broad || [])].map(normalizeText).filter(Boolean)),
+      broad: new Set((definition.broad || []).map(normalizeText).filter(Boolean)),
       compound: false
     });
     emittedControlledIds.add(definition.id);
@@ -447,7 +510,10 @@ function alternativeMatchScore(alternative, normalized, tokens) {
 function conceptMatchScore(concept, normalized, tokens) {
   let best = 0;
   for (const alternative of concept.alternatives) {
-    const score = alternativeMatchScore(alternative, normalized, tokens);
+    // Un terme large de la famille (sauf s'il a été tapé) pèse un peu moins.
+    // Dans une expression composée (« trafic de cocaïne »), le mot seul reste large.
+    const broad = concept.broad && concept.broad.has(alternative) && (concept.compound || !concept.source_tokens.includes(alternative));
+    const score = alternativeMatchScore(alternative, normalized, tokens) * (broad ? 0.85 : 1);
     if (score > best) best = score;
     if (best === 1) break;
   }

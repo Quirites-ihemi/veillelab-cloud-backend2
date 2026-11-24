@@ -42,7 +42,8 @@ const compoundConceptsOk =
   compoundIds.includes('port') &&
   compound.query_concepts.every(c => c.compound === true);
 const compoundNoise = compoundPubs.filter(id => ['PUB006', 'PUB008', 'PUB051', 'PUB026'].includes(id));
-const compoundRelevantOnly = compoundPubs.length > 0 && compoundPubs.every(id => ['PUB024', 'PUB025'].includes(id));
+// PUB137 (rapport européen sur les drogues, ajouté au corpus après ce test) est pertinente.
+const compoundRelevantOnly = compoundPubs.length > 0 && compoundPubs.every(id => ['PUB024', 'PUB025', 'PUB137'].includes(id));
 const preciseNodeAboveNoise = compound.results.some(r => r.result_id === 'node:N0672');
 
 console.log(`${compoundConceptsOk ? 'OK' : 'ECHEC'} | concepts composés | ${compoundIds.join(', ')} | sources: ${compoundSources.join(' / ')}`);
